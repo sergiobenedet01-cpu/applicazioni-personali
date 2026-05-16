@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forkfolio — Piano Pasti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ──────────────────────────────────── */
+:root {
+  --bg:       #0c0c0e;
+  --surface:  #131316;
+  --surface2: #18181d;
+  --surface3: #202026;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.13);
+  --text:     #edeae6;
+  --muted:    #62626e;
+  --muted2:   #94939f;
+  --accent:   #e5c040;
+  --accent2:  #ff7a4a;
+  --single:   #5b8dfa;
+  --double:   #e5c040;
+  --green:    #46b07a;
+  --r:  12px;
+  --r2:  8px;
+  --r3:  6px;
+  --t: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-x: hidden;
+  letter-spacing: 0.01em;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+
+/* ─── AMBIENT GLOW ────────────────────────────── */
+.ambient {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(91,141,250,0.045) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 80% 85%, rgba(229,192,64,0.04) 0%, transparent 60%);
+}
+
+/* ─── SPLASH ──────────────────────────────────── */
+#splash {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.4rem;
+  animation: splashFade 0.7s 3.8s ease forwards;
+}
+@keyframes splashFade { to { opacity: 0; pointer-events: none; } }
+
+.sp-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  animation: spUp 0.7s 0.1s both;
+}
+.sp-logo span { color: var(--accent); }
+.sp-sub {
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  animation: spUp 0.7s 0.4s both;
+}
+.sp-credit {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  animation: spUp 0.7s 0.7s both;
+}
+.sp-credit em { color: var(--accent); font-style: normal; font-weight: 600; }
+.sp-line {
+  width: 0; height: 1px; margin-top: 1.8rem;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: spLine 1.2s 1s ease forwards;
+}
+@keyframes spLine { to { width: 240px; } }
+.sp-claude {
+  margin-top: 0.6rem;
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.68rem; color: var(--muted);
+  letter-spacing: 0.06em;
+  animation: spUp 0.7s 1.4s both;
+}
+.sp-claude-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: linear-gradient(135deg, #e07b4c, #c96090);
+  display: grid; place-items: center;
+  font-size: 0.55rem; color: white; font-weight: 700;
+}
+
+@keyframes spUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── HEADER ──────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(12,12,14,0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+  opacity: 0;
+  animation: spUp 0.5s 4.2s forwards;
+}
+.hdr-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem; font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.hdr-logo span { color: var(--accent); }
+.hdr-right { display: flex; align-items: center; gap: 1rem; }
+.hdr-credit {
+  font-size: 0.65rem; color: var(--muted);
+  letter-spacing: 0.03em; display: flex; align-items: center; gap: 0.4rem;
+}
+.claude-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.18rem 0.6rem; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(224,123,76,0.15), rgba(201,96,144,0.15));
+  border: 1px solid rgba(224,123,76,0.25);
+  font-size: 0.62rem; color: #d48a70; font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.claude-badge::before {
+  content: '';
+  width: 10px; height: 10px; border-radius: 50%;
+  background: linear-gradient(135deg, #e07b4c, #c96090);
+  flex-shrink: 0;
+}
+.claude-badge-sm {
+  font-size: 0.58rem; color: var(--muted); letter-spacing: 0.05em;
+  opacity: 0.55;
+}
+nav { display: flex; gap: 2px; }
+.nav-btn {
+  background: none; border: none; color: var(--muted);
+  font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.35rem 0.8rem; border-radius: 20px; cursor: pointer;
+  transition: all var(--t);
+}
+.nav-btn:hover { color: var(--text); background: var(--surface3); }
+.nav-btn.active { color: var(--accent); background: rgba(229,192,64,0.1); }
+
+/* ─── LAYOUT ──────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 272px 1fr;
+  min-height: calc(100vh - 56px);
+  position: relative; z-index: 1;
+  opacity: 0;
+  animation: spUp 0.5s 4.3s forwards;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────── */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.4rem 1.2rem;
+  position: sticky; top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 1.4rem;
+}
+.sb-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.65rem;
+}
+
+.sum-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+.sum-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 0.8rem 0.75rem;
+  transition: border-color var(--t), transform var(--t);
+}
+.sum-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.sc-lbl { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.2rem; }
+.sc-lbl.s { color: var(--single); }
+.sc-lbl.d { color: var(--double); }
+.sc-num { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; line-height: 1; }
+.sc-sub { font-size: 0.67rem; color: var(--muted); margin-top: 0.15rem; }
+
+.ring-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.ring-svg { transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: var(--surface3); stroke-width: 3.5; }
+.ring-fill {
+  fill: none; stroke: var(--accent); stroke-width: 3.5; stroke-linecap: round;
+  transition: stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.ring-lbl { font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--muted2); text-align: center; }
+.ring-lbl strong { color: var(--text); display: block; font-size: 1.05rem; }
+
+.sb-divider { height: 1px; background: var(--border); }
+
+.recent-list { display: flex; flex-direction: column; gap: 0.3rem; }
+.r-item {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.42rem 0.55rem; background: var(--surface2);
+  border-radius: var(--r3); font-size: 0.76rem;
+  transition: background var(--t); cursor: default;
+}
+.r-item:hover { background: var(--surface3); }
+.r-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.r-dot.s { background: var(--single); }
+.r-dot.d { background: var(--double); }
+.r-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.r-rm {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font-size: 0.7rem; padding: 0.1rem 0.25rem; border-radius: 3px;
+  opacity: 0; transition: all var(--t);
+}
+.r-item:hover .r-rm { opacity: 1; }
+.r-rm:hover { color: var(--accent2); }
+
+/* ─── MAIN ────────────────────────────────────── */
+main { padding: 2rem 2rem 3rem; display: flex; flex-direction: column; gap: 2.5rem; }
+
+/* ─── SECTION HEADER ──────────────────────────── */
+.sec-hdr { margin-bottom: 1.4rem; }
+.sec-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem; color: var(--muted); letter-spacing: 0.12em; margin-bottom: 0.25rem;
+}
+.sec-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.55rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+}
+.sec-title .hl { color: var(--accent); }
+.sec-sub { font-size: 0.82rem; color: var(--muted2); margin-top: 0.3rem; line-height: 1.5; }
+
+/* ─── SECTION 01 SETUP ────────────────────────── */
+.setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 700px; }
+.setup-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 1.4rem; position: relative; overflow: hidden;
+  transition: border-color var(--t), transform var(--t), box-shadow var(--t);
+}
+.setup-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  border-radius: var(--r) var(--r) 0 0;
+}
+.setup-card.sc-s::before { background: var(--single); }
+.setup-card.sc-d::before { background: var(--double); }
+.setup-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 10px 36px rgba(0,0,0,0.3); }
+.sc-icon { font-size: 1.5rem; margin-bottom: 0.65rem; }
+.sc-title { font-family: 'Syne', sans-serif; font-size: 0.98rem; font-weight: 700; margin-bottom: 0.15rem; }
+.setup-card.sc-s .sc-title { color: var(--single); }
+.setup-card.sc-d .sc-title { color: var(--double); }
+.sc-desc { font-size: 0.77rem; color: var(--muted2); margin-bottom: 1.2rem; line-height: 1.5; }
+.ig { margin-bottom: 0.85rem; }
+.ig label {
+  display: block; font-size: 0.66rem; font-weight: 600;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.38rem;
+}
+.num-row {
+  display: flex; align-items: center;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r2);
+  overflow: hidden; transition: border-color var(--t);
+}
+.num-row:focus-within { border-color: var(--border2); }
+.nb {
+  background: none; border: none; color: var(--muted2);
+  width: 38px; height: 40px; cursor: pointer; font-size: 1.05rem;
+  transition: all var(--t); flex-shrink: 0;
+}
+.nb:hover { color: var(--text); background: var(--surface3); }
+.nv {
+  flex: 1; background: none; border: none; color: var(--text);
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+  text-align: center; outline: none; min-width: 0;
+}
+.nv::-webkit-inner-spin-button, .nv::-webkit-outer-spin-button { display: none; }
+.hint-box {
+  padding: 0.55rem 0.75rem; background: var(--surface3);
+  border-radius: var(--r3); font-size: 0.74rem; color: var(--muted2);
+  margin-top: 0.1rem; line-height: 1.5;
+}
+.hint-box strong { color: var(--text); }
+.apply-btn {
+  width: 100%; margin-top: 0.9rem;
+  background: var(--surface3); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 0.62rem;
+  color: var(--text); font-family: 'Syne', sans-serif;
+  font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer;
+  transition: all var(--t);
+}
+.apply-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* ─── COLLAPSIBLE ─────────────────────────────── */
+.coll {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 0.7rem;
+  transition: border-color var(--t), box-shadow var(--t);
+}
+.coll:hover { border-color: var(--border2); }
+.coll-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.95rem 1.2rem; cursor: pointer; user-select: none;
+  transition: background var(--t);
+}
+.coll-hdr:hover { background: var(--surface2); }
+.coll-left { display: flex; align-items: center; gap: 0.55rem; }
+.coll-icon { font-size: 0.95rem; }
+.coll-title { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; }
+.coll-badge {
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.05em;
+  padding: 0.12rem 0.45rem; border-radius: 20px;
+  background: var(--surface3); color: var(--muted2);
+}
+.coll-arrow { color: var(--muted); font-size: 0.68rem; transition: transform 0.3s; }
+.coll.open .coll-arrow { transform: rotate(180deg); }
+.coll-body { max-height: 0; overflow: hidden; transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1); }
+.coll.open .coll-body { max-height: 5000px; }
+.coll-content { padding: 0 1.2rem 1.4rem; }
+
+/* ─── BUILDER ────────────────────────────────── */
+.builder-layout { display: flex; flex-direction: column; gap: 1rem; }
+.bz-label { font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.45rem; }
+.bz {
+  min-height: 88px; border: 1.5px dashed var(--border2);
+  border-radius: var(--r2); padding: 0.65rem;
+  display: flex; flex-wrap: wrap; gap: 0.3rem; align-content: flex-start;
+  transition: border-color var(--t), background var(--t); margin-bottom: 0.8rem;
+}
+.bz.has { border-style: solid; border-color: rgba(229,192,64,0.3); background: rgba(229,192,64,0.025); }
+.bz-empty { font-size: 0.77rem; color: var(--muted); font-style: italic; margin: auto; }
+.ba { display: flex; gap: 0.4rem; }
+.bb {
+  flex: 1; border-radius: var(--r3); padding: 0.52rem 0.45rem;
+  font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 700;
+  cursor: pointer; transition: all var(--t); border: 1.5px solid;
+  letter-spacing: 0.03em;
+}
+.bb.bs { border-color: var(--single); color: var(--single); background: rgba(91,141,250,0.07); }
+.bb.bs:hover { background: var(--single); color: #fff; }
+.bb.bd { border-color: var(--double); color: var(--double); background: rgba(229,192,64,0.07); }
+.bb.bd:hover { background: var(--double); color: #000; }
+.bb.bc { border-color: var(--border); color: var(--muted); background: transparent; }
+.bb.bc:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ─── ING PANEL ──────────────────────────────── */
+.ing-panel {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r2); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+/* ─── ING SEARCH ──────────────────────────────── */
+.ing-search-wrap {
+  position: relative; padding: 0.65rem 0.75rem 0; flex-shrink: 0;
+}
+.ing-search {
+  width: 100%; box-sizing: border-box;
+  background: var(--surface3); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 0.45rem 2rem 0.45rem 0.75rem;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.78rem;
+  color: var(--text); outline: none;
+  transition: border-color var(--t), background var(--t);
+}
+.ing-search::placeholder { color: var(--muted); }
+.ing-search:focus { border-color: var(--border2); }
+.ing-search-clear {
+  position: absolute; right: 1.1rem; top: 50%; transform: translateY(-20%);
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font-size: 0.72rem; padding: 0.15rem; line-height: 1;
+  opacity: 0; pointer-events: none; transition: opacity var(--t), color var(--t);
+}
+.ing-search-clear.visible { opacity: 1; pointer-events: all; }
+.ing-search-clear:hover { color: var(--accent2); }
+.ing-search-results {
+  padding: 0.6rem 0.75rem 0.75rem; max-height: 330px; overflow-y: auto;
+}
+.ing-search-count {
+  font-size: 0.62rem; color: var(--muted); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 0.45rem;
+  font-family: 'Syne', sans-serif; font-weight: 700;
+}
+.ing-search-empty {
+  font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 0.3rem 0;
+}
+/* ─────────────────────────────────────────────── */
+.ing-tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; flex-shrink: 0; }
+.ing-tabs::-webkit-scrollbar { height: 0; }
+.itab {
+  padding: 0.6rem 1.05rem; background: none; border: none;
+  color: var(--muted); font-family: 'Syne', sans-serif;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all var(--t);
+}
+.itab:hover { color: var(--text); }
+.itab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.ipane { display: none; padding: 1rem 1.1rem; max-height: 380px; overflow-y: auto; }
+.ipane.active { display: block; }
+.ipane-cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0 2rem; }
+.isub {
+  font-size: 0.59rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin: 0.6rem 0 0.3rem;
+  padding-bottom: 0.25rem; border-bottom: 1px solid var(--border);
+}
+.isub:first-child { margin-top: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.28rem; margin-bottom: 0.15rem; }
+.chip {
+  padding: 0.2rem 0.52rem; border-radius: 20px;
+  background: var(--surface3); border: 1px solid var(--border);
+  font-size: 0.71rem; color: var(--muted2); cursor: pointer;
+  transition: all var(--t); user-select: none; line-height: 1.5;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(229,192,64,0.08); transform: translateY(-1px); }
+.chip.sel { background: rgba(229,192,64,0.12); border-color: var(--accent); color: var(--accent); }
+
+/* ─── RECIPE CATS ────────────────────────────── */
+.rcat-tabs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1.1rem; }
+.rcb {
+  padding: 0.28rem 0.72rem; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 0.71rem; color: var(--muted2); cursor: pointer;
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  transition: all var(--t);
+}
+.rcb:hover { border-color: var(--border2); color: var(--text); }
+.rcb.active { background: rgba(229,192,64,0.1); border-color: var(--accent); color: var(--accent); }
+
+.recipes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 0.6rem; }
+.rc {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 0.85rem 0.95rem;
+  transition: all var(--t); position: relative;
+}
+.rc:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.25); }
+.rc-name { font-weight: 600; font-size: 0.87rem; line-height: 1.4; margin-bottom: 0.4rem; }
+.rc-tags { display: flex; flex-wrap: wrap; gap: 0.22rem; margin-bottom: 0.65rem; }
+.rc-tag { font-size: 0.6rem; padding: 0.08rem 0.38rem; background: var(--surface3); border-radius: 20px; color: var(--muted); }
+.rc-actions { display: flex; gap: 0.3rem; }
+.rcb2 {
+  flex: 1; padding: 0.32rem; border-radius: var(--r3);
+  font-family: 'Syne', sans-serif; font-size: 0.67rem; font-weight: 700;
+  cursor: pointer; transition: all var(--t); border: 1px solid;
+  display: flex; align-items: center; justify-content: center; gap: 0.2rem;
+}
+.rcb2.rcs { border-color: rgba(91,141,250,0.35); color: var(--single); background: rgba(91,141,250,0.06); }
+.rcb2.rcs:hover { background: var(--single); color: #fff; border-color: var(--single); }
+.rcb2.rcd { border-color: rgba(229,192,64,0.35); color: var(--double); background: rgba(229,192,64,0.06); }
+.rcb2.rcd:hover { background: var(--double); color: #000; border-color: var(--double); }
+.rcb2.rcp {
+  flex: none; width: 34px; border-color: var(--border); color: var(--muted);
+  background: transparent;
+}
+.rcb2.rcp:hover { border-color: var(--accent); color: var(--accent); }
+/* rcFlash defined below */
+
+/* ─── TRACKER ────────────────────────────────── */
+.tracker-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.tcol {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+}
+.tcol-hdr {
+  padding: 0.8rem 1rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.tcol-title { font-family: 'Syne', sans-serif; font-size: 0.84rem; font-weight: 700; display: flex; align-items: center; gap: 0.45rem; }
+.tdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tcol-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+.tcol-meals { padding: 0.7rem; display: flex; flex-direction: column; gap: 0.35rem; min-height: 80px; }
+.t-empty { font-size: 0.77rem; color: var(--muted); font-style: italic; padding: 0.6rem 0.25rem; }
+.t-meal {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.5rem 0.65rem; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--r3);
+  font-size: 0.81rem; line-height: 1.35;
+  animation: mealIn 0.3s ease; transition: border-color var(--t);
+}
+@keyframes mealIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+.t-meal:hover { border-color: var(--border2); }
+.t-idx { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); min-width: 18px; }
+.t-name { flex: 1; line-height: 1.4; }
+.t-cp, .t-rm {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font-size: 0.7rem; padding: 0.12rem 0.3rem; border-radius: 3px;
+  opacity: 0; transition: all var(--t);
+}
+.t-meal:hover .t-cp, .t-meal:hover .t-rm { opacity: 1; }
+.t-cp:hover { color: var(--accent); }
+.t-cp.copied { color: var(--green); opacity: 1 !important; }
+.t-rm:hover { color: var(--accent2); background: rgba(255,122,74,0.1); }
+
+/* ─── STAPLES ─────────────────────────────────── */
+.staples-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 0.4rem; }
+.staple-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.45rem 0.65rem; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--r3);
+  font-size: 0.8rem; transition: all var(--t); gap: 0.4rem;
+}
+.staple-item:hover { border-color: var(--border2); background: var(--surface3); }
+.staple-item:hover .staple-copy { opacity: 1; }
+.staple-name { flex: 1; line-height: 1.4; }
+.staple-copy {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 0.72rem;
+  padding: 0.08rem 0.25rem; border-radius: 3px;
+  opacity: 0; transition: all var(--t); flex-shrink: 0;
+}
+.staple-copy:hover { color: var(--accent); }
+
+/* ─── SHOPPING ───────────────────────────────── */
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 0.65rem; }
+.shop-cat {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r2); overflow: hidden;
+  transition: border-color var(--t);
+}
+.shop-cat:hover { border-color: var(--border2); }
+.shop-cat-hdr {
+  padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border);
+  font-family: 'Syne', sans-serif; font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted2);
+}
+.shop-items { padding: 0.45rem 0.5rem; }
+.shop-item {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.35rem 0.38rem; border-radius: var(--r3);
+  transition: background var(--t);
+}
+.shop-item:hover { background: var(--surface2); }
+.shop-item:hover .si-copy { opacity: 1; }
+.schk {
+  width: 15px; height: 15px; border-radius: 4px;
+  border: 1.5px solid var(--border2); flex-shrink: 0; cursor: pointer;
+  transition: all var(--t); display: grid; place-items: center;
+}
+.schk:hover { border-color: var(--green); }
+.schk.on { background: var(--green); border-color: var(--green); }
+.schk.on::after { content: '✓'; color: #000; font-size: 0.58rem; font-weight: 700; }
+.si-name { flex: 1; font-size: 0.79rem; transition: all var(--t); line-height: 1.4; }
+.shop-item.done .si-name { text-decoration: line-through; color: var(--muted); }
+.si-qty { font-family: 'JetBrains Mono', monospace; font-size: 0.63rem; color: var(--accent2); flex-shrink: 0; }
+.si-copy {
+  opacity: 0; background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 0.7rem; padding: 0.08rem 0.28rem;
+  border-radius: 3px; transition: all var(--t); flex-shrink: 0;
+}
+.si-copy:hover { color: var(--accent); }
+.si-copy.copied { color: var(--green); opacity: 1 !important; }
+
+/* ─── REPS MODAL ─────────────────────────────── */
+#repsModal {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+#repsModal.open { opacity: 1; pointer-events: all; }
+.reps-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.reps-box {
+  position: relative; z-index: 1;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 1.6rem 1.8rem;
+  min-width: 300px; max-width: 400px; width: 100%;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  transform: translateY(12px) scale(0.97);
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+#repsModal.open .reps-box { transform: translateY(0) scale(1); }
+.reps-title {
+  font-family: 'Syne', sans-serif; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.reps-name {
+  font-size: 0.92rem; font-weight: 600; line-height: 1.4;
+  margin-bottom: 1.2rem; color: var(--text);
+}
+.reps-row {
+  display: flex; align-items: center; gap: 0.8rem;
+  margin-bottom: 1.4rem;
+}
+.reps-label { font-size: 0.78rem; color: var(--muted2); flex: 1; }
+.reps-ctrl {
+  display: flex; align-items: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r2); overflow: hidden;
+  transition: border-color var(--t);
+}
+.reps-ctrl:focus-within { border-color: var(--border2); }
+.reps-nb {
+  background: none; border: none; color: var(--muted2);
+  width: 36px; height: 38px; cursor: pointer; font-size: 1rem;
+  transition: all var(--t); flex-shrink: 0;
+}
+.reps-nb:hover { color: var(--text); background: var(--surface3); }
+.reps-val {
+  font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800;
+  color: var(--accent); width: 36px; text-align: center;
+  background: none; border: none; outline: none;
+}
+.reps-btns { display: flex; gap: 0.5rem; }
+.reps-btn {
+  flex: 1; padding: 0.6rem; border-radius: var(--r2);
+  font-family: 'Syne', sans-serif; font-size: 0.74rem; font-weight: 700;
+  cursor: pointer; transition: all var(--t); border: 1px solid;
+  letter-spacing: 0.02em;
+}
+.reps-btn.confirm-s { border-color: var(--single); color: var(--single); background: rgba(91,141,250,0.07); }
+.reps-btn.confirm-s:hover { background: var(--single); color: #fff; }
+.reps-btn.confirm-d { border-color: var(--double); color: var(--double); background: rgba(229,192,64,0.07); }
+.reps-btn.confirm-d:hover { background: var(--double); color: #000; }
+.reps-btn.cancel { border-color: var(--border); color: var(--muted); background: transparent; flex: 0 0 auto; width: 44px; }
+.reps-btn.cancel:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ─── REPS BADGE in tracker ─────────────────── */
+.t-reps {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+  color: var(--accent2); background: rgba(255,122,74,0.1);
+  border: 1px solid rgba(255,122,74,0.2); border-radius: 20px;
+  padding: 0.05rem 0.38rem; flex-shrink: 0; cursor: pointer;
+  transition: all var(--t); white-space: nowrap;
+}
+.t-reps:hover { background: rgba(255,122,74,0.2); border-color: var(--accent2); }
+.t-reps.once { color: var(--muted); background: transparent; border-color: transparent; cursor: default; }
+
+/* ─── FLOATING PARTICLES ──────────────────────── */
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.particle {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%;
+  background: var(--accent); opacity: 0;
+  animation: float linear infinite;
+}
+@keyframes float {
+  0%   { opacity: 0; transform: translateY(100vh) translateX(0); }
+  10%  { opacity: 0.25; }
+  90%  { opacity: 0.1; }
+  100% { opacity: 0; transform: translateY(-10vh) translateX(var(--dx)); }
+}
+
+/* ─── TOAST ──────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 1.4rem; right: 1.4rem; z-index: 300;
+  background: var(--surface3); color: var(--text);
+  border: 1px solid var(--border2); padding: 0.6rem 1.05rem;
+  border-radius: var(--r2); font-size: 0.8rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transform: translateY(16px); opacity: 0; pointer-events: none;
+  transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* ─── RECIPE FLASH ────────────────────────────── */
+@keyframes rcFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(229,192,64,0); border-color: var(--border); }
+  30%  { box-shadow: 0 0 0 6px rgba(229,192,64,0.2); border-color: var(--accent); }
+  100% { box-shadow: 0 0 0 0 rgba(229,192,64,0); border-color: var(--border); }
+}
+.rc.rc-flash { animation: rcFlash 0.65s ease forwards; }
+
+/* ─── SECTION FADE-IN ─────────────────────────── */
+section {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+section.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .builder-layout { grid-template-columns: 1fr; }
+  .tracker-split { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  main { padding: 1rem; gap: 2rem; }
+  .setup-grid { grid-template-columns: 1fr; }
+  header { padding: 0 1rem; }
+  .hdr-credit { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient -->
+<div class="ambient"></div>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-logo">Fork<span>folio</span></div>
+  <div class="sp-sub">Piano Pasti Settimanale</div>
+  <div class="sp-credit">Creato da <em>Sergio Benedet</em></div>
+  <div class="sp-line"></div>
+  <div class="sp-claude">
+    <span class="sp-claude-dot">C</span>
+    Realizzato con Claude · Anthropic
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-logo" style="display:flex;align-items:baseline;gap:0.4rem;">
+    Fork<span>folio</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--muted);font-weight:400;letter-spacing:0.06em;margin-bottom:0.1rem;">v3.0</span>
+  </div>
+  <nav>
+    <button class="nav-btn active" onclick="goTo('s01',this)">Setup</button>
+    <button class="nav-btn" onclick="goTo('s02',this)">Ricette</button>
+    <button class="nav-btn" onclick="goTo('s03',this)">Tracker</button>
+    <button class="nav-btn" onclick="goTo('s04',this)">Spesa</button>
+  </nav>
+  <div class="hdr-right">
+    <div class="hdr-credit"><strong style="color:var(--text); font-size:0.8rem; font-family:'Syne',sans-serif; font-weight:700; margin-right:0.2rem;">Sergio Benedet</strong></div>
+    <span class="claude-badge-sm">w/ Claude</span>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ─── SIDEBAR ─────────────────────────────── -->
+<aside class="sidebar">
+  <div>
+    <div class="sb-label">Riepilogo Settimana</div>
+    <div class="sum-pair">
+      <div class="sum-card">
+        <div class="sc-lbl s">👤 Singoli</div>
+        <div class="sc-num" id="sbS">0</div>
+        <div class="sc-sub" id="sbSr">0 ricette</div>
+      </div>
+      <div class="sum-card">
+        <div class="sc-lbl d">👥 Coppia</div>
+        <div class="sc-num" id="sbD">0</div>
+        <div class="sc-sub" id="sbDr">0 ricette</div>
+      </div>
+    </div>
+  </div>
+  <div class="ring-wrap">
+    <svg class="ring-svg" width="76" height="76" viewBox="0 0 76 76">
+      <circle class="ring-track" cx="38" cy="38" r="32"/>
+      <circle class="ring-fill" id="ringF" cx="38" cy="38" r="32"
+        stroke-dasharray="201.1" stroke-dashoffset="201.1"/>
+    </svg>
+    <div class="ring-lbl"><strong id="ringT">0/0</strong>pasti pianificati</div>
+  </div>
+  <div class="sb-divider"></div>
+  <div style="flex:1;min-height:0;">
+    <div class="sb-label">Pasti aggiunti</div>
+    <div class="recent-list" id="recentList">
+      <div style="font-size:0.74rem;color:var(--muted);font-style:italic;">Nessun pasto ancora.</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─────────────────────────────────── -->
+<main>
+
+<!-- ══ 01 SETUP ═════════════════════════════════ -->
+<section id="s01">
+  <div class="sec-hdr">
+    <div class="sec-num">// 01</div>
+    <div class="sec-title">Pianifica la tua <span class="hl">settimana</span></div>
+    <div class="sec-sub">Imposta quanti pasti singoli e di coppia vuoi preparare questa settimana</div>
+  </div>
+  <div class="setup-grid">
+    <div class="setup-card sc-s">
+      <div class="sc-icon">👤</div>
+      <div class="sc-title">Pasti Singoli</div>
+      <div class="sc-desc">Solo per te — porzione singola</div>
+      <div class="ig">
+        <label>Numero di pasti</label>
+        <div class="num-row">
+          <button class="nb" onclick="adj('sM',-1)">−</button>
+          <input class="nv" type="number" id="sM" value="6" min="0" max="21" oninput="hints()">
+          <button class="nb" onclick="adj('sM',1)">+</button>
+        </div>
+      </div>
+      <div class="ig">
+        <label>Ricette distinte</label>
+        <div class="num-row">
+          <button class="nb" onclick="adj('sR',-1)">−</button>
+          <input class="nv" type="number" id="sR" value="3" min="1" max="21" oninput="hints()">
+          <button class="nb" onclick="adj('sR',1)">+</button>
+        </div>
+      </div>
+      <div class="hint-box" id="hintS">💡 6 pasti · 3 ricette → ogni ricetta <strong>×2</strong></div>
+      <button class="apply-btn" onclick="applySetup()">✓ Applica</button>
+    </div>
+    <div class="setup-card sc-d">
+      <div class="sc-icon">👥</div>
+      <div class="sc-title">Pasti di Coppia</div>
+      <div class="sc-desc">Per te e la tua ragazza — porzione doppia</div>
+      <div class="ig">
+        <label>Numero di pasti</label>
+        <div class="num-row">
+          <button class="nb" onclick="adj('dM',-1)">−</button>
+          <input class="nv" type="number" id="dM" value="0" min="0" max="21" oninput="hints()">
+          <button class="nb" onclick="adj('dM',1)">+</button>
+        </div>
+      </div>
+      <div class="ig">
+        <label>Ricette distinte</label>
+        <div class="num-row">
+          <button class="nb" onclick="adj('dR',-1)">−</button>
+          <input class="nv" type="number" id="dR" value="2" min="1" max="21" oninput="hints()">
+          <button class="nb" onclick="adj('dR',1)">+</button>
+        </div>
+      </div>
+      <div class="hint-box" id="hintD">💡 0 pasti · 2 ricette → ogni ricetta <strong>×0</strong></div>
+      <button class="apply-btn" onclick="applySetup()">✓ Applica</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 ISPIRAZIONE ═══════════════════════════ -->
+<section id="s02">
+  <div class="sec-hdr">
+    <div class="sec-num">// 02</div>
+    <div class="sec-title">Sezioni di <span class="hl">ispirazione</span></div>
+    <div class="sec-sub">Assembla il tuo pasto da ingredienti o scegli una ricetta completa</div>
+  </div>
+
+  <!-- A: MODULARE -->
+  <div class="coll" id="cA">
+    <div class="coll-hdr" onclick="toggleC('cA')">
+      <div class="coll-left">
+        <span class="coll-icon">🧩</span>
+        <span class="coll-title">Cucina Modulare</span>
+        <span class="coll-badge">Assembla il tuo piatto</span>
+      </div>
+      <span class="coll-arrow">▼</span>
+    </div>
+    <div class="coll-body">
+      <div class="coll-content">
+        <div class="builder-layout">
+          <div>
+            <div class="bz-label">Ingredienti selezionati</div>
+            <div class="bz" id="bzZone"><span class="bz-empty">Clicca gli ingredienti nel pannello →</span></div>
+            <div class="bz-label">Aggiungi come</div>
+            <div class="ba">
+              <button class="bb bs" onclick="addBuilt('single')">👤 Pasto Singolo</button>
+              <button class="bb bd" onclick="addBuilt('double')">👥 Pasto Coppia</button>
+              <button class="bb bc" onclick="clearB()">✕</button>
+            </div>
+          </div>
+          <div class="ing-panel">
+            <div class="ing-search-wrap">
+              <input type="text" id="ingSearch" class="ing-search" placeholder="🔍 Cerca ingrediente…" oninput="filterIngredients(this.value)" autocomplete="off" spellcheck="false">
+              <button class="ing-search-clear" id="ingSearchClear" onclick="clearIngSearch()" title="Cancella">✕</button>
+            </div>
+            <div class="ing-tabs" id="ingTabs"></div>
+            <div id="ingPanes"></div>
+            <div id="ingSearchResults" class="ing-search-results" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: RICETTE PRONTE -->
+  <div class="coll" id="cB">
+    <div class="coll-hdr" onclick="toggleC('cB')">
+      <div class="coll-left">
+        <span class="coll-icon">📖</span>
+        <span class="coll-title">Ricette Complete</span>
+        <span class="coll-badge" id="recBadge">— ricette</span>
+      </div>
+      <span class="coll-arrow">▼</span>
+    </div>
+    <div class="coll-body">
+      <div class="coll-content">
+        <div class="rcat-tabs" id="rcatTabs"></div>
+        <div class="recipes-grid" id="recipesGrid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 TRACKER ════════════════════════════════ -->
+<section id="s03">
+  <div class="sec-hdr">
+    <div class="sec-num">// 03</div>
+    <div class="sec-title">Tracker <span class="hl">settimanale</span></div>
+    <div class="sec-sub">I pasti scelti per la settimana, divisi per tipologia</div>
+  </div>
+  <div class="tracker-split">
+    <div class="tcol">
+      <div class="tcol-hdr">
+        <div class="tcol-title"><span class="tdot" style="background:var(--single)"></span>Pasti Singoli</div>
+        <span class="tcol-count" id="tSc">0 / 0</span>
+      </div>
+      <div class="tcol-meals" id="tSl"><div class="t-empty">Nessun pasto singolo.</div></div>
+    </div>
+    <div class="tcol">
+      <div class="tcol-hdr">
+        <div class="tcol-title"><span class="tdot" style="background:var(--double)"></span>Pasti di Coppia</div>
+        <span class="tcol-count" id="tDc">0 / 0</span>
+      </div>
+      <div class="tcol-meals" id="tDl"><div class="t-empty">Nessun pasto coppia.</div></div>
+    </div>
+  </div>
+  <div style="margin-top:0.75rem;display:flex;justify-content:flex-end;">
+    <button class="bb bc" style="flex:none;width:auto;padding:0.42rem 1rem;" onclick="clearAll()">🗑 Svuota tutto</button>
+  </div>
+
+  <!-- Staples -->
+  <div style="margin-top:1.5rem;">
+    <div class="sec-hdr" style="margin-bottom:0.85rem;">
+      <div class="sec-num">// 03b</div>
+      <div class="sec-title" style="font-size:1.1rem;">Ingredienti <span class="hl">ricorrenti</span></div>
+      <div class="sec-sub">Quelli che compri sempre — clicca 📋 per copiare</div>
+    </div>
+    <div class="staples-grid" id="staplesGrid"></div>
+  </div>
+</section>
+
+<!-- ══ 04 SPESA ══════════════════════════════════ -->
+<section id="s04">
+  <div class="sec-hdr">
+    <div class="sec-num">// 04</div>
+    <div class="sec-title">Lista della <span class="hl">spesa</span></div>
+    <div class="sec-sub" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+      <span>Generata automaticamente · hover su ogni voce per copiare 📋</span>
+      <button class="bb bc" style="flex:none;width:auto;padding:0.32rem 0.85rem;font-size:0.68rem;" onclick="clearShopChecks()" title="Deseleziona tutti">↺ Reset spunta</button>
+    </div>
+  </div>
+  <div class="shop-grid" id="shopGrid">
+    <div style="font-size:0.81rem;color:var(--muted);font-style:italic;grid-column:1/-1;padding:0.4rem 0;">
+      Aggiungi pasti nel tracker per generare la lista.
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+<div id="toast"></div>
+
+<!-- REPS MODAL -->
+<div id="repsModal">
+  <div class="reps-backdrop" onclick="closeRepsModal()"></div>
+  <div class="reps-box">
+    <div class="reps-title">Aggiungi al piano</div>
+    <div class="reps-name" id="repsRecName">—</div>
+    <div class="reps-row">
+      <span class="reps-label">Quante volte questa settimana?</span>
+      <div class="reps-ctrl">
+        <button class="reps-nb" onclick="adjReps(-1)">−</button>
+        <span class="reps-val" id="repsVal">1</span>
+        <button class="reps-nb" onclick="adjReps(1)">+</button>
+      </div>
+    </div>
+    <div class="reps-btns" id="repsBtns">
+      <button class="reps-btn cancel" onclick="closeRepsModal()">✕</button>
+      <button class="reps-btn confirm-s" id="repsBtnS" onclick="confirmReps('single')">👤 Singolo</button>
+      <button class="reps-btn confirm-d" id="repsBtnD" onclick="confirmReps('double')">👥 Coppia</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════ */
+
+const STAPLES = [
+  "Latte","Avena","Cacao","Banane","Mela","Frutta varia",
+  "Yogurt bianco","Burro di arachidi","Grissini","Pavesini",
+  "Caffè","Miele","Pane in cassetta","Uova (scorta)",
+  "Olio EVO (scorta)","Sale","Pepe","Acqua frizzante","Dolcetti"
+];
+
+const INGREDIENTS = {
+  "🥩 Carni": {
+    "🐔 Pollo": [
+      "Petto di pollo","Sovracosce di pollo","Ali di pollo","Pollo intero",
+      "Straccetti di pollo","Pollo marinato"
+    ],
+    "🥩 Manzo": [
+      "Bistecca di manzo","Straccetti di manzo","Hamburger di manzo",
+      "Carpaccio di manzo","Bresaola","Polpette di manzo","Manzo spezzatino","Tagliata di manzo","Tartare di manzo"
+    ],
+    "🐖 Maiale": [
+      "Lonza di maiale","Filetto di maiale","Prosciutto crudo","Prosciutto cotto",
+      "Pancetta/guanciale","Polpette di suino","Speck"
+    ],
+    "🦃 Tacchino": [
+      "Fesa di tacchino","Arrosto di tacchino","Polpette di tacchino","Tacchino alla griglia"
+    ]
+  },
+  "🐟 Pesce": {
+    "Freschi": [
+      "Orata","Branzino","Salmone fresco","Trota salmonata",
+      "Merluzzo","Sgombro fresco","Tonno fresco","Calamari","Gamberetti"
+    ],
+    "Conserve": [
+      "Tonno al naturale","Tonno in olio","Sgombro in scatola",
+      "Salmone affumicato","Acciughe","Sardine","Polpo precotto"
+    ]
+  },
+  "🥚 Uova & Formaggi": {
+    "Uova": [
+      "Uova strapazzate","Uova sode","Frittata","Uova all'occhio di bue",
+      "Uovo alla coque","Frittata al forno"
+    ],
+    "Formaggi": [
+      "Ricotta vaccina","Ricotta di pecora","Mozzarella","Mozzarella light",
+      "Fiocchi di latte","Primo sale","Feta","Pecorino","Parmigiano/Grana","Scamorza","Sottilette"
+    ]
+  },
+  "🫘 Legumi & Veg.": {
+    "Legumi": [
+      "Ceci","Lenticchie rosse","Lenticchie verdi","Fagioli cannellini",
+      "Fagioli borlotti","Fagioli rossi","Edamame","Soia gialla","Piselli"
+    ],
+    "Proteine vegetali": [
+      "Tofu naturale","Tofu affumicato","Tempeh","Seitan","Burger vegetali",
+      "Hummus di ceci","Hummus di barbabietola"
+    ]
+  },
+  "🍚 Carboidrati": {
+    "Pasta": [
+      "Spaghetti","Penne","Trofie","Rigatoni","Fusilli","Pasta integrale",
+      "Pasta ai legumi","Lasagne","Orecchiette","Tagliatelle"
+    ],
+    "Riso & Cereali": [
+      "Riso basmati","Riso integrale","Riso venere","Riso jasmine",
+      "Cous cous","Cous cous integrale","Bulgur","Farro","Orzo","Quinoa","Miglio"
+    ],
+    "Pane & Altro": [
+      "Pane integrale","Pane ai cereali","Pane di segale","Piadina",
+      "Piadina integrale","Pita","Wrap","Gnocchi di patate","Polenta",
+      "Crackers integrali","Grissini","Fiocchi d'avena","Crostini di pane",
+      "Pangrattato","Saikebon"
+    ],
+    "Tuberi": [
+      "Patate","Patate dolci","Zucca (autunno)","Topinambur"
+    ]
+  },
+  "🥦 Verdure": {
+    "☀️ Estate": [
+      "Zucchine","Melanzane","Peperoni","Peperoncino fresco",
+      "Pomodorini ciliegino","Pomodori ramati","Cetrioli","Mais"
+    ],
+    "🍂 Autunno-Inverno": [
+      "Spinaci","Finocchi","Broccoli","Cavolfiore","Cavolo verza",
+      "Cavolo nero","Bietole","Radicchio","Cavolo cappuccio","Porri"
+    ],
+    "🌿 Primavera": [
+      "Asparagi","Fagiolini","Piselli freschi","Carciofi","Fave fresche"
+    ],
+    "🔄 Tutto l'anno": [
+      "Carote","Cipolla rossa","Cipolla bianca","Cipolla di Tropea",
+      "Sedano","Barbabietola","Funghi champignon","Funghi porcini",
+      "Avocado","Rucola","Lattuga/misticanza","Songino"
+    ]
+  },
+  "🥄 Salse": {
+    "Basi": [
+      "Olio EVO","Salsa di pomodoro","Passata di pomodoro",
+      "Pesto basilico","Pesto rucola","Pesto pistacchio","Crema di peperoni"
+    ],
+    "Salse internazionali": [
+      "Salsa di soia","Salsa tahina","Yogurt greco","Yogurt magro",
+      "Tzatziki","Guacamole","Hummus","Glassa balsamica","Aceto balsamico",
+      "Aceto di mele","Maionese light","Senape Dijon","Senape al miele","Panna"
+    ],
+    "Agrumi & Freschezza": [
+      "Limone","Lime","Arancia","Succo di limone"
+    ]
+  },
+  "🧄 Aromi & Topping": {
+    "Aromi freschi": [
+      "Aglio","Prezzemolo","Basilico","Menta","Erba cipollina",
+      "Rosmarino","Timo","Salvia","Zenzero fresco","Peperoncino fresco"
+    ],
+    "Spezie secche": [
+      "Origano","Paprika dolce","Paprika affumicata","Curry","Cumino",
+      "Curcuma","Peperoncino secco","Cannella","Noce moscata","Za'atar"
+    ],
+    "Topping & Frutta secca": [
+      "Olive nere","Olive verdi","Olive taggiasche","Capperi",
+      "Pomodori secchi","Parmigiano grattugiato","Semi di sesamo",
+      "Semi di zucca","Semi di girasole","Semi di lino",
+      "Noci","Mandorle","Pistacchi","Anacardi","Pinoli"
+    ]
+  }
+};
+
+const RECIPES = [
+  // 🍝 Pasta & Cereali
+  { id:1, cat:"🍝 Pasta & Cereali", name:"Trofie zucchina, cipolla, panna e pancetta", tags:["pasta","pancetta","cremosa"], ing:{proteine:["Pancetta/guanciale"],carb:["Trofie"],verd:["Zucchine","Cipolla bianca"],salse:["Panna","Olio EVO"]} },
+  { id:2, cat:"🍝 Pasta & Cereali", name:"Spaghetti al pomodoro, olive e acciughe", tags:["pasta","pesce","mediterraneo"], ing:{proteine:["Acciughe"],carb:["Spaghetti"],verd:["Pomodorini ciliegino"],aromi:["Olive nere","Origano","Aglio"]} },
+  { id:3, cat:"🍝 Pasta & Cereali", name:"Pasta fredda tonno, mais e pomodorini", tags:["pasta fredda","tonno","estate"], ing:{proteine:["Tonno al naturale"],carb:["Penne"],verd:["Pomodorini ciliegino","Mais"],aromi:["Olive nere","Basilico"]} },
+  { id:4, cat:"🍝 Pasta & Cereali", name:"Spaghetti aglio, olio, acciughe e pangrattato croccante", tags:["pasta","veloce","acciughe"], ing:{proteine:["Acciughe"],carb:["Spaghetti"],aromi:["Aglio","Peperoncino fresco","Prezzemolo"]} },
+  { id:5, cat:"🍝 Pasta & Cereali", name:"Orzo freddo con salmone affumicato, avocado e cetriolo", tags:["orzo","salmone","fresco"], ing:{proteine:["Salmone affumicato"],carb:["Orzo"],verd:["Avocado","Cetrioli"],salse:["Limone","Olio EVO"]} },
+  { id:6, cat:"🍝 Pasta & Cereali", name:"Farro con verdure grigliate, feta e menta", tags:["farro","feta","estate"], ing:{proteine:["Feta"],carb:["Farro"],verd:["Zucchine","Peperoni","Cipolla rossa"],salse:["Olio EVO","Aceto balsamico"],aromi:["Menta"]} },
+  { id:7, cat:"🍝 Pasta & Cereali", name:"Quinoa con gamberetti, avocado e lime", tags:["quinoa","gamberetti","bowl"], ing:{proteine:["Gamberetti"],carb:["Quinoa"],verd:["Avocado","Pomodorini ciliegino"],salse:["Lime","Olio EVO"],aromi:["Erba cipollina","Peperoncino fresco"]} },
+  // 🌾 Cous Cous & Riso
+  { id:8, cat:"🌾 Cous Cous & Riso", name:"Cous cous mozzarella, pomodorini, basilico e acciughe", tags:["cous cous","mozzarella","estate"], ing:{proteine:["Mozzarella","Acciughe"],carb:["Cous cous"],verd:["Pomodorini ciliegino"],aromi:["Basilico"]} },
+  { id:9, cat:"🌾 Cous Cous & Riso", name:"Cous cous zucchine, trota salmonata e acciughe", tags:["cous cous","pesce"], ing:{proteine:["Trota salmonata","Acciughe"],carb:["Cous cous"],verd:["Zucchine"],salse:["Olio EVO","Limone"]} },
+  { id:10, cat:"🌾 Cous Cous & Riso", name:"Cous cous tonno, olive nere, pomodorini e melanzane", tags:["cous cous","tonno","estate"], ing:{proteine:["Tonno al naturale","Acciughe"],carb:["Cous cous"],verd:["Pomodorini ciliegino","Melanzane"],aromi:["Olive nere","Origano","Peperoncino secco"]} },
+  { id:11, cat:"🌾 Cous Cous & Riso", name:"Cous cous pollo aromatizzato, carote e zucchine", tags:["cous cous","pollo","forno"], ing:{proteine:["Sovracosce di pollo"],carb:["Cous cous"],verd:["Carote","Cipolla rossa","Zucchine"],aromi:["Paprika dolce","Rosmarino","Olio EVO"]} },
+  { id:12, cat:"🌾 Cous Cous & Riso", name:"Riso basmati, straccetti di manzo, broccolo e salsa di soia", tags:["riso","manzo","asiatico"], ing:{proteine:["Straccetti di manzo"],carb:["Riso basmati"],verd:["Broccoli","Carote","Cipolla bianca"],salse:["Salsa di soia","Olio EVO"]} },
+  { id:13, cat:"🌾 Cous Cous & Riso", name:"Riso venere con salmone in padella, zucchine e limone", tags:["riso venere","salmone","elegante"], ing:{proteine:["Salmone fresco"],carb:["Riso venere"],verd:["Zucchine"],salse:["Limone","Olio EVO"],aromi:["Erba cipollina"]} },
+  { id:14, cat:"🌾 Cous Cous & Riso", name:"Poke bowl: riso, salmone, avocado ed edamame", tags:["poke","salmone","bowl"], ing:{proteine:["Salmone fresco","Edamame"],carb:["Riso basmati"],verd:["Avocado","Carote","Cetrioli"],salse:["Salsa di soia"],aromi:["Semi di sesamo","Zenzero fresco"]} },
+  { id:15, cat:"🌾 Cous Cous & Riso", name:"Bulgur con pollo alla curcuma, spinaci e yogurt", tags:["bulgur","pollo","speziato"], ing:{proteine:["Petto di pollo"],carb:["Bulgur"],verd:["Spinaci"],salse:["Yogurt greco"],aromi:["Curcuma","Cumino","Limone"]} },
+  // 🥩 Proteine Protagoniste
+  { id:16, cat:"🥩 Proteine Protagoniste", name:"Petto di pollo alla griglia con riso e finocchio", tags:["pollo","riso","leggero"], ing:{proteine:["Petto di pollo"],carb:["Riso basmati"],verd:["Finocchi"],salse:["Olio EVO","Limone"]} },
+  { id:17, cat:"🥩 Proteine Protagoniste", name:"Cheeseburger artigianale con insalata mista", tags:["manzo","burger","casual"], ing:{proteine:["Hamburger di manzo","Mozzarella"],carb:["Pane ai cereali"],verd:["Lattuga/misticanza","Pomodori ramati"],salse:["Senape Dijon","Maionese light"]} },
+  { id:18, cat:"🥩 Proteine Protagoniste", name:"Wrap sovracoscia di pollo, cipolla, yogurt e curry", tags:["wrap","pollo","fusion"], ing:{proteine:["Sovracosce di pollo"],carb:["Wrap"],verd:["Cipolla rossa","Peperoncino fresco","Lattuga/misticanza"],salse:["Yogurt greco"],aromi:["Curry"]} },
+  { id:19, cat:"🥩 Proteine Protagoniste", name:"Orata al cartoccio con pomodorini, olive e capperi", tags:["pesce","forno","mediterraneo"], ing:{proteine:["Orata"],verd:["Pomodorini ciliegino"],aromi:["Olive nere","Capperi","Aglio","Prezzemolo","Olio EVO"]} },
+  { id:20, cat:"🥩 Proteine Protagoniste", name:"Salmone in padella con quinoa e spinaci saltati", tags:["salmone","quinoa","fit"], ing:{proteine:["Salmone fresco"],carb:["Quinoa"],verd:["Spinaci"],salse:["Limone","Olio EVO"],aromi:["Zenzero fresco"]} },
+  { id:21, cat:"🥩 Proteine Protagoniste", name:"Tonno scottato, insalata di avocado e lime", tags:["tonno","avocado","fresco"], ing:{proteine:["Tonno fresco"],verd:["Avocado","Pomodorini ciliegino","Rucola"],salse:["Lime"],aromi:["Semi di sesamo"]} },
+  { id:22, cat:"🥩 Proteine Protagoniste", name:"Tagliata di manzo su rucola, parmigiano e balsamico", tags:["manzo","rucola","elegante"], ing:{proteine:["Tagliata di manzo"],verd:["Rucola"],aromi:["Parmigiano/Grana","Pomodori secchi"],salse:["Glassa balsamica","Olio EVO"]} },
+  { id:23, cat:"🥩 Proteine Protagoniste", name:"Lonza di maiale al vino bianco con patate al forno", tags:["maiale","patate","forno"], ing:{proteine:["Lonza di maiale"],carb:["Patate"],aromi:["Rosmarino","Aglio","Olio EVO"]} },
+  { id:24, cat:"🥩 Proteine Protagoniste", name:"Branzino al sale con patate dolci e asparagi", tags:["pesce","forno","dietetico"], ing:{proteine:["Branzino"],carb:["Patate dolci"],verd:["Asparagi"],salse:["Limone","Olio EVO"]} },
+  // 🥚 Uova & Formaggi
+  { id:25, cat:"🥚 Uova & Formaggi", name:"Uova strapazzate con zucchine trifolate e riso", tags:["uova","zucchine","quick"], ing:{proteine:["Uova strapazzate"],carb:["Riso basmati"],verd:["Zucchine"],salse:["Olio EVO"],aromi:["Erba cipollina"]} },
+  { id:26, cat:"🥚 Uova & Formaggi", name:"Frittata al forno con spinaci e feta", tags:["uova","feta","forno"], ing:{proteine:["Frittata al forno","Feta"],verd:["Spinaci","Cipolla bianca"],salse:["Olio EVO"],aromi:["Origano"]} },
+  { id:27, cat:"🥚 Uova & Formaggi", name:"Panino ricotta, tacchino, rucola e glassa balsamica", tags:["panino","tacchino","ricotta"], ing:{proteine:["Fesa di tacchino","Ricotta vaccina","Uova strapazzate"],carb:["Pane ai cereali"],verd:["Rucola"],salse:["Glassa balsamica"]} },
+  { id:28, cat:"🥚 Uova & Formaggi", name:"Frittata di verdure al forno con feta e erbe", tags:["uova","verdure","light"], ing:{proteine:["Frittata al forno","Feta"],verd:["Peperoni","Zucchine","Cipolla rossa"],aromi:["Origano","Timo","Olio EVO"]} },
+  // 🫘 Legumi & Verdure
+  { id:29, cat:"🫘 Legumi & Verdure", name:"Hummus di ceci con pane integrale e melanzane grigliate", tags:["legumi","vegan","pane"], ing:{proteine:["Ceci","Hummus di ceci"],carb:["Pane integrale"],verd:["Melanzane"],salse:["Olio EVO","Limone"],aromi:["Paprika dolce"]} },
+  { id:30, cat:"🫘 Legumi & Verdure", name:"Lenticchie al pomodoro con cipolla e acciughe", tags:["legumi","umido","rustico"], ing:{proteine:["Lenticchie verdi","Acciughe"],carb:["Riso basmati"],verd:["Cipolla rossa"],salse:["Salsa di pomodoro","Olio EVO"]} },
+  { id:31, cat:"🫘 Legumi & Verdure", name:"Bowl di ceci al curry, riso basmati e spinaci", tags:["legumi","curry","bowl"], ing:{proteine:["Ceci"],carb:["Riso basmati"],verd:["Spinaci","Cipolla bianca"],salse:["Salsa di pomodoro"],aromi:["Curry","Curcuma","Zenzero fresco"]} },
+  { id:32, cat:"🫘 Legumi & Verdure", name:"Zuppa di fagioli cannellini con rosmarino e pane tostato", tags:["legumi","zuppa","invernale"], ing:{proteine:["Fagioli cannellini"],carb:["Pane ai cereali"],verd:["Cipolla bianca","Sedano","Carote"],aromi:["Rosmarino","Aglio","Olio EVO"]} },
+  { id:33, cat:"🫘 Legumi & Verdure", name:"Lenticchie rosse con cocco e zenzero su riso integrale", tags:["legumi","fusion","vegan"], ing:{proteine:["Lenticchie rosse"],carb:["Riso integrale"],verd:["Cipolla bianca"],aromi:["Zenzero fresco","Curcuma","Curry"]} },
+  // 🥗 Bowl & Insalate
+  { id:34, cat:"🥗 Bowl & Insalate", name:"Bowl mediterranea: bulgur, feta, olive e pomodorini", tags:["bulgur","feta","estate"], ing:{proteine:["Feta"],carb:["Bulgur"],verd:["Pomodorini ciliegino","Cetrioli","Cipolla rossa"],aromi:["Olive nere","Menta","Olio EVO"]} },
+  { id:35, cat:"🥗 Bowl & Insalate", name:"Insalata tiepida di lenticchie, radicchio e noci", tags:["legumi","insalata","autunno"], ing:{proteine:["Lenticchie verdi"],verd:["Radicchio","Cipolla rossa"],salse:["Glassa balsamica","Olio EVO"],aromi:["Noci"]} },
+  { id:36, cat:"🥗 Bowl & Insalate", name:"Insalata di sgombro, fagiolini e uova sode", tags:["pesce","uova","estate"], ing:{proteine:["Sgombro in scatola","Uova sode"],verd:["Fagiolini","Pomodorini ciliegino"],salse:["Olio EVO","Aceto di mele"]} },
+  { id:37, cat:"🥗 Bowl & Insalate", name:"Caesar salad con petto di pollo e parmigiano", tags:["pollo","insalata","classica"], ing:{proteine:["Petto di pollo"],verd:["Lattuga/misticanza"],aromi:["Parmigiano grattugiato","Aglio"],salse:["Maionese light","Limone"]} },
+];
+
+const SHOP_CATS = {
+  "🥩 Carni": ["Petto di pollo","Sovracosce di pollo","Ali di pollo","Pollo intero","Straccetti di pollo","Pollo marinato","Fesa di tacchino","Arrosto di tacchino","Polpette di tacchino","Tacchino alla griglia","Bistecca di manzo","Straccetti di manzo","Hamburger di manzo","Carpaccio di manzo","Bresaola","Polpette di manzo","Manzo spezzatino","Tagliata di manzo","Tartare di manzo","Lonza di maiale","Filetto di maiale","Prosciutto crudo","Prosciutto cotto","Pancetta/guanciale","Polpette di suino","Speck"],
+  "🐟 Pesce": ["Orata","Branzino","Salmone fresco","Trota salmonata","Merluzzo","Sgombro fresco","Tonno fresco","Calamari","Gamberetti","Tonno al naturale","Tonno in olio","Sgombro in scatola","Salmone affumicato","Acciughe","Sardine","Polpo precotto"],
+  "🥚 Uova & Latticini": ["Uova strapazzate","Uova sode","Frittata","Frittata al forno","Ricotta vaccina","Ricotta di pecora","Mozzarella","Mozzarella light","Fiocchi di latte","Primo sale","Feta","Pecorino","Parmigiano/Grana","Scamorza","Parmigiano grattugiato","Sottilette"],
+  "🫘 Legumi": ["Ceci","Lenticchie rosse","Lenticchie verdi","Fagioli cannellini","Fagioli borlotti","Fagioli rossi","Edamame","Soia gialla","Piselli","Tofu naturale","Tofu affumicato","Tempeh","Hummus di ceci","Hummus di barbabietola"],
+  "🍚 Carboidrati": ["Spaghetti","Penne","Trofie","Rigatoni","Fusilli","Pasta integrale","Pasta ai legumi","Orecchiette","Tagliatelle","Riso basmati","Riso integrale","Riso venere","Cous cous","Bulgur","Farro","Orzo","Quinoa","Miglio","Pane integrale","Pane ai cereali","Piadina","Pita","Wrap","Gnocchi di patate","Crackers integrali","Crostini di pane","Pangrattato","Saikebon"],
+  "🥦 Frutta & Verdura": ["Zucchine","Melanzane","Peperoni","Peperoncino fresco","Pomodorini ciliegino","Pomodori ramati","Cetrioli","Mais","Spinaci","Finocchi","Broccoli","Cavolfiore","Cavolo verza","Bietole","Radicchio","Asparagi","Fagiolini","Carote","Cipolla rossa","Cipolla bianca","Sedano","Barbabietola","Funghi champignon","Avocado","Rucola","Lattuga/misticanza","Patate","Patate dolci","Porri"],
+  "🥄 Salse & Condimenti": ["Olio EVO","Salsa di pomodoro","Passata di pomodoro","Pesto basilico","Pesto rucola","Salsa di soia","Salsa tahina","Yogurt greco","Tzatziki","Hummus","Glassa balsamica","Aceto balsamico","Aceto di mele","Maionese light","Senape Dijon","Senape al miele","Panna","Limone","Lime"],
+  "🧄 Aromi & Spezie": ["Aglio","Prezzemolo","Basilico","Menta","Erba cipollina","Rosmarino","Timo","Salvia","Zenzero fresco","Peperoncino fresco","Origano","Paprika dolce","Paprika affumicata","Curry","Cumino","Curcuma","Peperoncino secco","Cannella"],
+  "🫙 Dispensa": ["Olive nere","Olive verdi","Olive taggiasche","Capperi","Pomodori secchi","Semi di sesamo","Semi di zucca","Noci","Mandorle","Pistacchi","Anacardi","Pinoli"]
+};
+
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+const ST = {
+  sM:6, sR:3, dM:0, dR:2,
+  meals:[], nextId:1, selIng:[], activeRCat:'all'
+};
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+function init() {
+  buildParticles();
+  renderIngPanel();
+  renderRecCatTabs();
+  renderRecipes();
+  renderStaples();
+  renderAll();
+  observeSections();
+}
+
+/* ─── PARTICLES ───────────────────────────────── */
+function buildParticles() {
+  const wrap = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const x = Math.random() * 100;
+    const dur = 18 + Math.random() * 22;
+    const delay = Math.random() * 20;
+    const dx = (Math.random() - 0.5) * 120;
+    p.style.cssText = `left:${x}%;animation-duration:${dur}s;animation-delay:-${delay}s;--dx:${dx}px;opacity:0;`;
+    wrap.appendChild(p);
+  }
+}
+
+/* ─── SCROLL SECTIONS FADE ────────────────────── */
+function observeSections() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('section').forEach(s => obs.observe(s));
+}
+
+/* ─── SETUP ───────────────────────────────────── */
+function adj(id, d) {
+  const el = document.getElementById(id);
+  const minVal = (id === 'sR' || id === 'dR') ? 1 : 0;
+  const v = Math.max(minVal, Math.min(21, (parseInt(el.value)||0) + d));
+  el.value = v;
+  hints();
+}
+function hints() {
+  const sm = parseInt(document.getElementById('sM').value)||0;
+  const sr = Math.max(1, parseInt(document.getElementById('sR').value)||1);
+  const dm = parseInt(document.getElementById('dM').value)||0;
+  const dr = Math.max(1, parseInt(document.getElementById('dR').value)||1);
+  const fmtRep = (meals, recs) => {
+    if (meals === 0) return '<strong>×0</strong>';
+    const r = meals / recs;
+    return Number.isInteger(r) ? `<strong>×${r}</strong>` : `<strong>~×${r.toFixed(1)}</strong>`;
+  };
+  document.getElementById('hintS').innerHTML = `💡 ${sm} pasti · ${sr} ricette → ogni ricetta ${fmtRep(sm,sr)}`;
+  document.getElementById('hintD').innerHTML = `💡 ${dm} pasti · ${dr} ricette → ogni ricetta ${fmtRep(dm,dr)}`;
+}
+function applySetup() {
+  ST.sM = parseInt(document.getElementById('sM').value)||0;
+  ST.sR = Math.max(1,parseInt(document.getElementById('sR').value)||1);
+  ST.dM = parseInt(document.getElementById('dM').value)||0;
+  ST.dR = Math.max(1,parseInt(document.getElementById('dR').value)||1);
+  renderAll();
+  toast('✅ Impostazioni aggiornate');
+}
+
+/* ─── INGREDIENT PANEL ────────────────────────── */
+function renderIngPanel() {
+  const tabs = document.getElementById('ingTabs');
+  const panes = document.getElementById('ingPanes');
+  tabs.innerHTML = ''; panes.innerHTML = '';
+  Object.keys(INGREDIENTS).forEach((cat, i) => {
+    const label = cat.replace(/^[^\s]+\s/, '');
+    const tab = document.createElement('button');
+    tab.className = 'itab' + (i===0?' active':'');
+    tab.textContent = label;
+    tab.onclick = () => {
+      document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.ipane').forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('ipane'+i).classList.add('active');
+    };
+    tabs.appendChild(tab);
+    const pane = document.createElement('div');
+    pane.className = 'ipane' + (i===0?' active':'');
+    pane.id = 'ipane'+i;
+    const colsWrap = document.createElement('div');
+    colsWrap.className = 'ipane-cols';
+    Object.entries(INGREDIENTS[cat]).forEach(([sub, items]) => {
+      const group = document.createElement('div');
+      const sl = document.createElement('div');
+      sl.className = 'isub';
+      sl.textContent = sub;
+      group.appendChild(sl);
+      const cc = document.createElement('div');
+      cc.className = 'chips';
+      items.forEach(item => {
+        const c = document.createElement('div');
+        c.className = 'chip';
+        c.textContent = item;
+        c.onclick = () => toggleIng(item, c);
+        cc.appendChild(c);
+      });
+      group.appendChild(cc);
+      colsWrap.appendChild(group);
+    });
+    pane.appendChild(colsWrap);
+    panes.appendChild(pane);
+  });
+}
+
+/* ─── ING SEARCH ──────────────────────────────── */
+function filterIngredients(query) {
+  const q = query.trim().toLowerCase();
+  const tabs = document.getElementById('ingTabs');
+  const panes = document.getElementById('ingPanes');
+  const results = document.getElementById('ingSearchResults');
+  const clearBtn = document.getElementById('ingSearchClear');
+
+  clearBtn.classList.toggle('visible', q.length > 0);
+
+  if (!q) {
+    // Restore normal view
+    tabs.style.display = '';
+    panes.style.display = '';
+    results.style.display = 'none';
+    results.innerHTML = '';
+    return;
+  }
+
+  // Hide tabs/panes, show results panel
+  tabs.style.display = 'none';
+  panes.style.display = 'none';
+  results.style.display = '';
+
+  // Collect all matching ingredients across all categories
+  const matches = [];
+  Object.entries(INGREDIENTS).forEach(([cat, subs]) => {
+    Object.entries(subs).forEach(([sub, items]) => {
+      items.forEach(item => {
+        if (item.toLowerCase().includes(q)) matches.push(item);
+      });
+    });
+  });
+
+  if (!matches.length) {
+    results.innerHTML = `<div class="ing-search-empty">Nessun ingrediente trovato per "<strong>${escHtml(query)}</strong>"</div>`;
+    return;
+  }
+
+  // Build chips from matches, preserving sel state
+  results.innerHTML = `<div class="ing-search-count">${matches.length} risultat${matches.length === 1 ? 'o' : 'i'}</div>`;
+  const chipsWrap = document.createElement('div');
+  chipsWrap.className = 'chips';
+  matches.forEach(item => {
+    const c = document.createElement('div');
+    c.className = 'chip' + (ST.selIng.includes(item) ? ' sel' : '');
+    c.textContent = item;
+    c.onclick = () => {
+      toggleIng(item, c);
+      // Also sync the chip in the main panes if visible
+      document.querySelectorAll('.chip').forEach(ch => {
+        if (ch.textContent === item && ch !== c) {
+          ch.classList.toggle('sel', ST.selIng.includes(item));
+        }
+      });
+    };
+    chipsWrap.appendChild(c);
+  });
+  results.appendChild(chipsWrap);
+}
+
+function clearIngSearch() {
+  const inp = document.getElementById('ingSearch');
+  inp.value = '';
+  filterIngredients('');
+  inp.focus();
+}
+
+function toggleIng(name, el) {
+  const idx = ST.selIng.indexOf(name);
+  if (idx === -1) { ST.selIng.push(name); el.classList.add('sel'); }
+  else { ST.selIng.splice(idx,1); el.classList.remove('sel'); }
+  renderBZ();
+}
+function renderBZ() {
+  const z = document.getElementById('bzZone');
+  z.innerHTML = '';
+  if (!ST.selIng.length) {
+    z.innerHTML = '<span class="bz-empty">Clicca gli ingredienti nel pannello →</span>';
+    z.classList.remove('has'); return;
+  }
+  z.classList.add('has');
+  ST.selIng.forEach(ing => {
+    const c = document.createElement('div');
+    c.className = 'chip sel';
+    c.textContent = ing;
+    c.onclick = () => {
+      ST.selIng.splice(ST.selIng.indexOf(ing),1);
+      document.querySelectorAll('.chip').forEach(ch => { if(ch.textContent===ing) ch.classList.remove('sel'); });
+      renderBZ();
+    };
+    z.appendChild(c);
+  });
+}
+function addBuilt(type) {
+  if (!ST.selIng.length) { toast('⚠️ Seleziona almeno un ingrediente'); return; }
+  if (ST.sM === 0 && ST.dM === 0) { toast('⚠️ Imposta prima i pasti nella sezione 01'); return; }
+  const name = ST.selIng.slice(0, 3).join(' + ');
+  const fakeRec = { id: null, name, ing: { ingredienti: [...ST.selIng] }, _isBuilt: true };
+  openRepsModal(fakeRec, type);
+}
+function clearB() {
+  ST.selIng = [];
+  document.querySelectorAll('.chip.sel').forEach(c=>c.classList.remove('sel'));
+  renderBZ();
+}
+
+/* ─── RECIPES ─────────────────────────────────── */
+const REC_CATS = ['all', ...new Set(RECIPES.map(r=>r.cat))];
+function renderRecCatTabs() {
+  const el = document.getElementById('rcatTabs');
+  el.innerHTML = '';
+  REC_CATS.forEach(cat => {
+    const b = document.createElement('button');
+    b.className = 'rcb' + (cat==='all'?' active':'');
+    b.textContent = cat==='all' ? '✦ Tutte' : cat;
+    b.onclick = () => {
+      ST.activeRCat = cat;
+      document.querySelectorAll('.rcb').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderRecipes();
+    };
+    el.appendChild(b);
+  });
+  document.getElementById('recBadge').textContent = RECIPES.length + ' ricette';
+}
+function renderRecipes() {
+  const grid = document.getElementById('recipesGrid');
+  grid.innerHTML = '';
+  const list = ST.activeRCat==='all' ? RECIPES : RECIPES.filter(r=>r.cat===ST.activeRCat);
+  list.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'rc'; card.id = 'rc'+r.id;
+    const allIng = Object.values(r.ing).flat();
+    card.innerHTML = `
+      <div class="rc-name">${r.name}</div>
+      <div class="rc-tags">${r.tags.map(t=>`<span class="rc-tag">${t}</span>`).join('')}</div>
+      <div class="rc-actions">
+        <button class="rcb2 rcs" onclick="addRec(${r.id},'single')">👤 Singolo</button>
+        <button class="rcb2 rcd" onclick="addRec(${r.id},'double')">👥 Coppia</button>
+        <button class="rcb2 rcp" onclick="copyRecipe(${r.id},this)" title="Copia ricetta">📋</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+function addRec(id, type) {
+  // Opens reps modal — type pre-selects the button highlight
+  const rec = RECIPES.find(r => r.id === id);
+  openRepsModal(rec, type);
+}
+
+/* ─── REPS MODAL ─────────────────────────────── */
+let _repsRec = null;
+let _repsType = null;
+
+function openRepsModal(rec, preferredType) {
+  _repsRec = rec;
+  _repsType = preferredType;
+  document.getElementById('repsRecName').textContent = rec.name;
+  document.getElementById('repsVal').textContent = '1';
+
+  // Highlight preferred type button
+  document.getElementById('repsBtnS').className = 'reps-btn confirm-s' + (preferredType === 'single' ? ' active-type' : '');
+  document.getElementById('repsBtnD').className = 'reps-btn confirm-d' + (preferredType === 'double' ? ' active-type' : '');
+
+  // Show/hide buttons based on setup limits
+  document.getElementById('repsBtnS').style.display = ST.sM > 0 ? '' : 'none';
+  document.getElementById('repsBtnD').style.display = ST.dM > 0 ? '' : 'none';
+
+  document.getElementById('repsModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeRepsModal() {
+  document.getElementById('repsModal').classList.remove('open');
+  document.body.style.overflow = '';
+  // Restore default buttons visibility and remove any temp update button
+  document.getElementById('repsBtnS').style.display = '';
+  document.getElementById('repsBtnD').style.display = '';
+  document.querySelector('.reps-btn.update-reps')?.remove();
+  _repsRec = null;
+}
+function adjReps(d) {
+  const el = document.getElementById('repsVal');
+  const cur = parseInt(el.textContent) || 1;
+  el.textContent = Math.max(1, Math.min(7, cur + d));
+}
+function confirmReps(type) {
+  if (!_repsRec) return;
+  const reps = parseInt(document.getElementById('repsVal').textContent) || 1;
+  const lim = type === 'single' ? ST.sM : ST.dM;
+  const cur = ST.meals.filter(m => m.type === type).reduce((s, m) => s + (m.reps || 1), 0);
+  if (lim === 0) { toast('⚠️ Imposta prima i pasti nella sezione 01'); return; }
+  if (cur + reps > lim) {
+    toast(`⚠️ Supereresti il limite di ${lim} pasti ${type === 'single' ? 'singoli' : 'di coppia'}`);
+    return;
+  }
+  const isBuilt = !!_repsRec._isBuilt;
+  const id = _repsRec.id;
+  addMeal(_repsRec.name, type, _repsRec.ing, reps);
+  closeRepsModal();
+  if (isBuilt) clearB();
+  if (id !== null) {
+    const card = document.getElementById('rc' + id);
+    if (card) { card.classList.add('rc-flash'); setTimeout(() => card.classList.remove('rc-flash'), 600); }
+  }
+}
+
+// Close modal on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRepsModal(); });
+function copyRecipe(id, btn) {
+  const rec = RECIPES.find(r=>r.id===id);
+  const allIng = Object.values(rec.ing).flat();
+  const text = `📖 ${rec.name}\n\nIngredienti:\n${allIng.map(i=>`• ${i}`).join('\n')}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1600);
+    toast('📋 Ricetta copiata!');
+  });
+}
+
+/* ─── MEAL MANAGEMENT ─────────────────────────── */
+function addMeal(name, type, ing, reps) {
+  reps = Math.max(1, parseInt(reps) || 1);
+  ST.meals.push({ id: ST.nextId++, name, type, ing, reps });
+  renderAll();
+  const label = type === 'single' ? '👤' : '👥';
+  const repsLabel = reps > 1 ? ` ×${reps}` : '';
+  toast(`${label} ${name.length > 34 ? name.slice(0, 34) + '…' : name}${repsLabel}`);
+}
+function removeMeal(id) {
+  ST.meals = ST.meals.filter(m => m.id !== id);
+  renderAll();
+}
+function clearAll() {
+  if (!ST.meals.length) return;
+  if (!confirm('Svuotare tutti i pasti pianificati?')) return;
+  ST.meals = [];
+  renderAll();
+  toast('🗑 Tutti i pasti rimossi');
+}
+function renderAll() {
+  renderSidebar();
+  renderTracker();
+  renderShop();
+}
+
+/* ─── SIDEBAR ─────────────────────────────────── */
+function animateNum(el, target) {
+  const cur = parseInt(el.textContent) || 0;
+  if (cur === target) return;
+  el.style.transform = 'scale(1.2)';
+  el.style.transition = 'transform 0.2s cubic-bezier(0.4,0,0.2,1)';
+  el.textContent = target;
+  requestAnimationFrame(() => {
+    setTimeout(() => { el.style.transform = ''; }, 160);
+  });
+}
+function renderSidebar() {
+  const singles = ST.meals.filter(m=>m.type==='single');
+  const doubles = ST.meals.filter(m=>m.type==='double');
+  const sTotal = singles.reduce((s, m) => s + (m.reps||1), 0);
+  const dTotal = doubles.reduce((s, m) => s + (m.reps||1), 0);
+  animateNum(document.getElementById('sbS'), sTotal);
+  animateNum(document.getElementById('sbD'), dTotal);
+  document.getElementById('sbSr').textContent = `${singles.length} ricett${singles.length===1?'a':'e'}`;
+  document.getElementById('sbDr').textContent = `${doubles.length} ricett${doubles.length===1?'a':'e'}`;
+  const total = ST.sM + ST.dM;
+  const done = sTotal + dTotal;
+  const circ = 201.1;
+  document.getElementById('ringF').style.strokeDashoffset = total>0 ? circ - Math.min(1,done/total)*circ : circ;
+  document.getElementById('ringT').textContent = `${done}/${total}`;
+  const rl = document.getElementById('recentList');
+  if (!ST.meals.length) {
+    rl.innerHTML = '<div style="font-size:0.73rem;color:var(--muted);font-style:italic;">Nessun pasto ancora.</div>';
+    return;
+  }
+  rl.innerHTML = [...ST.meals].reverse().slice(0,10).map(m=>`
+    <div class="r-item">
+      <span class="r-dot ${m.type==='single'?'s':'d'}"></span>
+      <span class="r-name">${escHtml(m.name)}${(m.reps||1)>1?` <span style="font-size:0.6rem;color:var(--accent2)">×${m.reps}</span>`:''}</span>
+      <button class="r-rm" onclick="removeMeal(${m.id})">✕</button>
+    </div>`).join('');
+}
+
+/* ─── TRACKER ─────────────────────────────────── */
+function renderTracker() {
+  const singles = ST.meals.filter(m=>m.type==='single');
+  const doubles = ST.meals.filter(m=>m.type==='double');
+  const sTotal = singles.reduce((s,m)=>s+(m.reps||1),0);
+  const dTotal = doubles.reduce((s,m)=>s+(m.reps||1),0);
+  document.getElementById('tSc').textContent = `${sTotal} / ${ST.sM}`;
+  document.getElementById('tDc').textContent = `${dTotal} / ${ST.dM}`;
+  const makeMealRow = (m, i) => {
+    const div = document.createElement('div');
+    div.className = 't-meal';
+    const reps = m.reps || 1;
+    div.innerHTML = `
+      <span class="t-idx">${String(i+1).padStart(2,'0')}</span>
+      <span class="t-name">${escHtml(m.name)}</span>
+      <span class="t-reps ${reps===1?'once':''}" title="${reps===1?'Preparato 1 volta':'Clic per modificare ripetizioni'}">${reps===1?'×1':'×'+reps}</span>
+      <button class="t-cp" title="Copia nome">📋</button>
+      <button class="t-rm" title="Rimuovi">✕</button>`;
+    div.querySelector('.t-cp').addEventListener('click', function() { copyMealName(m.name, this); });
+    div.querySelector('.t-rm').addEventListener('click', () => removeMeal(m.id));
+    if (reps > 1) {
+      div.querySelector('.t-reps').addEventListener('click', () => editReps(m.id));
+    }
+    return div;
+  };
+  const slEl = document.getElementById('tSl');
+  slEl.innerHTML = '';
+  if (singles.length) singles.forEach((m,i) => slEl.appendChild(makeMealRow(m,i)));
+  else slEl.innerHTML = '<div class="t-empty">Nessun pasto singolo.</div>';
+  const dlEl = document.getElementById('tDl');
+  dlEl.innerHTML = '';
+  if (doubles.length) doubles.forEach((m,i) => dlEl.appendChild(makeMealRow(m,i)));
+  else dlEl.innerHTML = '<div class="t-empty">Nessun pasto coppia.</div>';
+}
+function editReps(id) {
+  const meal = ST.meals.find(m => m.id === id);
+  if (!meal) return;
+  // Re-open modal pre-filled
+  const fakeRec = { id: null, name: meal.name, ing: meal.ing };
+  _repsRec = fakeRec;
+  _repsType = meal.type;
+  document.getElementById('repsRecName').textContent = meal.name;
+  document.getElementById('repsVal').textContent = meal.reps || 1;
+  // Override confirm to update existing meal
+  document.getElementById('repsBtnS').style.display = 'none';
+  document.getElementById('repsBtnD').style.display = 'none';
+  // Use a temporary update button
+  const btns = document.getElementById('repsBtns');
+  const existing = btns.querySelector('.reps-btn.update-reps');
+  if (!existing) {
+    const upd = document.createElement('button');
+    upd.className = 'reps-btn confirm-s update-reps';
+    upd.style.flex = '1';
+    upd.textContent = '✓ Aggiorna';
+    upd.addEventListener('click', () => {
+      const newReps = parseInt(document.getElementById('repsVal').textContent) || 1;
+      meal.reps = newReps;
+      closeRepsModal();
+      btns.querySelector('.update-reps')?.remove();
+      renderAll();
+      toast(`✏️ Ripetizioni aggiornate: ×${newReps}`);
+    });
+    btns.appendChild(upd);
+  }
+  document.getElementById('repsModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+/* ─── STAPLES ─────────────────────────────────── */
+function renderStaples() {
+  const grid = document.getElementById('staplesGrid');
+  grid.innerHTML = '';
+  STAPLES.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'staple-item';
+    div.innerHTML = `<span class="staple-name">${escHtml(s)}</span><button class="staple-copy" title="Copia">📋</button>`;
+    div.querySelector('.staple-copy').addEventListener('click', function() { copyItem(s, this); });
+    grid.appendChild(div);
+  });
+}
+
+/* ─── SHOPPING LIST ───────────────────────────── */
+function findShopCategory(ingName) {
+  const normalized = ingName.toLowerCase().trim();
+  // 1. Exact match (case-insensitive)
+  for (const [cat, items] of Object.entries(SHOP_CATS)) {
+    if (items.some(i => i.toLowerCase() === normalized)) return cat;
+  }
+  // 2. Substring containment — ing name contains a known item, or vice versa
+  for (const [cat, items] of Object.entries(SHOP_CATS)) {
+    if (items.some(i => {
+      const iLow = i.toLowerCase();
+      return normalized.includes(iLow) || iLow.includes(normalized);
+    })) return cat;
+  }
+  // 3. First significant word match (>=4 chars to avoid false positives)
+  const firstWord = normalized.split(/[\s,/]/)[0];
+  if (firstWord.length >= 4) {
+    for (const [cat, items] of Object.entries(SHOP_CATS)) {
+      if (items.some(i => i.toLowerCase().startsWith(firstWord) || firstWord.startsWith(i.toLowerCase().split(/[\s,/]/)[0]))) return cat;
+    }
+  }
+  return '🫙 Dispensa';
+}
+
+function renderShop() {
+  const wrap = document.getElementById('shopGrid');
+  if (!ST.meals.length) {
+    wrap.innerHTML = '<div style="font-size:0.81rem;color:var(--muted);font-style:italic;grid-column:1/-1;padding:0.4rem 0;">Aggiungi pasti nel tracker per generare la lista.</div>';
+    return;
+  }
+
+  // Aggregate ingredients: key = normalized name, value = {displayName, qty}
+  const counts = {};
+  ST.meals.forEach(meal => {
+    const mult = (meal.type === 'double' ? 2 : 1) * (meal.reps || 1);
+    (meal.ing ? Object.values(meal.ing).flat() : []).forEach(ing => {
+      const key = ing.toLowerCase().trim();
+      if (!counts[key]) counts[key] = { name: ing, qty: 0 };
+      counts[key].qty += mult;
+    });
+  });
+
+  // Categorize
+  const catMap = {};
+  Object.values(counts).forEach(({ name, qty }) => {
+    const cat = findShopCategory(name);
+    (catMap[cat] = catMap[cat] || []).push({ name, qty });
+  });
+
+  // Sort items within each category alphabetically
+  Object.values(catMap).forEach(arr => arr.sort((a, b) => a.name.localeCompare(b.name, 'it')));
+
+  const ordered = Object.keys(SHOP_CATS).filter(c => catMap[c]);
+  wrap.innerHTML = ordered.map(cat => {
+    const items = catMap[cat];
+    return `<div class="shop-cat">
+      <div class="shop-cat-hdr">${cat}</div>
+      <div class="shop-items">${items.map(item => {
+        const sid = 'si' + Math.random().toString(36).slice(2, 8);
+        const safeN = item.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return `<div class="shop-item" id="${sid}">
+          <div class="schk" onclick="toggleChk(this)"></div>
+          <span class="si-name">${item.name}</span>
+          ${item.qty > 1 ? `<span class="si-qty">×${item.qty}</span>` : ''}
+          <button class="si-copy" onclick="copyItem('${safeN}',this)">📋</button>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── UTILS ───────────────────────────────────── */
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function toggleC(id) { document.getElementById(id).classList.toggle('open'); }
+function toggleChk(el) { el.classList.toggle('on'); el.closest('.shop-item').classList.toggle('done'); }
+function copyItem(name, btn) {
+  navigator.clipboard.writeText(name).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+  }).catch(() => toast('⚠️ Copia non riuscita'));
+}
+function clearShopChecks() {
+  document.querySelectorAll('.shop-item.done').forEach(el => {
+    el.classList.remove('done');
+    el.querySelector('.schk')?.classList.remove('on');
+  });
+  toast('↺ Spunte azzerate');
+}
+function goTo(id, btn) {
+  document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function copyMealName(name, btn) {
+  navigator.clipboard.writeText(name).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+  }).catch(() => toast('⚠️ Copia non riuscita'));
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ─── START ───────────────────────────────────── */
+init();
+</script>
+</body>
+</html>
