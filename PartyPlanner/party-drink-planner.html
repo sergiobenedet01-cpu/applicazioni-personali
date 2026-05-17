@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Party Drink Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   CSS CUSTOM PROPERTIES — easily portable to style.css
+   ============================================================ */
+:root {
+  --bg-base:       #090910;
+  --bg-surface:    #0f0f1a;
+  --bg-card:       #141422;
+  --bg-card-hover: #191928;
+  --border:        rgba(255,255,255,0.07);
+  --border-active: rgba(120,80,255,0.5);
+  --accent-1:      #7c4dff;
+  --accent-2:      #00c6ff;
+  --accent-3:      #ff4d9b;
+  --glow-1:        rgba(124,77,255,0.35);
+  --glow-2:        rgba(0,198,255,0.2);
+  --text-1:        #f0f0f8;
+  --text-2:        #9090a8;
+  --text-3:        #55556a;
+  --radius-sm:     8px;
+  --radius-md:     14px;
+  --radius-lg:     20px;
+  --font-display:  'Syne', sans-serif;
+  --font-body:     'DM Sans', sans-serif;
+  --transition:    0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-1);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   BACKGROUND AMBIENT BLOBS
+   ============================================================ */
+.ambient {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.blob {
+  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.18;
+  animation: drift 14s ease-in-out infinite alternate;
+}
+.blob-1 { width: 600px; height: 600px; background: var(--accent-1); top: -200px; left: -150px; animation-duration: 16s; }
+.blob-2 { width: 400px; height: 400px; background: var(--accent-2); bottom: 0; right: -100px; animation-duration: 20s; animation-delay: -6s; }
+.blob-3 { width: 300px; height: 300px; background: var(--accent-3); top: 40%; left: 60%; animation-duration: 12s; animation-delay: -3s; }
+@keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(30px, 40px) scale(1.05); } }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  padding: 72px 0 56px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(124,77,255,0.12);
+  border: 1px solid rgba(124,77,255,0.3);
+  border-radius: 99px; padding: 6px 16px;
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #aa88ff; margin-bottom: 24px;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge-dot { width: 6px; height: 6px; background: var(--accent-1); border-radius: 50%; box-shadow: 0 0 8px var(--accent-1); }
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #fff 20%, #aa88ff 60%, #00c6ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s ease 0.1s both;
+}
+.hero p {
+  color: var(--text-2); font-size: 18px; max-width: 520px; margin: 0 auto 36px;
+  animation: fadeUp 0.6s ease 0.2s both;
+}
+.hero-stats {
+  display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+  animation: fadeUp 0.6s ease 0.3s both;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--text-1); }
+.hero-stat-lbl { font-size: 12px; color: var(--text-3); letter-spacing: 0.05em; text-transform: uppercase; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ============================================================
+   SECTION STRUCTURE
+   ============================================================ */
+.section { margin-bottom: 40px; animation: fadeUp 0.5s ease both; }
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.section-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+}
+.section-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; }
+.section-sub { color: var(--text-2); font-size: 13px; margin-left: auto; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: border-color var(--transition), background var(--transition);
+}
+.card:hover { border-color: rgba(124,77,255,0.2); }
+
+/* ============================================================
+   PARTICIPANTS
+   ============================================================ */
+.participants-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .participants-grid { grid-template-columns: 1fr; } }
+
+.participant-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.participant-card-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.stepper { display: flex; align-items: center; gap: 0; }
+.stepper-btn {
+  width: 40px; height: 40px; border: 1px solid var(--border);
+  background: var(--bg-surface); border-radius: var(--radius-sm);
+  color: var(--text-1); font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition), border-color var(--transition);
+  user-select: none;
+}
+.stepper-btn:hover { background: rgba(124,77,255,0.15); border-color: var(--accent-1); }
+.stepper-val {
+  flex: 1; text-align: center; font-family: var(--font-display);
+  font-size: 28px; font-weight: 700; color: var(--text-1);
+}
+
+.intensity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.intensity-btn {
+  padding: 8px 6px; border: 1px solid var(--border);
+  background: var(--bg-surface); border-radius: var(--radius-sm);
+  color: var(--text-2); font-size: 12px; cursor: pointer; text-align: center;
+  transition: all var(--transition); font-family: var(--font-body);
+}
+.intensity-btn.active {
+  border-color: var(--accent-1); background: rgba(124,77,255,0.15);
+  color: #c4a0ff;
+}
+.intensity-btn .int-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+.intensity-btn .int-num { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--text-1); }
+
+/* ============================================================
+   TOTALS BAR
+   ============================================================ */
+.totals-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-top: 16px;
+}
+@media (max-width: 600px) { .totals-bar { grid-template-columns: repeat(2, 1fr); } }
+.total-chip {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 16px; text-align: center;
+}
+.total-chip-val { font-family: var(--font-display); font-size: 26px; font-weight: 700; }
+.total-chip-lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+.val-purple { color: #aa88ff; }
+.val-blue   { color: #5cc8ff; }
+.val-pink   { color: #ff7ec8; }
+.val-white  { color: var(--text-1); }
+
+/* ============================================================
+   DRINK LIBRARY
+   ============================================================ */
+.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+.search-box {
+  flex: 1; min-width: 200px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 16px;
+  color: var(--text-1); font-family: var(--font-body); font-size: 14px;
+  outline: none; transition: border-color var(--transition);
+}
+.search-box:focus { border-color: var(--accent-1); }
+.search-box::placeholder { color: var(--text-3); }
+.filter-pill {
+  padding: 8px 16px; border: 1px solid var(--border);
+  background: var(--bg-card); border-radius: 99px;
+  color: var(--text-2); font-size: 12px; cursor: pointer; white-space: nowrap;
+  transition: all var(--transition);
+}
+.filter-pill.active {
+  background: rgba(124,77,255,0.15); border-color: var(--accent-1); color: #c4a0ff;
+}
+
+.drinks-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.drink-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 18px;
+  cursor: pointer; transition: all var(--transition);
+  position: relative; overflow: hidden;
+}
+.drink-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  opacity: 0; transition: opacity var(--transition);
+}
+.drink-card:hover { border-color: rgba(124,77,255,0.3); background: var(--bg-card-hover); transform: translateY(-2px); }
+.drink-card:hover::before { opacity: 1; }
+.drink-card.selected { border-color: var(--accent-1); background: rgba(124,77,255,0.08); }
+.drink-card.selected::before { opacity: 1; }
+
+.drink-emoji { font-size: 28px; margin-bottom: 10px; display: block; }
+.drink-name { font-family: var(--font-display); font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.drink-cat { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.drink-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag {
+  font-size: 10px; padding: 3px 8px; border-radius: 99px;
+  border: 1px solid var(--border); color: var(--text-3);
+}
+.tag-alc { border-color: rgba(255,77,155,0.3); color: #ff8cc0; }
+.tag-diff { border-color: rgba(0,198,255,0.3); color: #5cc8ff; }
+
+.drink-select-badge {
+  position: absolute; top: 12px; right: 12px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent-1); display: flex; align-items: center; justify-content: center;
+  font-size: 11px; opacity: 0; transform: scale(0.5);
+  transition: all var(--transition);
+}
+.drink-card.selected .drink-select-badge { opacity: 1; transform: scale(1); }
+
+/* ============================================================
+   SELECTED DRINKS MIXER
+   ============================================================ */
+.mixer-list { display: flex; flex-direction: column; gap: 12px; }
+.mixer-item {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 16px;
+  display: flex; align-items: center; gap: 16px;
+}
+.mixer-emoji { font-size: 24px; flex-shrink: 0; }
+.mixer-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; flex: 1; }
+.mixer-pct-label { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+.mixer-pct { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--accent-1); min-width: 44px; text-align: center; }
+.mixer-slider {
+  flex: 1; min-width: 80px; accent-color: var(--accent-1);
+  height: 4px; border-radius: 99px;
+}
+.mixer-remove {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2);
+  color: #ff6060; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; flex-shrink: 0;
+  transition: all var(--transition);
+}
+.mixer-remove:hover { background: rgba(255,77,77,0.2); }
+
+.pct-warning {
+  background: rgba(255,180,0,0.08); border: 1px solid rgba(255,180,0,0.2);
+  border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px;
+  color: #ffd060; display: none; margin-top: 12px;
+}
+.pct-warning.show { display: flex; align-items: center; gap: 8px; }
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 700px) { .results-grid { grid-template-columns: 1fr; } }
+
+.ingredient-list { display: flex; flex-direction: column; gap: 10px; }
+.ingredient-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+}
+.ing-name { flex: 1; font-size: 14px; }
+.ing-bar-wrap { flex: 2; height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+.ing-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); transition: width 0.6s ease; }
+.ing-l { font-family: var(--font-display); font-size: 14px; font-weight: 700; min-width: 52px; text-align: right; color: var(--accent-2); }
+.ing-bottles { font-size: 12px; color: var(--text-3); min-width: 60px; text-align: right; }
+
+/* ============================================================
+   DASHBOARD / SUMMARY
+   ============================================================ */
+.summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+@media (max-width: 600px) { .summary-stats { grid-template-columns: repeat(2, 1fr); } }
+.stat-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 18px; text-align: center;
+}
+.stat-val { font-family: var(--font-display); font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+.stat-lbl { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; }
+
+.chart-wrap { margin-bottom: 24px; }
+.chart-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-2); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.07em; }
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 12px; }
+.bar-label { font-size: 13px; min-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-outer { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden; }
+.bar-inner { height: 100%; border-radius: 99px; }
+.bar-val { font-family: var(--font-display); font-size: 13px; font-weight: 700; min-width: 50px; text-align: right; color: var(--text-2); }
+
+.summary-bottles {
+  background: rgba(124,77,255,0.06); border: 1px solid rgba(124,77,255,0.15);
+  border-radius: var(--radius-md); padding: 20px;
+}
+.bottles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 14px; }
+.bottle-chip {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px; display: flex; align-items: center; gap: 10px;
+}
+.bottle-icon { font-size: 20px; }
+.bottle-name { font-size: 12px; color: var(--text-2); }
+.bottle-count { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--accent-1); }
+.bottle-sub { font-size: 11px; color: var(--text-3); }
+
+/* ============================================================
+   CTA / CALCULATE BUTTON
+   ============================================================ */
+.cta-bar { display: flex; justify-content: center; margin: 32px 0; }
+.btn-calculate {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  border: none; border-radius: 99px;
+  color: #fff; font-family: var(--font-display); font-size: 16px; font-weight: 700;
+  padding: 16px 48px; cursor: pointer; letter-spacing: 0.03em;
+  box-shadow: 0 0 40px rgba(124,77,255,0.4);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.btn-calculate:hover { transform: scale(1.03); box-shadow: 0 0 60px rgba(124,77,255,0.6); }
+.btn-calculate:active { transform: scale(0.98); }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast-container { position: fixed; bottom: 32px; right: 32px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+.toast {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px 20px;
+  font-size: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  display: flex; align-items: center; gap: 10px;
+  animation: toastIn 0.3s ease; min-width: 200px;
+}
+.toast-success { border-color: rgba(0,200,120,0.3); }
+.toast-info    { border-color: rgba(0,198,255,0.3); }
+.toast-warning { border-color: rgba(255,180,0,0.3); }
+.toast-icon { font-size: 18px; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(20px); } }
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+  text-align: center; padding: 60px 24px;
+  color: var(--text-3); border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+}
+.empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+.empty-state p { font-size: 15px; }
+
+/* ============================================================
+   MISC
+   ============================================================ */
+.divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(9,9,16,0.85); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px; display: flex; align-items: center; gap: 20px;
+  margin: 0 -24px 40px; padding-left: 24px; padding-right: 24px;
+}
+.sticky-logo { font-family: var(--font-display); font-size: 16px; font-weight: 800; background: linear-gradient(135deg, #aa88ff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.sticky-nav { display: flex; gap: 6px; margin-left: auto; }
+.nav-btn {
+  padding: 6px 14px; border-radius: 99px; font-size: 12px;
+  border: 1px solid var(--border); color: var(--text-2); cursor: pointer;
+  background: transparent; transition: all var(--transition);
+}
+.nav-btn:hover { border-color: var(--accent-1); color: var(--text-1); }
+.save-btn {
+  padding: 6px 16px; border-radius: 99px; font-size: 12px;
+  background: rgba(124,77,255,0.15); border: 1px solid rgba(124,77,255,0.3);
+  color: #c4a0ff; cursor: pointer; transition: all var(--transition);
+}
+.save-btn:hover { background: rgba(124,77,255,0.25); }
+
+/* ============================================================
+   RESULTS SECTION (initially hidden)
+   ============================================================ */
+#results-section { display: none; }
+#results-section.visible { display: block; animation: fadeUp 0.5s ease; }
+</style>
+</head>
+<body>
+
+<!-- AMBIENT BACKGROUND -->
+<div class="ambient">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app">
+
+  <!-- STICKY HEADER -->
+  <div class="sticky-header">
+    <div class="sticky-logo">🍹 Party Planner</div>
+    <div class="sticky-nav">
+      <button class="nav-btn" onclick="scrollTo('participants')">Ospiti</button>
+      <button class="nav-btn" onclick="scrollTo('drinks')">Drink</button>
+      <button class="nav-btn" onclick="scrollTo('results-section')">Risultati</button>
+    </div>
+    <button class="save-btn" onclick="saveToLocalStorage()">💾 Salva</button>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge"><div class="hero-badge-dot"></div>Party Planner Pro</div>
+    <h1>Party Drink<br>Planner</h1>
+    <p>Calcola litri, bottiglie e ingredienti per la tua festa. In 60 secondi.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num" id="heroDrinkCount">26</div><div class="hero-stat-lbl">Drink in libreria</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">∞</div><div class="hero-stat-lbl">Combinazioni</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">0€</div><div class="hero-stat-lbl">Costo</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== SECTION 1: PARTECIPANTI ===================== -->
+  <div class="section" id="participants">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Partecipanti</div>
+      <div class="section-sub" id="totalDrinksEstimate">Stima: — drink totali</div>
+    </div>
+
+    <div class="participants-grid">
+
+      <!-- UOMINI -->
+      <div class="participant-card">
+        <div class="participant-card-title">👨 Uomini</div>
+        <div class="stepper">
+          <button class="stepper-btn" onclick="changeCount('men', -1)">−</button>
+          <div class="stepper-val" id="men-val">4</div>
+          <button class="stepper-btn" onclick="changeCount('men', 1)">+</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Consumo medio</div>
+          <div class="intensity-grid" id="men-intensity">
+            <button class="intensity-btn" data-val="light" onclick="setIntensity('men','light',this)">
+              <span class="int-icon">🍋</span><div>Leggero</div><div class="int-num">2 🍹</div>
+            </button>
+            <button class="intensity-btn active" data-val="moderate" onclick="setIntensity('men','moderate',this)">
+              <span class="int-icon">🍸</span><div>Moderato</div><div class="int-num">4 🍹</div>
+            </button>
+            <button class="intensity-btn" data-val="heavy" onclick="setIntensity('men','heavy',this)">
+              <span class="int-icon">🥃</span><div>Bevitore</div><div class="int-num">7 🍹</div>
+            </button>
+            <button class="intensity-btn" data-val="none" onclick="setIntensity('men','none',this)">
+              <span class="int-icon">🚫</span><div>Non beve</div><div class="int-num">0 🍹</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DONNE -->
+      <div class="participant-card">
+        <div class="participant-card-title">👩 Donne</div>
+        <div class="stepper">
+          <button class="stepper-btn" onclick="changeCount('women', -1)">−</button>
+          <div class="stepper-val" id="women-val">4</div>
+          <button class="stepper-btn" onclick="changeCount('women', 1)">+</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Consumo medio</div>
+          <div class="intensity-grid" id="women-intensity">
+            <button class="intensity-btn" data-val="light" onclick="setIntensity('women','light',this)">
+              <span class="int-icon">🍋</span><div>Leggero</div><div class="int-num">2 🍹</div>
+            </button>
+            <button class="intensity-btn active" data-val="moderate" onclick="setIntensity('women','moderate',this)">
+              <span class="int-icon">🍸</span><div>Moderato</div><div class="int-num">3 🍹</div>
+            </button>
+            <button class="intensity-btn" data-val="heavy" onclick="setIntensity('women','heavy',this)">
+              <span class="int-icon">🥃</span><div>Bevitore</div><div class="int-num">5 🍹</div>
+            </button>
+            <button class="intensity-btn" data-val="none" onclick="setIntensity('women','none',this)">
+              <span class="int-icon">🚫</span><div>Non beve</div><div class="int-num">0 🍹</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TOTALS BAR -->
+    <div class="totals-bar">
+      <div class="total-chip">
+        <div class="total-chip-val val-purple" id="totalPeople">8</div>
+        <div class="total-chip-lbl">Totale ospiti</div>
+      </div>
+      <div class="total-chip">
+        <div class="total-chip-val val-blue" id="totalDrinks">—</div>
+        <div class="total-chip-lbl">Drink stimati</div>
+      </div>
+      <div class="total-chip">
+        <div class="total-chip-val val-pink" id="totalAlcohol">—</div>
+        <div class="total-chip-lbl">Litri alcol ~</div>
+      </div>
+      <div class="total-chip">
+        <div class="total-chip-val val-white" id="totalHours">4h</div>
+        <div class="total-chip-lbl">Durata festa</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ===================== SECTION 2: LIBRERIA DRINK ===================== -->
+  <div class="section" id="drinks">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Libreria Drink</div>
+      <div class="section-sub" id="selectedCount">0 selezionati</div>
+    </div>
+
+    <div class="filter-bar">
+      <input class="search-box" type="text" placeholder="Cerca un drink..." id="searchBox" oninput="renderDrinks()" />
+      <button class="filter-pill active" data-cat="Tutti" onclick="setCat(this)">Tutti</button>
+      <button class="filter-pill" data-cat="Aperitivi" onclick="setCat(this)">Aperitivi</button>
+      <button class="filter-pill" data-cat="Cocktail classici" onclick="setCat(this)">Classici</button>
+      <button class="filter-pill" data-cat="Gin drinks" onclick="setCat(this)">Gin</button>
+      <button class="filter-pill" data-cat="Vodka drinks" onclick="setCat(this)">Vodka</button>
+      <button class="filter-pill" data-cat="Rum drinks" onclick="setCat(this)">Rum</button>
+      <button class="filter-pill" data-cat="Long drink" onclick="setCat(this)">Long</button>
+      <button class="filter-pill" data-cat="Shot" onclick="setCat(this)">Shot</button>
+      <button class="filter-pill" data-cat="Analcolici" onclick="setCat(this)">Analcolici</button>
+    </div>
+
+    <div class="drinks-grid" id="drinksGrid"></div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ===================== SECTION 3: MIXER ===================== -->
+  <div class="section" id="mixer">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Mixer — Imposta le proporzioni</div>
+    </div>
+
+    <div id="mixerEmpty" class="empty-state">
+      <div class="empty-state-icon">🎚️</div>
+      <p>Seleziona almeno un drink dalla libreria per impostare le percentuali.</p>
+    </div>
+
+    <div class="mixer-list" id="mixerList"></div>
+
+    <div class="pct-warning" id="pctWarning">
+      ⚠️ Le percentuali sommano <span id="pctTotal">0</span>%. Devono fare 100%.
+    </div>
+  </div>
+
+  <!-- CALCULATE BUTTON -->
+  <div class="cta-bar">
+    <button class="btn-calculate" onclick="calculate()">⚡ Calcola ingredienti</button>
+  </div>
+
+  <!-- ===================== SECTION 4: RESULTS ===================== -->
+  <div class="section" id="results-section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Dashboard Risultati</div>
+    </div>
+
+    <!-- SUMMARY STATS -->
+    <div class="summary-stats">
+      <div class="stat-card">
+        <div class="stat-val" id="res-drinks" style="color:#aa88ff">—</div>
+        <div class="stat-lbl">Drink totali</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="res-liters" style="color:#5cc8ff">—</div>
+        <div class="stat-lbl">Litri totali</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="res-bottles" style="color:#ff8cc0">—</div>
+        <div class="stat-lbl">Bottiglie est.</div>
+      </div>
+    </div>
+
+    <!-- DRINK DISTRIBUTION CHART -->
+    <div class="card chart-wrap">
+      <div class="chart-title">Distribuzione drink</div>
+      <div class="bar-chart" id="drinkDistChart"></div>
+    </div>
+
+    <!-- INGREDIENT BREAKDOWN -->
+    <div class="results-grid">
+      <div>
+        <div class="chart-title" style="margin-bottom:14px">Ingredienti necessari</div>
+        <div class="ingredient-list" id="ingredientList"></div>
+      </div>
+      <div>
+        <div class="summary-bottles">
+          <div class="chart-title">🍾 Bottiglie da acquistare</div>
+          <div class="bottles-grid" id="bottlesGrid"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /app -->
+
+<script>
+/* ============================================================
+   DATA — Drink database (easily expandable as JSON)
+   ============================================================ */
+const DRINKS_DB = [
+  {
+    id: 'spritz-aperol', name: 'Spritz Aperol', category: 'Aperitivi', emoji: '🍊',
+    difficulty: 1, alcoholLevel: 2,
+    ingredients: [{ name: 'Aperol', ml: 60 }, { name: 'Prosecco', ml: 90 }, { name: 'Acqua Frizzante', ml: 30 }],
+    ice: true, garnish: 'Fetta d\'arancia'
+  },
+  {
+    id: 'spritz-campari', name: 'Spritz Campari', category: 'Aperitivi', emoji: '🔴',
+    difficulty: 1, alcoholLevel: 2,
+    ingredients: [{ name: 'Campari', ml: 60 }, { name: 'Prosecco', ml: 90 }, { name: 'Acqua Frizzante', ml: 30 }],
+    ice: true, garnish: 'Fetta d\'arancia'
+  },
+  {
+    id: 'hugo', name: 'Hugo Spritz', category: 'Aperitivi', emoji: '🌿',
+    difficulty: 1, alcoholLevel: 2,
+    ingredients: [{ name: 'Prosecco', ml: 120 }, { name: 'Sciroppo di Sambuco', ml: 30 }, { name: 'Acqua Frizzante', ml: 30 }, { name: 'Menta', ml: 5 }],
+    ice: true, garnish: 'Menta + lime'
+  },
+  {
+    id: 'americano', name: 'Americano', category: 'Aperitivi', emoji: '🥂',
+    difficulty: 1, alcoholLevel: 2,
+    ingredients: [{ name: 'Campari', ml: 30 }, { name: 'Vermouth Rosso', ml: 30 }, { name: 'Acqua Frizzante', ml: 60 }],
+    ice: true, garnish: 'Scorza d\'arancia'
+  },
+  {
+    id: 'negroni', name: 'Negroni', category: 'Cocktail classici', emoji: '🍸',
+    difficulty: 2, alcoholLevel: 5,
+    ingredients: [{ name: 'Gin', ml: 30 }, { name: 'Campari', ml: 30 }, { name: 'Vermouth Rosso', ml: 30 }],
+    ice: true, garnish: 'Scorza d\'arancia'
+  },
+  {
+    id: 'negroni-sbagliato', name: 'Negroni Sbagliato', category: 'Cocktail classici', emoji: '🥃',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Campari', ml: 30 }, { name: 'Vermouth Rosso', ml: 30 }, { name: 'Prosecco', ml: 60 }],
+    ice: true, garnish: 'Scorza d\'arancia'
+  },
+  {
+    id: 'gin-tonic', name: 'Gin Tonic', category: 'Gin drinks', emoji: '🫧',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Gin', ml: 50 }, { name: 'Acqua Tonica', ml: 150 }],
+    ice: true, garnish: 'Lime + rosmarino'
+  },
+  {
+    id: 'gin-lemon', name: 'Gin Lemon', category: 'Gin drinks', emoji: '🍋',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Gin', ml: 50 }, { name: 'Limonata', ml: 150 }],
+    ice: true, garnish: 'Fetta di limone'
+  },
+  {
+    id: 'moscow-mule', name: 'Moscow Mule', category: 'Vodka drinks', emoji: '🫚',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Vodka', ml: 50 }, { name: 'Ginger Beer', ml: 120 }, { name: 'Succo di Lime', ml: 20 }],
+    ice: true, garnish: 'Lime + menta'
+  },
+  {
+    id: 'vodka-lemon', name: 'Vodka Lemon', category: 'Vodka drinks', emoji: '🍋',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Vodka', ml: 50 }, { name: 'Limonata', ml: 150 }],
+    ice: true, garnish: 'Fetta di limone'
+  },
+  {
+    id: 'cuba-libre', name: 'Cuba Libre', category: 'Rum drinks', emoji: '🥤',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Rum Bianco', ml: 50 }, { name: 'Cola', ml: 150 }, { name: 'Succo di Lime', ml: 15 }],
+    ice: true, garnish: 'Lime'
+  },
+  {
+    id: 'mojito', name: 'Mojito', category: 'Rum drinks', emoji: '🍃',
+    difficulty: 3, alcoholLevel: 3,
+    ingredients: [{ name: 'Rum Bianco', ml: 50 }, { name: 'Succo di Lime', ml: 30 }, { name: 'Sciroppo di Zucchero', ml: 20 }, { name: 'Acqua Frizzante', ml: 80 }, { name: 'Menta', ml: 10 }],
+    ice: true, garnish: 'Menta + lime'
+  },
+  {
+    id: 'caipirinha', name: 'Caipirinha', category: 'Cocktail classici', emoji: '🍈',
+    difficulty: 2, alcoholLevel: 4,
+    ingredients: [{ name: 'Cachaça', ml: 60 }, { name: 'Succo di Lime', ml: 30 }, { name: 'Sciroppo di Zucchero', ml: 20 }],
+    ice: true, garnish: 'Lime a spicchi'
+  },
+  {
+    id: 'margarita', name: 'Margarita', category: 'Cocktail classici', emoji: '🍸',
+    difficulty: 2, alcoholLevel: 4,
+    ingredients: [{ name: 'Tequila', ml: 50 }, { name: 'Triple Sec', ml: 25 }, { name: 'Succo di Lime', ml: 25 }],
+    ice: true, garnish: 'Sale + lime'
+  },
+  {
+    id: 'paloma', name: 'Paloma', category: 'Long drink', emoji: '🏖️',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Tequila', ml: 50 }, { name: 'Succo di Pompelmo', ml: 90 }, { name: 'Acqua Frizzante', ml: 60 }, { name: 'Succo di Lime', ml: 15 }],
+    ice: true, garnish: 'Sale + pompelmo'
+  },
+  {
+    id: 'daiquiri', name: 'Daiquiri', category: 'Cocktail classici', emoji: '🍓',
+    difficulty: 2, alcoholLevel: 4,
+    ingredients: [{ name: 'Rum Bianco', ml: 60 }, { name: 'Succo di Lime', ml: 30 }, { name: 'Sciroppo di Zucchero', ml: 15 }],
+    ice: true, garnish: 'Lime'
+  },
+  {
+    id: 'whiskey-sour', name: 'Whiskey Sour', category: 'Cocktail classici', emoji: '🥃',
+    difficulty: 2, alcoholLevel: 4,
+    ingredients: [{ name: 'Whiskey Bourbon', ml: 60 }, { name: 'Succo di Limone', ml: 30 }, { name: 'Sciroppo di Zucchero', ml: 15 }],
+    ice: true, garnish: 'Ciliegina al maraschino'
+  },
+  {
+    id: 'manhattan', name: 'Manhattan', category: 'Cocktail classici', emoji: '🍸',
+    difficulty: 3, alcoholLevel: 5,
+    ingredients: [{ name: 'Whiskey Bourbon', ml: 60 }, { name: 'Vermouth Rosso', ml: 30 }, { name: 'Angostura Bitters', ml: 5 }],
+    ice: false, garnish: 'Ciliegina al maraschino'
+  },
+  {
+    id: 'long-island', name: 'Long Island', category: 'Long drink', emoji: '🏝️',
+    difficulty: 3, alcoholLevel: 5,
+    ingredients: [{ name: 'Vodka', ml: 20 }, { name: 'Rum Bianco', ml: 20 }, { name: 'Tequila', ml: 20 }, { name: 'Gin', ml: 20 }, { name: 'Triple Sec', ml: 20 }, { name: 'Succo di Limone', ml: 30 }, { name: 'Cola', ml: 60 }],
+    ice: true, garnish: 'Lime'
+  },
+  {
+    id: 'sex-on-the-beach', name: 'Sex on the Beach', category: 'Long drink', emoji: '🌅',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Vodka', ml: 40 }, { name: 'Succo di Pesca', ml: 60 }, { name: 'Succo d\'Arancia', ml: 60 }, { name: 'Succo di Mirtillo', ml: 30 }],
+    ice: true, garnish: 'Arancia'
+  },
+  {
+    id: 'pina-colada', name: 'Piña Colada', category: 'Long drink', emoji: '🍍',
+    difficulty: 2, alcoholLevel: 3,
+    ingredients: [{ name: 'Rum Bianco', ml: 60 }, { name: 'Succo di Ananas', ml: 90 }, { name: 'Crema di Cocco', ml: 30 }],
+    ice: true, garnish: 'Ananas + ombrellino'
+  },
+  {
+    id: 'white-russian', name: 'White Russian', category: 'Cocktail classici', emoji: '🥛',
+    difficulty: 1, alcoholLevel: 4,
+    ingredients: [{ name: 'Vodka', ml: 50 }, { name: 'Kahlúa', ml: 20 }, { name: 'Panna', ml: 30 }],
+    ice: true, garnish: ''
+  },
+  {
+    id: 'espresso-martini', name: 'Espresso Martini', category: 'Cocktail classici', emoji: '☕',
+    difficulty: 3, alcoholLevel: 4,
+    ingredients: [{ name: 'Vodka', ml: 50 }, { name: 'Kahlúa', ml: 20 }, { name: 'Espresso', ml: 30 } ],
+    ice: true, garnish: '3 chicchi di caffè'
+  },
+  {
+    id: 'bloody-mary', name: 'Bloody Mary', category: 'Long drink', emoji: '🍅',
+    difficulty: 2, alcoholLevel: 3,
+    ingredients: [{ name: 'Vodka', ml: 50 }, { name: 'Succo di Pomodoro', ml: 120 }, { name: 'Succo di Limone', ml: 15 }, { name: 'Worcestershire Sauce', ml: 5 }],
+    ice: true, garnish: 'Sedano + lime'
+  },
+  {
+    id: 'malibu-cola', name: 'Malibu Cola', category: 'Long drink', emoji: '🌴',
+    difficulty: 1, alcoholLevel: 2,
+    ingredients: [{ name: 'Malibu', ml: 50 }, { name: 'Cola', ml: 150 }],
+    ice: true, garnish: ''
+  },
+  {
+    id: 'jagerbomb', name: 'Jägerbomb', category: 'Shot', emoji: '💣',
+    difficulty: 1, alcoholLevel: 3,
+    ingredients: [{ name: 'Jägermeister', ml: 35 }, { name: 'Energy Drink', ml: 100 }],
+    ice: false, garnish: ''
+  }
+];
+
+/* ============================================================
+   STATE — all app state in one object (easily serializable)
+   ============================================================ */
+const state = {
+  men: 4,
+  women: 4,
+  menIntensity: 'moderate',
+  womenIntensity: 'moderate',
+  selectedDrinks: new Set(),
+  drinkPct: {},
+  currentCat: 'Tutti',
+  results: null
+};
+
+/* ============================================================
+   INTENSITY CONFIG — alcohol drink estimates per person
+   ============================================================ */
+const INTENSITY = {
+  none:     { drinks: 0,  label: '0 🍹' },
+  light:    { drinks: 2,  label: '2 🍹' },
+  moderate: { drinks: 4,  label: '4 🍹' },
+  heavy:    { drinks: 7,  label: '7 🍹' }
+};
+const GENDER_MULTIPLIER = { men: 1.0, women: 0.75 };
+
+/* ============================================================
+   CATEGORY COLORS for bar chart
+   ============================================================ */
+const CAT_COLORS = {
+  'Aperitivi':         'linear-gradient(90deg,#ff9950,#ffc940)',
+  'Cocktail classici': 'linear-gradient(90deg,#7c4dff,#aa88ff)',
+  'Gin drinks':        'linear-gradient(90deg,#00c6ff,#0090ff)',
+  'Vodka drinks':      'linear-gradient(90deg,#4dffce,#00c6a0)',
+  'Rum drinks':        'linear-gradient(90deg,#ff7c4d,#ff4d4d)',
+  'Long drink':        'linear-gradient(90deg,#ff4d9b,#ff7c4d)',
+  'Shot':              'linear-gradient(90deg,#ff4d4d,#ff004c)',
+  'Analcolici':        'linear-gradient(90deg,#5cc8ff,#00e5ff)',
+  'default':           'linear-gradient(90deg,#7c4dff,#00c6ff)'
+};
+
+/* ============================================================
+   PARTICIPANTS LOGIC
+   ============================================================ */
+function changeCount(gender, delta) {
+  state[gender] = Math.max(0, state[gender] + delta);
+  document.getElementById(`${gender}-val`).textContent = state[gender];
+  updateTotals();
+}
+
+function setIntensity(gender, val, btn) {
+  state[`${gender}Intensity`] = val;
+  document.querySelectorAll(`#${gender}-intensity .intensity-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateTotals();
+}
+
+function calcTotalDrinks() {
+  const menD   = state.men   * INTENSITY[state.menIntensity].drinks   * GENDER_MULTIPLIER.men;
+  const womenD = state.women * INTENSITY[state.womenIntensity].drinks * GENDER_MULTIPLIER.women;
+  return Math.round(menD + womenD);
+}
+
+function updateTotals() {
+  const total = state.men + state.women;
+  const drinks = calcTotalDrinks();
+  const litersAlcEst = (drinks * 30 / 1000).toFixed(1);
+  document.getElementById('totalPeople').textContent = total;
+  document.getElementById('totalDrinks').textContent = drinks || '—';
+  document.getElementById('totalAlcohol').textContent = drinks ? litersAlcEst + 'L' : '—';
+  document.getElementById('totalDrinksEstimate').textContent = drinks ? `Stima: ${drinks} drink totali` : 'Stima: —';
+}
+
+/* ============================================================
+   DRINK LIBRARY RENDERING
+   ============================================================ */
+function setCat(btn) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  state.currentCat = btn.dataset.cat;
+  renderDrinks();
+}
+
+function renderDrinks() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  const grid = document.getElementById('drinksGrid');
+  const filtered = DRINKS_DB.filter(d => {
+    const catOk = state.currentCat === 'Tutti' || d.category === state.currentCat;
+    const searchOk = !q || d.name.toLowerCase().includes(q) || d.category.toLowerCase().includes(q);
+    return catOk && searchOk;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔍</div><p>Nessun drink trovato.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(d => {
+    const sel = state.selectedDrinks.has(d.id);
+    const stars = '★'.repeat(d.difficulty) + '☆'.repeat(3 - d.difficulty);
+    const alcBar = '🔥'.repeat(Math.min(d.alcoholLevel, 5));
+    return `
+    <div class="drink-card ${sel ? 'selected' : ''}" onclick="toggleDrink('${d.id}')" id="dc-${d.id}">
+      <div class="drink-select-badge">✓</div>
+      <span class="drink-emoji">${d.emoji}</span>
+      <div class="drink-name">${d.name}</div>
+      <div class="drink-cat">${d.category}</div>
+      <div class="drink-tags">
+        <span class="tag tag-diff" title="Difficoltà">${stars}</span>
+        <span class="tag tag-alc" title="Gradazione">${alcBar}</span>
+        <span class="tag">${d.ingredients.length} ing.</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  updateSelectedCount();
+}
+
+function toggleDrink(id) {
+  if (state.selectedDrinks.has(id)) {
+    state.selectedDrinks.delete(id);
+    delete state.drinkPct[id];
+  } else {
+    state.selectedDrinks.add(id);
+  }
+  const card = document.getElementById(`dc-${id}`);
+  if (card) card.classList.toggle('selected', state.selectedDrinks.has(id));
+  updateSelectedCount();
+  rebalancePct();
+  renderMixer();
+}
+
+function updateSelectedCount() {
+  document.getElementById('selectedCount').textContent = `${state.selectedDrinks.size} selezionati`;
+}
+
+/* ============================================================
+   MIXER LOGIC
+   ============================================================ */
+function rebalancePct() {
+  const ids = [...state.selectedDrinks];
+  if (ids.length === 0) { state.drinkPct = {}; return; }
+  const equal = Math.floor(100 / ids.length);
+  ids.forEach((id, i) => {
+    state.drinkPct[id] = (i === ids.length - 1) ? 100 - equal * (ids.length - 1) : equal;
+  });
+}
+
+function renderMixer() {
+  const list = document.getElementById('mixerList');
+  const empty = document.getElementById('mixerEmpty');
+  const ids = [...state.selectedDrinks];
+  if (ids.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; updatePctWarning(); return; }
+  empty.style.display = 'none';
+  list.innerHTML = ids.map(id => {
+    const d = DRINKS_DB.find(x => x.id === id);
+    const pct = state.drinkPct[id] || 0;
+    return `
+    <div class="mixer-item" id="mi-${id}">
+      <div class="mixer-emoji">${d.emoji}</div>
+      <div class="mixer-name">${d.name}</div>
+      <div style="display:flex;align-items:center;gap:10px;flex:2">
+        <input type="range" class="mixer-slider" min="0" max="100" value="${pct}"
+          oninput="updatePct('${id}', this.value)" />
+        <div class="mixer-pct" id="pct-${id}">${pct}%</div>
+      </div>
+      <button class="mixer-remove" onclick="toggleDrink('${id}')">✕</button>
+    </div>`;
+  }).join('');
+  updatePctWarning();
+}
+
+function updatePct(id, val) {
+  state.drinkPct[id] = parseInt(val);
+  document.getElementById(`pct-${id}`).textContent = val + '%';
+  updatePctWarning();
+}
+
+function updatePctWarning() {
+  const total = Object.values(state.drinkPct).reduce((a, b) => a + b, 0);
+  const warn = document.getElementById('pctWarning');
+  const valid = Math.abs(total - 100) < 1 || [...state.selectedDrinks].length === 0;
+  warn.classList.toggle('show', !valid);
+  document.getElementById('pctTotal').textContent = total;
+}
+
+/* ============================================================
+   CALCULATION ENGINE
+   ============================================================ */
+function calculate() {
+  const ids = [...state.selectedDrinks];
+  if (ids.length === 0) { toast('⚠️', 'Seleziona almeno un drink!', 'warning'); return; }
+  const total = Object.values(state.drinkPct).reduce((a, b) => a + b, 0);
+  if (Math.abs(total - 100) > 1) { toast('⚠️', 'Le percentuali devono fare 100%', 'warning'); return; }
+
+  const totalDrinks = calcTotalDrinks();
+  if (totalDrinks === 0) { toast('⚠️', 'Imposta i partecipanti prima!', 'warning'); return; }
+
+  // Ingredient aggregation
+  const ingredients = {};
+  ids.forEach(id => {
+    const d = DRINKS_DB.find(x => x.id === id);
+    const count = Math.round(totalDrinks * (state.drinkPct[id] / 100));
+    d.ingredients.forEach(ing => {
+      if (!ingredients[ing.name]) ingredients[ing.name] = 0;
+      ingredients[ing.name] += (ing.ml * count);
+    });
+  });
+
+  // Sort by quantity
+  const sorted = Object.entries(ingredients).sort((a, b) => b[1] - a[1]);
+  const maxMl = sorted[0]?.[1] || 1;
+  const totalLiters = sorted.reduce((a, b) => a + b[1], 0) / 1000;
+
+  // Bottle estimate (0.7L standard)
+  const bottlesEst = sorted.reduce((a, b) => a + Math.ceil(b[1] / 700), 0);
+
+  state.results = { totalDrinks, sorted, maxMl, totalLiters, bottlesEst, ids };
+  renderResults();
+
+  document.getElementById('results-section').classList.add('visible');
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  toast('✅', `Calcolo completato! ${totalDrinks} drink, ${totalLiters.toFixed(1)}L totali.`, 'success');
+}
+
+/* ============================================================
+   RESULTS RENDERING
+   ============================================================ */
+function renderResults() {
+  const { totalDrinks, sorted, maxMl, totalLiters, bottlesEst, ids } = state.results;
+
+  document.getElementById('res-drinks').textContent  = totalDrinks;
+  document.getElementById('res-liters').textContent  = totalLiters.toFixed(1) + 'L';
+  document.getElementById('res-bottles').textContent = bottlesEst;
+
+  // Drink distribution bar chart
+  const distChart = document.getElementById('drinkDistChart');
+  distChart.innerHTML = ids.map(id => {
+    const d = DRINKS_DB.find(x => x.id === id);
+    const pct = state.drinkPct[id];
+    const count = Math.round(totalDrinks * pct / 100);
+    const col = CAT_COLORS[d.category] || CAT_COLORS.default;
+    return `
+    <div class="bar-row">
+      <div class="bar-label">${d.emoji} ${d.name}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${col}"></div></div>
+      <div class="bar-val">${pct}% · ${count}</div>
+    </div>`;
+  }).join('');
+
+  // Ingredient list
+  const ingList = document.getElementById('ingredientList');
+  ingList.innerHTML = sorted.map(([name, ml]) => {
+    const liters = ml / 1000;
+    const bottles = Math.ceil(ml / 700);
+    const pct = Math.round(ml / maxMl * 100);
+    return `
+    <div class="ingredient-row">
+      <div class="ing-name">${name}</div>
+      <div class="ing-bar-wrap"><div class="ing-bar" style="width:${pct}%"></div></div>
+      <div class="ing-l">${liters.toFixed(2)}L</div>
+      <div class="ing-bottles">${bottles} bott.</div>
+    </div>`;
+  }).join('');
+
+  // Bottles grid
+  const bottGrid = document.getElementById('bottlesGrid');
+  bottGrid.innerHTML = sorted.map(([name, ml]) => {
+    const bottles = Math.ceil(ml / 700);
+    const liters = (ml / 1000).toFixed(2);
+    const emoji = getIngEmoji(name);
+    return `
+    <div class="bottle-chip">
+      <div class="bottle-icon">${emoji}</div>
+      <div>
+        <div class="bottle-name">${name}</div>
+        <div class="bottle-count">${bottles}x</div>
+        <div class="bottle-sub">${liters}L totali</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getIngEmoji(name) {
+  const map = {
+    'Gin': '🫧', 'Vodka': '🍶', 'Rum Bianco': '🌊', 'Tequila': '🌵', 'Campari': '🔴',
+    'Aperol': '🍊', 'Prosecco': '🥂', 'Vermouth Rosso': '🍷', 'Whiskey Bourbon': '🥃',
+    'Acqua Tonica': '💧', 'Acqua Frizzante': '💧', 'Cola': '🥤', 'Limonata': '🍋',
+    'Ginger Beer': '🫚', 'Malibu': '🌴', 'Kahlúa': '☕', 'Jägermeister': '🦌',
+    'Energy Drink': '⚡', 'Succo di Lime': '🍈', 'Succo di Limone': '🍋',
+    'Sciroppo di Zucchero': '🍯', 'Triple Sec': '🍊', 'Cachaça': '🌿',
+    'Panna': '🥛', 'Espresso': '☕', 'Menta': '🌿',
+  };
+  return map[name] || '🍾';
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+function toast(icon, message, type = 'info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.animation = 'toastOut 0.3s ease forwards';
+    setTimeout(() => t.remove(), 300);
+  }, 3500);
+}
+
+/* ============================================================
+   LOCALSTORAGE
+   ============================================================ */
+function saveToLocalStorage() {
+  const data = {
+    men: state.men, women: state.women,
+    menIntensity: state.menIntensity, womenIntensity: state.womenIntensity,
+    selectedDrinks: [...state.selectedDrinks],
+    drinkPct: state.drinkPct
+  };
+  localStorage.setItem('partyPlannerState', JSON.stringify(data));
+  toast('💾', 'Configurazione salvata!', 'success');
+}
+
+function loadFromLocalStorage() {
+  const raw = localStorage.getItem('partyPlannerState');
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    state.men = data.men || 4;
+    state.women = data.women || 4;
+    state.menIntensity = data.menIntensity || 'moderate';
+    state.womenIntensity = data.womenIntensity || 'moderate';
+    state.selectedDrinks = new Set(data.selectedDrinks || []);
+    state.drinkPct = data.drinkPct || {};
+    // Restore UI
+    document.getElementById('men-val').textContent = state.men;
+    document.getElementById('women-val').textContent = state.women;
+    ['men', 'women'].forEach(g => {
+      document.querySelectorAll(`#${g}-intensity .intensity-btn`).forEach(b => {
+        b.classList.toggle('active', b.dataset.val === state[`${g}Intensity`]);
+      });
+    });
+    toast('📂', 'Configurazione caricata.', 'info');
+  } catch(e) {}
+}
+
+/* ============================================================
+   SCROLL HELPER
+   ============================================================ */
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('heroDrinkCount').textContent = DRINKS_DB.length;
+  renderDrinks();
+  updateTotals();
+  renderMixer();
+  loadFromLocalStorage();
+  // After load, re-render if we have selected drinks
+  if (state.selectedDrinks.size > 0) {
+    renderDrinks();
+    renderMixer();
+  }
+});
+</script>
+</body>
+</html>
