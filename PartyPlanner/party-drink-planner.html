@@ -144,8 +144,8 @@ body {
 /* ============================================================
    PARTICIPANTS
    ============================================================ */
-.participants-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 600px) { .participants-grid { grid-template-columns: 1fr; } }
+.participants-grid { display: grid; grid-template-columns: minmax(260px, 0.85fr) 1.35fr; gap: 16px; align-items: start; }
+@media (max-width: 760px) { .participants-grid { grid-template-columns: 1fr; } }
 
 .participant-card {
   background: var(--bg-card); border: 1px solid var(--border);
@@ -153,6 +153,7 @@ body {
   display: flex; flex-direction: column; gap: 16px;
 }
 .participant-card-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.08em; }
+.participant-hint { color: var(--text-3); font-size: 12px; margin-top: -8px; }
 
 .stepper { display: flex; align-items: center; gap: 0; }
 .stepper-btn {
@@ -182,6 +183,56 @@ body {
 }
 .intensity-btn .int-icon { font-size: 18px; display: block; margin-bottom: 4px; }
 .intensity-btn .int-num { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--text-1); }
+
+.profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.profile-control {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px;
+}
+.profile-label {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  color: var(--text-2); font-size: 12px; margin-bottom: 8px;
+}
+.profile-label strong { color: var(--text-1); font-family: var(--font-display); font-size: 13px; }
+.profile-input,
+.participant-input,
+.participant-select,
+.bottle-size-input {
+  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-1); font-family: var(--font-body);
+  outline: none; transition: border-color var(--transition), background var(--transition);
+}
+.profile-input { padding: 8px 10px; font-size: 15px; text-align: center; font-family: var(--font-display); font-weight: 700; }
+.profile-input:focus,
+.participant-input:focus,
+.participant-select:focus,
+.bottle-size-input:focus { border-color: var(--accent-1); background: rgba(124,77,255,0.09); }
+.participant-list { display: flex; flex-direction: column; gap: 10px; max-height: 520px; overflow: auto; padding-right: 4px; }
+.participant-row {
+  display: grid; grid-template-columns: 42px minmax(0, 1fr) 140px 82px;
+  align-items: center; gap: 10px; background: var(--bg-surface);
+  border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px;
+}
+.participant-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(124,77,255,0.9), rgba(0,198,255,0.75));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 13px;
+  box-shadow: 0 0 18px rgba(124,77,255,0.25);
+}
+.participant-input { padding: 10px 12px; font-size: 14px; min-width: 0; }
+.participant-select { padding: 10px 12px; font-size: 13px; cursor: pointer; }
+.participant-select option { background: var(--bg-card); color: var(--text-1); }
+.participant-drinks {
+  font-family: var(--font-display); font-weight: 800; color: var(--accent-2);
+  text-align: right; white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .profile-grid { grid-template-columns: 1fr 1fr; }
+  .participant-row { grid-template-columns: 38px 1fr; }
+  .participant-select { grid-column: 2; }
+  .participant-drinks { grid-column: 2; text-align: left; font-size: 13px; }
+}
 
 /* ============================================================
    TOTALS BAR
@@ -226,7 +277,7 @@ body {
 }
 
 .drinks-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 14px;
 }
 .drink-card {
@@ -234,6 +285,7 @@ body {
   border-radius: var(--radius-md); padding: 18px;
   cursor: pointer; transition: all var(--transition);
   position: relative; overflow: hidden;
+  min-height: 240px;
 }
 .drink-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -264,6 +316,35 @@ body {
   transition: all var(--transition);
 }
 .drink-card.selected .drink-select-badge { opacity: 1; transform: scale(1); }
+.drink-overlay {
+  position: absolute; inset: 8px; border-radius: calc(var(--radius-md) - 2px);
+  padding: 14px; background: rgba(15,15,26,0.72);
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 16px 42px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.08);
+  opacity: 0; transform: translateY(12px) scale(0.96); overflow-y:auto;
+  transition: opacity var(--transition), transform var(--transition);
+  pointer-events: none; display: flex; flex-direction: column; gap: 10px; max-height: calc(100% - 16px);
+}
+.drink-card:hover .drink-overlay { opacity: 1; transform: translateY(0) scale(1); }
+
+.drink-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+.drink-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+}
+.overlay-title { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #d8ccff; text-transform: uppercase; letter-spacing: 0.08em; }
+.overlay-ingredients { display: flex; flex-direction: column; gap: 6px; }
+.overlay-ing { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--text-2); }
+.overlay-ing span:last-child { color: var(--text-1); font-family: var(--font-display); font-weight: 700; }
+.overlay-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+.overlay-chip {
+  font-size: 11px; padding: 5px 8px; border-radius: 99px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-2);
+}
 
 /* ============================================================
    SELECTED DRINKS MIXER
@@ -272,16 +353,60 @@ body {
 .mixer-item {
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius-md); padding: 16px;
-  display: flex; align-items: center; gap: 16px;
+  display: grid; grid-template-columns: 34px minmax(140px, 1fr) minmax(260px, 1.6fr) 120px 34px;
+  align-items: center; gap: 16px;
 }
 .mixer-emoji { font-size: 24px; flex-shrink: 0; }
-.mixer-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; flex: 1; }
-.mixer-pct-label { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+.mixer-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+.mixer-meta {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+
+.mixer-sub {
+  font-size:12px;
+  color:var(--text-3);
+}
+
+.mixer-drink-count {
+  min-width:120px;
+  text-align:right;
+}
+
+.mixer-drink-count strong {
+  font-family:var(--font-display);
+  font-size:24px;
+  color:var(--accent-2);
+}
+
+.mixer-drink-count span {
+  display:block;
+  font-size:11px;
+  color:var(--text-3);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.mixer-control { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mixer-control-main { display: grid; grid-template-columns: 32px minmax(90px, 1fr) 32px 52px; align-items: center; gap: 10px; }
+.mixer-step-btn {
+  width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04); color: var(--text-1); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all var(--transition);
+}
+.mixer-step-btn:hover { border-color: var(--accent-1); background: rgba(124,77,255,0.15); }
 .mixer-pct { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--accent-1); min-width: 44px; text-align: center; }
 .mixer-slider {
-  flex: 1; min-width: 80px; accent-color: var(--accent-1);
+  width: 100%; min-width: 80px; accent-color: var(--accent-1);
   height: 4px; border-radius: 99px;
 }
+.mixer-scale {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  color: var(--text-3); font-size: 10px; line-height: 1; padding: 0 42px 0 42px;
+}
+.mixer-scale span { text-align: center; }
 .mixer-remove {
   width: 28px; height: 28px; border-radius: 50%;
   background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2);
@@ -297,6 +422,12 @@ body {
   color: #ffd060; display: none; margin-top: 12px;
 }
 .pct-warning.show { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 820px) {
+  .mixer-item { grid-template-columns: 30px 1fr 34px; gap: 12px; }
+  .mixer-control { grid-column: 1 / -1; }
+  .mixer-drink-count { grid-column: 1 / -1; text-align: left; }
+  .mixer-remove { grid-column: 3; grid-row: 1; }
+}
 
 /* ============================================================
    RESULTS
@@ -306,15 +437,29 @@ body {
 
 .ingredient-list { display: flex; flex-direction: column; gap: 10px; }
 .ingredient-row {
-  display: flex; align-items: center; gap: 12px;
+  display: grid; grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.4fr) 112px 72px 78px;
+  align-items: center; gap: 12px;
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: 12px 16px;
 }
-.ing-name { flex: 1; font-size: 14px; }
-.ing-bar-wrap { flex: 2; height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+.ing-name { font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ing-bar-wrap { height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
 .ing-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); transition: width 0.6s ease; }
 .ing-l { font-family: var(--font-display); font-size: 14px; font-weight: 700; min-width: 52px; text-align: right; color: var(--accent-2); }
 .ing-bottles { font-size: 12px; color: var(--text-3); min-width: 60px; text-align: right; }
+.bottle-size-input {
+  width: 96px; max-width: 96px; padding: 8px 10px; text-align: center;
+  font-family: var(--font-display); font-weight: 700;
+}
+.chart-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.bottle-size-control { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 12px; white-space: nowrap; }
+@media (max-width: 720px) {
+  .ingredient-row { grid-template-columns: 1fr 92px; gap: 10px; }
+  .ing-bar-wrap { grid-column: 1 / -1; order: 5; }
+  .ing-l, .ing-bottles { text-align: left; min-width: 0; }
+  .bottle-size-input { width: 92px; max-width: 92px; justify-self: end; }
+  .chart-title-row { align-items: flex-start; flex-direction: column; }
+}
 
 /* ============================================================
    DASHBOARD / SUMMARY
@@ -474,61 +619,25 @@ body {
     </div>
 
     <div class="participants-grid">
-
-      <!-- UOMINI -->
       <div class="participant-card">
-        <div class="participant-card-title">👨 Uomini</div>
+        <div class="participant-card-title">Ospiti totali</div>
         <div class="stepper">
-          <button class="stepper-btn" onclick="changeCount('men', -1)">−</button>
-          <div class="stepper-val" id="men-val">4</div>
-          <button class="stepper-btn" onclick="changeCount('men', 1)">+</button>
+          <button class="stepper-btn" onclick="changeParticipants(-1)">−</button>
+          <div class="stepper-val" id="participants-val">8</div>
+          <button class="stepper-btn" onclick="changeParticipants(1)">+</button>
         </div>
+        <div class="participant-hint">Aggiungi o rimuovi persone: la lista si aggiorna subito.</div>
+
         <div>
-          <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Consumo medio</div>
-          <div class="intensity-grid" id="men-intensity">
-            <button class="intensity-btn" data-val="light" onclick="setIntensity('men','light',this)">
-              <span class="int-icon">🍋</span><div>Leggero</div><div class="int-num">2 🍹</div>
-            </button>
-            <button class="intensity-btn active" data-val="moderate" onclick="setIntensity('men','moderate',this)">
-              <span class="int-icon">🍸</span><div>Moderato</div><div class="int-num">4 🍹</div>
-            </button>
-            <button class="intensity-btn" data-val="heavy" onclick="setIntensity('men','heavy',this)">
-              <span class="int-icon">🥃</span><div>Bevitore</div><div class="int-num">7 🍹</div>
-            </button>
-            <button class="intensity-btn" data-val="none" onclick="setIntensity('men','none',this)">
-              <span class="int-icon">🚫</span><div>Non beve</div><div class="int-num">0 🍹</div>
-            </button>
-          </div>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Profili consumo</div>
+          <div class="profile-grid" id="profileGrid"></div>
         </div>
       </div>
 
-      <!-- DONNE -->
       <div class="participant-card">
-        <div class="participant-card-title">👩 Donne</div>
-        <div class="stepper">
-          <button class="stepper-btn" onclick="changeCount('women', -1)">−</button>
-          <div class="stepper-val" id="women-val">4</div>
-          <button class="stepper-btn" onclick="changeCount('women', 1)">+</button>
-        </div>
-        <div>
-          <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Consumo medio</div>
-          <div class="intensity-grid" id="women-intensity">
-            <button class="intensity-btn" data-val="light" onclick="setIntensity('women','light',this)">
-              <span class="int-icon">🍋</span><div>Leggero</div><div class="int-num">2 🍹</div>
-            </button>
-            <button class="intensity-btn active" data-val="moderate" onclick="setIntensity('women','moderate',this)">
-              <span class="int-icon">🍸</span><div>Moderato</div><div class="int-num">3 🍹</div>
-            </button>
-            <button class="intensity-btn" data-val="heavy" onclick="setIntensity('women','heavy',this)">
-              <span class="int-icon">🥃</span><div>Bevitore</div><div class="int-num">5 🍹</div>
-            </button>
-            <button class="intensity-btn" data-val="none" onclick="setIntensity('women','none',this)">
-              <span class="int-icon">🚫</span><div>Non beve</div><div class="int-num">0 🍹</div>
-            </button>
-          </div>
-        </div>
+        <div class="participant-card-title">Lista partecipanti</div>
+        <div class="participant-list" id="participantList"></div>
       </div>
-
     </div>
 
     <!-- TOTALS BAR -->
@@ -543,7 +652,7 @@ body {
       </div>
       <div class="total-chip">
         <div class="total-chip-val val-pink" id="totalAlcohol">—</div>
-        <div class="total-chip-lbl">Litri alcol ~</div>
+        <div class="total-chip-lbl">Drink configurati</div>
       </div>
       <div class="total-chip">
         <div class="total-chip-val val-white" id="totalHours">4h</div>
@@ -584,18 +693,19 @@ body {
   <div class="section" id="mixer">
     <div class="section-header">
       <div class="section-num">3</div>
-      <div class="section-title">Mixer — Imposta le proporzioni</div>
+      <div class="section-title">Mixer — Drink per persona</div>
+      <div class="section-sub" id="mixerSummary">0 drink configurati</div>
     </div>
 
     <div id="mixerEmpty" class="empty-state">
       <div class="empty-state-icon">🎚️</div>
-      <p>Seleziona almeno un drink dalla libreria per impostare le percentuali.</p>
+      <p>Seleziona almeno un drink dalla libreria per configurare quanti drink per persona vuoi servire.</p>
     </div>
 
     <div class="mixer-list" id="mixerList"></div>
 
     <div class="pct-warning" id="pctWarning">
-      ⚠️ Le percentuali sommano <span id="pctTotal">0</span>%. Devono fare 100%.
+      Seleziona i drink e imposta quante porzioni per persona prevedi.
     </div>
   </div>
 
@@ -615,7 +725,7 @@ body {
     <div class="summary-stats">
       <div class="stat-card">
         <div class="stat-val" id="res-drinks" style="color:#aa88ff">—</div>
-        <div class="stat-lbl">Drink totali</div>
+        <div class="stat-lbl">Drink configurati</div>
       </div>
       <div class="stat-card">
         <div class="stat-val" id="res-liters" style="color:#5cc8ff">—</div>
@@ -629,14 +739,25 @@ body {
 
     <!-- DRINK DISTRIBUTION CHART -->
     <div class="card chart-wrap">
-      <div class="chart-title">Distribuzione drink</div>
+      <div class="chart-title">Drink per persona</div>
       <div class="bar-chart" id="drinkDistChart"></div>
+    </div>
+
+    <div class="card chart-wrap">
+      <div class="chart-title">Profili partecipanti</div>
+      <div class="bar-chart" id="profileChart"></div>
     </div>
 
     <!-- INGREDIENT BREAKDOWN -->
     <div class="results-grid">
       <div>
-        <div class="chart-title" style="margin-bottom:14px">Ingredienti necessari</div>
+        <div class="chart-title-row">
+          <div class="chart-title" style="margin-bottom:0">Ingredienti necessari</div>
+          <label class="bottle-size-control">
+            Bottiglia ml
+            <input class="bottle-size-input" id="bottleSizeInput" type="number" min="50" step="50" value="700" onchange="updateBottleSize(this)" onblur="updateBottleSize(this)" />
+          </label>
+        </div>
         <div class="ingredient-list" id="ingredientList"></div>
       </div>
       <div>
@@ -818,26 +939,31 @@ const DRINKS_DB = [
    STATE — all app state in one object (easily serializable)
    ============================================================ */
 const state = {
-  men: 4,
-  women: 4,
-  menIntensity: 'moderate',
-  womenIntensity: 'moderate',
+  participants: [],
+  drinkProfiles: {
+    none: 0,
+    light: 2,
+    moderate: 4,
+    heavy: 7
+  },
   selectedDrinks: new Set(),
-  drinkPct: {},
+  drinkPerPerson: {},
+  customBottleSizes: {},
   currentCat: 'Tutti',
   results: null
 };
 
+let bottleSize = 700;
+
 /* ============================================================
-   INTENSITY CONFIG — alcohol drink estimates per person
+   PROFILE CONFIG — alcohol drink estimates per person
    ============================================================ */
-const INTENSITY = {
-  none:     { drinks: 0,  label: '0 🍹' },
-  light:    { drinks: 2,  label: '2 🍹' },
-  moderate: { drinks: 4,  label: '4 🍹' },
-  heavy:    { drinks: 7,  label: '7 🍹' }
+const PROFILE_META = {
+  none:     { label: 'Non beve', icon: '🚫' },
+  light:    { label: 'Leggero', icon: '🍋' },
+  moderate: { label: 'Moderato', icon: '🍸' },
+  heavy:    { label: 'Bevitore', icon: '🥃' }
 };
-const GENDER_MULTIPLIER = { men: 1.0, women: 0.75 };
 
 /* ============================================================
    CATEGORY COLORS for bar chart
@@ -857,33 +983,149 @@ const CAT_COLORS = {
 /* ============================================================
    PARTICIPANTS LOGIC
    ============================================================ */
-function changeCount(gender, delta) {
-  state[gender] = Math.max(0, state[gender] + delta);
-  document.getElementById(`${gender}-val`).textContent = state[gender];
+function createParticipant(index = state.participants.length) {
+  return {
+    id: `p-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name: `Ospite ${index + 1}`,
+    profile: 'moderate'
+  };
+}
+
+function initializeParticipants(count = 8) {
+  state.participants = Array.from({ length: count }, (_, i) => createParticipant(i));
+  renderProfiles();
+  renderParticipants();
   updateTotals();
 }
 
-function setIntensity(gender, val, btn) {
-  state[`${gender}Intensity`] = val;
-  document.querySelectorAll(`#${gender}-intensity .intensity-btn`).forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+function renderProfiles() {
+  const grid = document.getElementById('profileGrid');
+  if (!grid) return;
+  grid.innerHTML = Object.keys(state.drinkProfiles).map(profile => {
+    const meta = PROFILE_META[profile];
+    return `
+    <label class="profile-control">
+      <div class="profile-label"><strong>${meta.icon} ${meta.label}</strong><span>${profile}</span></div>
+      <input class="profile-input" type="number" min="0" step="1" value="${state.drinkProfiles[profile]}"
+        onchange="changeProfile('${profile}', this.value)" oninput="changeProfile('${profile}', this.value)" />
+    </label>`;
+  }).join('');
+}
+
+function renderParticipants() {
+  const list = document.getElementById('participantList');
+  const countEl = document.getElementById('participants-val');
+  if (countEl) countEl.textContent = state.participants.length;
+  if (!list) return;
+
+  if (state.participants.length === 0) {
+    list.innerHTML = `<div class="empty-state" style="padding:32px 18px"><div class="empty-state-icon">👥</div><p>Aggiungi partecipanti per stimare i drink.</p></div>`;
+    return;
+  }
+
+  list.innerHTML = state.participants.map((participant, index) => {
+    const estimated = state.drinkProfiles[participant.profile] ?? 0;
+    const options = Object.keys(state.drinkProfiles).map(profile => {
+      const meta = PROFILE_META[profile];
+      return `<option value="${profile}" ${participant.profile === profile ? 'selected' : ''}>${meta.label}</option>`;
+    }).join('');
+    return `
+    <div class="participant-row" id="participant-${participant.id}">
+      <div class="participant-avatar">${index + 1}</div>
+      <input class="participant-input" type="text" value="${escapeHtml(participant.name)}"
+        oninput="updateParticipantName('${participant.id}', this.value)" aria-label="Nome partecipante ${index + 1}" />
+      <select class="participant-select" onchange="updateParticipantProfile('${participant.id}', this.value)" aria-label="Profilo consumo ${index + 1}">
+        ${options}
+      </select>
+      <div class="participant-drinks" id="participant-drinks-${participant.id}">${estimated} 🍹</div>
+    </div>`;
+  }).join('');
+}
+
+function updateParticipantName(id, name) {
+  const participant = state.participants.find(p => p.id === id);
+  if (!participant) return;
+  participant.name = name;
+}
+
+function updateParticipantProfile(id, profile) {
+  const participant = state.participants.find(p => p.id === id);
+  if (!participant || !Object.prototype.hasOwnProperty.call(state.drinkProfiles, profile)) return;
+  participant.profile = profile;
+  const drinksEl = document.getElementById(`participant-drinks-${id}`);
+  if (drinksEl) drinksEl.textContent = `${state.drinkProfiles[profile]} 🍹`;
+  updateTotals();
+}
+
+function changeParticipants(delta) {
+  const nextCount = Math.max(0, state.participants.length + delta);
+  while (state.participants.length < nextCount) {
+    state.participants.push(createParticipant(state.participants.length));
+  }
+  state.participants = state.participants.slice(0, nextCount);
+  renderParticipants();
+  updateTotals();
+}
+
+function changeProfile(profile, value) {
+  if (!Object.prototype.hasOwnProperty.call(state.drinkProfiles, profile)) return;
+  const parsed = Math.max(0, Math.round(Number(value) || 0));
+  state.drinkProfiles[profile] = parsed;
+  state.participants.forEach(participant => {
+    if (participant.profile !== profile) return;
+    const drinksEl = document.getElementById(`participant-drinks-${participant.id}`);
+    if (drinksEl) drinksEl.textContent = `${parsed} 🍹`;
+  });
   updateTotals();
 }
 
 function calcTotalDrinks() {
-  const menD   = state.men   * INTENSITY[state.menIntensity].drinks   * GENDER_MULTIPLIER.men;
-  const womenD = state.women * INTENSITY[state.womenIntensity].drinks * GENDER_MULTIPLIER.women;
-  return Math.round(menD + womenD);
+  return calcEstimatedDrinks();
+}
+
+function calcEstimatedDrinks() {
+  return state.participants.reduce((total, participant) => {
+    return total + (Number(state.drinkProfiles[participant.profile]) || 0);
+  }, 0);
+}
+
+function getParticipantCount() {
+  return state.participants.length;
+}
+
+function getSelectedDrinkIds() {
+  return [...state.selectedDrinks].filter(id => DRINKS_DB.some(d => d.id === id));
+}
+
+function calcDrinkCountForId(id) {
+  return Math.round((Number(state.drinkPerPerson[id]) || 0) * getParticipantCount());
+}
+
+function calcConfiguredDrinks() {
+  return getSelectedDrinkIds().reduce((total, id) => total + calcDrinkCountForId(id), 0);
+}
+
+function getBottleSizeForIngredient(name) {
+  return state.customBottleSizes[name] || bottleSize;
+}
+
+function calcBottleTotal(sorted) {
+  return sorted.reduce((total, [name, ml]) => total + Math.ceil(ml / getBottleSizeForIngredient(name)), 0);
 }
 
 function updateTotals() {
-  const total = state.men + state.women;
-  const drinks = calcTotalDrinks();
-  const litersAlcEst = (drinks * 30 / 1000).toFixed(1);
+  const total = getParticipantCount();
+  const estimatedDrinks = calcEstimatedDrinks();
+  const configuredDrinks = calcConfiguredDrinks();
+  const litersAlcEst = (estimatedDrinks * 30 / 1000).toFixed(1);
   document.getElementById('totalPeople').textContent = total;
-  document.getElementById('totalDrinks').textContent = drinks || '—';
-  document.getElementById('totalAlcohol').textContent = drinks ? litersAlcEst + 'L' : '—';
-  document.getElementById('totalDrinksEstimate').textContent = drinks ? `Stima: ${drinks} drink totali` : 'Stima: —';
+  document.getElementById('totalDrinks').textContent = estimatedDrinks || '—';
+  document.getElementById('totalAlcohol').textContent = configuredDrinks || '—';
+  document.getElementById('totalDrinksEstimate').textContent = estimatedDrinks
+    ? `Stima: ${estimatedDrinks} drink · Configurati: ${configuredDrinks || 0}`
+    : 'Stima: —';
+  refreshMixerShares();
+  if (state.results) calculate(false);
 }
 
 /* ============================================================
@@ -914,6 +1156,9 @@ function renderDrinks() {
     const sel = state.selectedDrinks.has(d.id);
     const stars = '★'.repeat(d.difficulty) + '☆'.repeat(3 - d.difficulty);
     const alcBar = '🔥'.repeat(Math.min(d.alcoholLevel, 5));
+    const ingredients = d.ingredients.map(ing => `
+      <div class="overlay-ing"><span>${ing.name}</span><span>${ing.ml} ml</span></div>
+    `).join('');
     return `
     <div class="drink-card ${sel ? 'selected' : ''}" onclick="toggleDrink('${d.id}')" id="dc-${d.id}">
       <div class="drink-select-badge">✓</div>
@@ -925,6 +1170,14 @@ function renderDrinks() {
         <span class="tag tag-alc" title="Gradazione">${alcBar}</span>
         <span class="tag">${d.ingredients.length} ing.</span>
       </div>
+      <div class="drink-overlay">
+        <div class="overlay-title">Ricetta</div>
+        <div class="overlay-ingredients">${ingredients}</div>
+        <div class="overlay-meta">
+          <span class="overlay-chip">${d.ice ? 'Ghiaccio' : 'No ghiaccio'}</span>
+          <span class="overlay-chip">${d.garnish ? d.garnish : 'No garnish'}</span>
+        </div>
+      </div>
     </div>`;
   }).join('');
 
@@ -934,15 +1187,17 @@ function renderDrinks() {
 function toggleDrink(id) {
   if (state.selectedDrinks.has(id)) {
     state.selectedDrinks.delete(id);
-    delete state.drinkPct[id];
+    delete state.drinkPerPerson[id];
   } else {
     state.selectedDrinks.add(id);
+    if (state.drinkPerPerson[id] === undefined) state.drinkPerPerson[id] = 1;
   }
   const card = document.getElementById(`dc-${id}`);
   if (card) card.classList.toggle('selected', state.selectedDrinks.has(id));
   updateSelectedCount();
-  rebalancePct();
+  initializeDrinkPerPerson();
   renderMixer();
+  updateTotals();
 }
 
 function updateSelectedCount() {
@@ -952,70 +1207,185 @@ function updateSelectedCount() {
 /* ============================================================
    MIXER LOGIC
    ============================================================ */
-function rebalancePct() {
-  const ids = [...state.selectedDrinks];
-  if (ids.length === 0) { state.drinkPct = {}; return; }
-  const equal = Math.floor(100 / ids.length);
-  ids.forEach((id, i) => {
-    state.drinkPct[id] = (i === ids.length - 1) ? 100 - equal * (ids.length - 1) : equal;
+function initializeDrinkPerPerson() {
+  const ids = getSelectedDrinkIds();
+
+  if (ids.length === 0) {
+    state.drinkPerPerson = {};
+    return;
+  }
+
+  ids.forEach(id => {
+    if (state.drinkPerPerson[id] === undefined) {
+      state.drinkPerPerson[id] = 1;
+    }
+  });
+
+  Object.keys(state.drinkPerPerson).forEach(id => {
+    if (!state.selectedDrinks.has(id)) delete state.drinkPerPerson[id];
   });
 }
 
 function renderMixer() {
   const list = document.getElementById('mixerList');
   const empty = document.getElementById('mixerEmpty');
-  const ids = [...state.selectedDrinks];
-  if (ids.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; updatePctWarning(); return; }
+  const ids = getSelectedDrinkIds();
+  initializeDrinkPerPerson();
+  renderMixerSummary();
+
+  if (ids.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    updateCoverageNotice();
+    return;
+  }
+
   empty.style.display = 'none';
+
   list.innerHTML = ids.map(id => {
     const d = DRINKS_DB.find(x => x.id === id);
-    const pct = state.drinkPct[id] || 0;
+    const drinksPerPerson = Number(state.drinkPerPerson[id]) || 0;
+    const totalForDrink = calcDrinkCountForId(id);
+    const configuredTotal = calcConfiguredDrinks();
+    const share = configuredTotal ? Math.round(totalForDrink / configuredTotal * 100) : 0;
+
     return `
     <div class="mixer-item" id="mi-${id}">
       <div class="mixer-emoji">${d.emoji}</div>
-      <div class="mixer-name">${d.name}</div>
-      <div style="display:flex;align-items:center;gap:10px;flex:2">
-        <input type="range" class="mixer-slider" min="0" max="100" value="${pct}"
-          oninput="updatePct('${id}', this.value)" />
-        <div class="mixer-pct" id="pct-${id}">${pct}%</div>
+
+      <div class="mixer-meta">
+        <div class="mixer-name">${d.name}</div>
+        <div class="mixer-sub" id="mix-share-${id}">${share}% dei drink configurati</div>
       </div>
+
+      <div class="mixer-control">
+        <div class="mixer-control-main">
+          <button class="mixer-step-btn" onclick="stepDrinkPerPerson('${id}', -0.5)">−</button>
+          <input
+            type="range"
+            class="mixer-slider"
+            id="drink-pp-${id}"
+            min="0"
+            max="10"
+            step="0.5"
+            value="${drinksPerPerson}"
+            oninput="updateDrinkPerPerson('${id}', this.value)"
+          />
+          <button class="mixer-step-btn" onclick="stepDrinkPerPerson('${id}', 0.5)">+</button>
+          <div class="mixer-pct" id="pct-${id}">${formatNumber(drinksPerPerson)}x</div>
+        </div>
+        <div class="mixer-scale"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span></div>
+      </div>
+
+      <div class="mixer-drink-count">
+        <strong id="drink-total-${id}">${formatNumber(totalForDrink)}</strong>
+        <span>drink totali</span>
+      </div>
+
       <button class="mixer-remove" onclick="toggleDrink('${id}')">✕</button>
     </div>`;
   }).join('');
-  updatePctWarning();
+
+  updateCoverageNotice();
+}
+
+function renderMixerSummary() {
+  const summary = document.getElementById('mixerSummary');
+  if (!summary) return;
+  const configured = calcConfiguredDrinks();
+  const people = getParticipantCount();
+  summary.textContent = `${formatNumber(configured)} drink configurati · ${people} partecipanti`;
+}
+
+function updateDrinkPerPerson(id, val) {
+  const value = clampToHalfStep(val);
+  state.drinkPerPerson[id] = value;
+
+  const slider = document.getElementById(`drink-pp-${id}`);
+  if (slider && Number(slider.value) !== value) slider.value = value;
+  const display = document.getElementById(`pct-${id}`);
+  if (display) display.textContent = `${formatNumber(value)}x`;
+  const totalEl = document.getElementById(`drink-total-${id}`);
+  if (totalEl) totalEl.textContent = formatNumber(calcDrinkCountForId(id));
+
+  refreshMixerShares();
+  updateTotals();
+}
+
+function stepDrinkPerPerson(id, delta) {
+  updateDrinkPerPerson(id, (Number(state.drinkPerPerson[id]) || 0) + delta);
+}
+
+function refreshMixerShares() {
+  const configuredTotal = calcConfiguredDrinks();
+  getSelectedDrinkIds().forEach(id => {
+    const totalEl = document.getElementById(`drink-total-${id}`);
+    if (totalEl) totalEl.textContent = formatNumber(calcDrinkCountForId(id));
+    const shareEl = document.getElementById(`mix-share-${id}`);
+    if (!shareEl) return;
+    const share = configuredTotal ? Math.round(calcDrinkCountForId(id) / configuredTotal * 100) : 0;
+    shareEl.textContent = `${share}% dei drink configurati`;
+  });
+  renderMixerSummary();
+  updateCoverageNotice();
 }
 
 function updatePct(id, val) {
-  state.drinkPct[id] = parseInt(val);
-  document.getElementById(`pct-${id}`).textContent = val + '%';
-  updatePctWarning();
+  updateDrinkPerPerson(id, val);
+}
+
+function updateCoverageNotice() {
+  const configured = calcConfiguredDrinks();
+  const estimated = calcEstimatedDrinks();
+  const warn = document.getElementById('pctWarning');
+
+  if (!warn || estimated === 0 || configured === 0) {
+    warn?.classList.remove('show');
+    return;
+  }
+
+  const delta = configured - estimated;
+  warn.classList.add('show');
+
+  if (delta > 0) {
+    warn.innerHTML = `🍾 Configurati <strong>${formatNumber(configured)}</strong> drink, ${formatNumber(delta)} in più rispetto alla stima profili.`;
+  } else if (delta < 0) {
+    warn.innerHTML = `⚠️ Configurati <strong>${formatNumber(configured)}</strong> drink, ${formatNumber(Math.abs(delta))} in meno rispetto alla stima profili.`;
+  } else {
+    warn.innerHTML = `✅ Configurazione allineata alla stima: ${formatNumber(configured)} drink.`;
+  }
 }
 
 function updatePctWarning() {
-  const total = Object.values(state.drinkPct).reduce((a, b) => a + b, 0);
-  const warn = document.getElementById('pctWarning');
-  const valid = Math.abs(total - 100) < 1 || [...state.selectedDrinks].length === 0;
-  warn.classList.toggle('show', !valid);
-  document.getElementById('pctTotal').textContent = total;
+  updateCoverageNotice();
 }
 
 /* ============================================================
    CALCULATION ENGINE
    ============================================================ */
-function calculate() {
-  const ids = [...state.selectedDrinks];
-  if (ids.length === 0) { toast('⚠️', 'Seleziona almeno un drink!', 'warning'); return; }
-  const total = Object.values(state.drinkPct).reduce((a, b) => a + b, 0);
-  if (Math.abs(total - 100) > 1) { toast('⚠️', 'Le percentuali devono fare 100%', 'warning'); return; }
+function calculate(showFeedback = true) {
+  const ids = getSelectedDrinkIds();
+  if (ids.length === 0) {
+    if (showFeedback) toast('⚠️', 'Seleziona almeno un drink!', 'warning');
+    return;
+  }
 
-  const totalDrinks = calcTotalDrinks();
-  if (totalDrinks === 0) { toast('⚠️', 'Imposta i partecipanti prima!', 'warning'); return; }
+  const estimatedDrinks = calcEstimatedDrinks();
+  const configuredDrinks = calcConfiguredDrinks();
+  if (getParticipantCount() === 0) {
+    if (showFeedback) toast('⚠️', 'Imposta i partecipanti prima!', 'warning');
+    return;
+  }
+  if (configuredDrinks === 0) {
+    if (showFeedback) toast('⚠️', 'Configura almeno un drink per persona nel mixer!', 'warning');
+    return;
+  }
 
   // Ingredient aggregation
   const ingredients = {};
   ids.forEach(id => {
     const d = DRINKS_DB.find(x => x.id === id);
-    const count = Math.round(totalDrinks * (state.drinkPct[id] / 100));
+    const count = calcDrinkCountForId(id);
     d.ingredients.forEach(ing => {
       if (!ingredients[ing.name]) ingredients[ing.name] = 0;
       ingredients[ing.name] += (ing.ml * count);
@@ -1027,52 +1397,76 @@ function calculate() {
   const maxMl = sorted[0]?.[1] || 1;
   const totalLiters = sorted.reduce((a, b) => a + b[1], 0) / 1000;
 
-  // Bottle estimate (0.7L standard)
-  const bottlesEst = sorted.reduce((a, b) => a + Math.ceil(b[1] / 700), 0);
+  const bottlesEst = calcBottleTotal(sorted);
 
-  state.results = { totalDrinks, sorted, maxMl, totalLiters, bottlesEst, ids };
+  state.results = { estimatedDrinks, totalDrinks: configuredDrinks, sorted, maxMl, totalLiters, bottlesEst, ids };
   renderResults();
 
-  document.getElementById('results-section').classList.add('visible');
-  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  toast('✅', `Calcolo completato! ${totalDrinks} drink, ${totalLiters.toFixed(1)}L totali.`, 'success');
+  if (showFeedback) {
+    document.getElementById('results-section').classList.add('visible');
+    document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast('✅', `Calcolo completato! ${formatNumber(configuredDrinks)} drink, ${totalLiters.toFixed(1)}L totali.`, 'success');
+  }
 }
 
 /* ============================================================
    RESULTS RENDERING
    ============================================================ */
 function renderResults() {
-  const { totalDrinks, sorted, maxMl, totalLiters, bottlesEst, ids } = state.results;
+  const { totalDrinks, estimatedDrinks, sorted, maxMl, totalLiters, bottlesEst, ids } = state.results;
+  const bottleSizeInput = document.getElementById('bottleSizeInput');
+  if (bottleSizeInput && document.activeElement !== bottleSizeInput && Number(bottleSizeInput.value) !== bottleSize) {
+    bottleSizeInput.value = bottleSize;
+  }
 
-  document.getElementById('res-drinks').textContent  = totalDrinks;
+  document.getElementById('res-drinks').textContent  = formatNumber(totalDrinks);
   document.getElementById('res-liters').textContent  = totalLiters.toFixed(1) + 'L';
   document.getElementById('res-bottles').textContent = bottlesEst;
 
-  // Drink distribution bar chart
+  // Drinks per person chart
   const distChart = document.getElementById('drinkDistChart');
   distChart.innerHTML = ids.map(id => {
     const d = DRINKS_DB.find(x => x.id === id);
-    const pct = state.drinkPct[id];
-    const count = Math.round(totalDrinks * pct / 100);
+    const drinksPerPerson = Number(state.drinkPerPerson[id]) || 0;
+    const count = calcDrinkCountForId(id);
+    const pct = totalDrinks ? Math.round(count / totalDrinks * 100) : 0;
     const col = CAT_COLORS[d.category] || CAT_COLORS.default;
     return `
     <div class="bar-row">
       <div class="bar-label">${d.emoji} ${d.name}</div>
       <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${col}"></div></div>
-      <div class="bar-val">${pct}% · ${count}</div>
+      <div class="bar-val">${formatNumber(drinksPerPerson)}x pp · ${formatNumber(count)} drink</div>
     </div>`;
   }).join('');
+
+  renderProfileChart(estimatedDrinks);
 
   // Ingredient list
   const ingList = document.getElementById('ingredientList');
   ingList.innerHTML = sorted.map(([name, ml]) => {
     const liters = ml / 1000;
-    const bottles = Math.ceil(ml / 700);
+    const localBottleSize = getBottleSizeForIngredient(name);
+    const bottles = Math.ceil(ml / localBottleSize);
     const pct = Math.round(ml / maxMl * 100);
+
     return `
     <div class="ingredient-row">
       <div class="ing-name">${name}</div>
-      <div class="ing-bar-wrap"><div class="ing-bar" style="width:${pct}%"></div></div>
+
+      <div class="ing-bar-wrap">
+        <div class="ing-bar" style="width:${pct}%"></div>
+      </div>
+
+      <input
+        class="bottle-size-input"
+        type="number"
+        min="50"
+        step="50"
+        value="${localBottleSize}"
+        onchange="updateIngredientBottleSize('${escapeJs(name)}', this)"
+        onblur="updateIngredientBottleSize('${escapeJs(name)}', this)"
+      />
+
       <div class="ing-l">${liters.toFixed(2)}L</div>
       <div class="ing-bottles">${bottles} bott.</div>
     </div>`;
@@ -1081,7 +1475,8 @@ function renderResults() {
   // Bottles grid
   const bottGrid = document.getElementById('bottlesGrid');
   bottGrid.innerHTML = sorted.map(([name, ml]) => {
-    const bottles = Math.ceil(ml / 700);
+    const localBottleSize = getBottleSizeForIngredient(name);
+    const bottles = Math.ceil(ml / localBottleSize);
     const liters = (ml / 1000).toFixed(2);
     const emoji = getIngEmoji(name);
     return `
@@ -1090,10 +1485,85 @@ function renderResults() {
       <div>
         <div class="bottle-name">${name}</div>
         <div class="bottle-count">${bottles}x</div>
-        <div class="bottle-sub">${liters}L totali</div>
+        <div class="bottle-sub">${liters}L totali · ${localBottleSize}ml</div>
       </div>
     </div>`;
   }).join('');
+}
+
+function renderProfileChart(estimatedDrinks = calcEstimatedDrinks()) {
+  const chart = document.getElementById('profileChart');
+  if (!chart) return;
+
+  const rows = Object.keys(state.drinkProfiles).map(profile => {
+    const guests = state.participants.filter(p => p.profile === profile).length;
+    const drinksEach = Number(state.drinkProfiles[profile]) || 0;
+    const contribution = guests * drinksEach;
+    return { profile, guests, drinksEach, contribution };
+  }).filter(row => row.guests > 0);
+
+  if (rows.length === 0) {
+    chart.innerHTML = `<div class="empty-state" style="padding:28px 18px"><p>Nessun profilo da visualizzare.</p></div>`;
+    return;
+  }
+
+  chart.innerHTML = rows.map(row => {
+    const meta = PROFILE_META[row.profile];
+    const pct = estimatedDrinks ? Math.round(row.contribution / estimatedDrinks * 100) : 0;
+    return `
+    <div class="bar-row">
+      <div class="bar-label">${meta.icon} ${meta.label}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${CAT_COLORS.default}"></div></div>
+      <div class="bar-val">${row.guests} ospiti · ${row.drinksEach} cad.</div>
+    </div>`;
+  }).join('');
+}
+
+function updateBottleSize(target) {
+  const input = typeof target === 'object' ? target : document.getElementById('bottleSizeInput');
+  const value = typeof target === 'object' ? target.value : target;
+  if (String(value).trim() === '') {
+    if (input) input.value = bottleSize;
+    return;
+  }
+  const parsed = Math.max(50, Math.round(Number(value) || 700));
+  bottleSize = parsed;
+  if (input && Number(input.value) !== parsed) input.value = parsed;
+
+  if (!state.results) return;
+  const sorted = state.results.sorted;
+  state.results.bottlesEst = calcBottleTotal(sorted);
+  renderResults();
+}
+
+function updateIngredientBottleSize(name, target) {
+  if (!state.results) return;
+  const input = typeof target === 'object' ? target : null;
+  const value = typeof target === 'object' ? target.value : target;
+  if (String(value).trim() === '') {
+    if (input) input.value = getBottleSizeForIngredient(name);
+    return;
+  }
+
+  state.customBottleSizes[name] = Math.max(50, Math.round(Number(value) || bottleSize));
+  if (input) input.value = state.customBottleSizes[name];
+  state.results.bottlesEst = calcBottleTotal(state.results.sorted);
+  renderResults();
+}
+
+function clampToHalfStep(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.min(10, Math.max(0, Math.round(parsed * 2) / 2));
+}
+
+function formatNumber(value) {
+  const number = Number(value) || 0;
+  return Number.isInteger(number) ? String(number) : number.toFixed(1);
+}
+
+function escapeJs(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
 function getIngEmoji(name) {
@@ -1124,15 +1594,23 @@ function toast(icon, message, type = 'info') {
   }, 3500);
 }
 
+function escapeHtml(value) {
+  const div = document.createElement('div');
+  div.textContent = value;
+  return div.innerHTML;
+}
+
 /* ============================================================
    LOCALSTORAGE
    ============================================================ */
 function saveToLocalStorage() {
   const data = {
-    men: state.men, women: state.women,
-    menIntensity: state.menIntensity, womenIntensity: state.womenIntensity,
+    participants: state.participants,
+    drinkProfiles: state.drinkProfiles,
     selectedDrinks: [...state.selectedDrinks],
-    drinkPct: state.drinkPct
+    drinkPerPerson: state.drinkPerPerson,
+    customBottleSizes: state.customBottleSizes,
+    bottleSize
   };
   localStorage.setItem('partyPlannerState', JSON.stringify(data));
   toast('💾', 'Configurazione salvata!', 'success');
@@ -1143,20 +1621,31 @@ function loadFromLocalStorage() {
   if (!raw) return;
   try {
     const data = JSON.parse(raw);
-    state.men = data.men || 4;
-    state.women = data.women || 4;
-    state.menIntensity = data.menIntensity || 'moderate';
-    state.womenIntensity = data.womenIntensity || 'moderate';
-    state.selectedDrinks = new Set(data.selectedDrinks || []);
-    state.drinkPct = data.drinkPct || {};
-    // Restore UI
-    document.getElementById('men-val').textContent = state.men;
-    document.getElementById('women-val').textContent = state.women;
-    ['men', 'women'].forEach(g => {
-      document.querySelectorAll(`#${g}-intensity .intensity-btn`).forEach(b => {
-        b.classList.toggle('active', b.dataset.val === state[`${g}Intensity`]);
+    if (Array.isArray(data.participants)) {
+      state.participants = data.participants.map((participant, index) => ({
+        id: participant.id || createParticipant(index).id,
+        name: participant.name || `Ospite ${index + 1}`,
+        profile: state.drinkProfiles[participant.profile] !== undefined ? participant.profile : 'moderate'
+      }));
+    }
+    if (data.drinkProfiles && typeof data.drinkProfiles === 'object') {
+      Object.keys(state.drinkProfiles).forEach(profile => {
+        if (Number.isFinite(Number(data.drinkProfiles[profile]))) {
+          state.drinkProfiles[profile] = Math.max(0, Math.round(Number(data.drinkProfiles[profile])));
+        }
       });
+    }
+    state.selectedDrinks = new Set(data.selectedDrinks || []);
+    state.drinkPerPerson = data.drinkPerPerson || data.drinkPct || {};
+    Object.keys(state.drinkPerPerson).forEach(id => {
+      state.drinkPerPerson[id] = clampToHalfStep(state.drinkPerPerson[id]);
     });
+    state.customBottleSizes = data.customBottleSizes || {};
+    bottleSize = Math.max(50, Math.round(Number(data.bottleSize) || bottleSize));
+    initializeDrinkPerPerson();
+    renderProfiles();
+    renderParticipants();
+    updateTotals();
     toast('📂', 'Configurazione caricata.', 'info');
   } catch(e) {}
 }
@@ -1173,10 +1662,11 @@ function scrollTo(id) {
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('heroDrinkCount').textContent = DRINKS_DB.length;
+  initializeParticipants();
+  loadFromLocalStorage();
   renderDrinks();
   updateTotals();
   renderMixer();
-  loadFromLocalStorage();
   // After load, re-render if we have selected drinks
   if (state.selectedDrinks.size > 0) {
     renderDrinks();
