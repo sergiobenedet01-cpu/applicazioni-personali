@@ -66,6 +66,11 @@
         --acc2: var(--go2);
         --acc3: var(--go3);
       }
+      body.tab-advisor {
+        --acc: #38d9ff;
+        --acc2: rgba(56, 217, 255, 0.12);
+        --acc3: rgba(56, 217, 255, 0.045);
+      }
 
       * {
         margin: 0;
@@ -341,6 +346,9 @@
       body.tab-fondi .np.on {
         box-shadow: 0 0 18px rgba(0, 229, 160, 0.22);
       }
+      body.tab-advisor .np.on {
+        box-shadow: 0 0 18px rgba(56, 217, 255, 0.24);
+      }
       .np.csv-btn {
         color: var(--bl);
         border-color: rgba(77, 143, 255, 0.22);
@@ -373,6 +381,9 @@
       }
       body.tab-fondi .tab-strip {
         background: linear-gradient(90deg, var(--go) 0%, transparent 40%);
+      }
+      body.tab-advisor .tab-strip {
+        background: linear-gradient(90deg, #38d9ff 0%, transparent 40%);
       }
 
       /* ─ COLLAPSE ────────────────────────────────────────────────────── */
@@ -711,29 +722,6 @@
         box-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
         margin-bottom: 8px;
       }
-      .tw-actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 6px;
-      }
-      .reset-cols-btn {
-        padding: 5px 12px;
-        background: transparent;
-        border: 1px solid var(--rim2);
-        color: var(--t2);
-        border-radius: 5px;
-        font-family: var(--SA);
-        font-size: 0.72rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .reset-cols-btn:hover {
-        border-color: var(--acc);
-        color: var(--acc);
-      }
       table {
         width: 100%;
         border-collapse: collapse;
@@ -775,36 +763,6 @@
       .gb {
         color: #22c97a;
       }
-      .gc {
-        color: #d4a818;
-      }
-      .gd {
-        color: #5580d8;
-      }
-      .col-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 14px;
-        height: 14px;
-        border-radius: 3px;
-        background: transparent;
-        border: 1px solid var(--t4);
-        cursor: pointer;
-        font-size: 0.5rem;
-        color: var(--t3);
-        margin-left: 4px;
-        vertical-align: middle;
-        transition: all 0.15s;
-        line-height: 1;
-      }
-      .col-toggle:hover {
-        border-color: var(--acc);
-        color: var(--acc);
-      }
-      .col-hidden {
-        display: none !important;
-      }
       tbody tr {
         border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         transition: background 0.12s;
@@ -824,6 +782,42 @@
       }
       td:first-child {
         text-align: left;
+      }
+      .sim-inc {
+        margin-top: 3px;
+        color: rgba(0, 229, 160, 0.68);
+        font-size: 0.68rem;
+        line-height: 1.2;
+      }
+      .sim-pm-change {
+        margin-top: 3px;
+        font-family: var(--MO);
+        font-size: 0.68rem;
+        line-height: 1.2;
+      }
+      .sim-pm-change.down {
+        color: var(--go);
+      }
+      .sim-pm-change.up {
+        color: var(--em);
+      }
+      .sim-pm-change.flat {
+        color: var(--t3);
+      }
+      /* I valori nelle tabelle sono copiabili senza modificare la loro
+         formattazione di visualizzazione. */
+      table [data-copy-value] {
+        cursor: copy;
+        border-bottom: 1px dotted transparent;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      table [data-copy-value]:hover,
+      table [data-copy-value]:focus-visible {
+        color: var(--acc);
+        border-bottom-color: currentColor;
+        outline: none;
       }
       .anm {
         font-family: var(--BE);
@@ -869,53 +863,6 @@
       }
       .mu {
         color: var(--t3);
-      }
-      .chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 3px 8px;
-        border-radius: 5px;
-        font-size: 0.68rem;
-        font-family: var(--BE);
-        letter-spacing: 0.05em;
-      }
-      .cbuy {
-        background: var(--go2);
-        color: var(--go);
-        border: 1px solid rgba(0, 229, 160, 0.2);
-      }
-      .cgood {
-        background: var(--bl2);
-        color: var(--bl);
-        border: 1px solid rgba(77, 143, 255, 0.2);
-      }
-      .cneu {
-        background: var(--em2);
-        color: var(--em);
-        border: 1px solid rgba(240, 192, 64, 0.18);
-      }
-      .ccau {
-        background: rgba(255, 140, 66, 0.1);
-        color: var(--or);
-        border: 1px solid rgba(255, 140, 66, 0.2);
-      }
-      .bw {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .bt {
-        flex: 1;
-        height: 3px;
-        background: var(--d4);
-        border-radius: 2px;
-        min-width: 30px;
-      }
-      .bf {
-        height: 100%;
-        border-radius: 2px;
-        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .sep-tr td {
         background: var(--d2);
@@ -1080,75 +1027,9 @@
         font-family: var(--MO);
         font-weight: 400;
       }
-      /* €/% toggle pill */
-      .mode-toggle {
-        display: flex;
-        border: 1px solid var(--rim2);
-        border-radius: 5px;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
-      .mode-btn {
-        padding: 3px 9px;
-        font-family: var(--MO);
-        font-size: 0.62rem;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        background: transparent;
-        color: var(--t3);
-        transition: all 0.18s;
-        letter-spacing: 0.03em;
-      }
-      .mode-btn.active {
-        background: var(--acc2);
-        color: var(--acc);
-      }
-      .mode-btn:hover:not(.active) {
-        color: var(--t2);
-      }
-      .ri {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 7px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      }
-      .ri:last-child {
-        border-bottom: none;
-      }
-      .rn2 {
-        font-family: var(--BE);
-        font-size: 1.05rem;
-        color: var(--t3);
-        width: 18px;
-        text-align: center;
-      }
-      .rn2.g1 {
-        color: var(--em);
-      }
-      .ri-info {
-        flex: 1;
-      }
-      .ri-info .rn {
-        font-family: var(--SA);
-        font-size: 0.84rem;
-        font-weight: 600;
-        color: var(--text);
-      }
-      .ri-info .rs {
-        font-size: 0.64rem;
-        color: var(--t3);
-        font-family: var(--MO);
-        margin-top: 1px;
-      }
-      .rv {
-        font-family: var(--MO);
-        font-size: 0.76rem;
-        font-weight: 700;
-      }
       .brow {
-        display: flex;
+        display: grid;
+        grid-template-columns: 118px minmax(0, 1fr) 78px 112px;
         align-items: center;
         gap: 8px;
         padding: 4px 0;
@@ -1157,17 +1038,13 @@
         font-family: var(--SA);
         font-size: 0.78rem;
         font-weight: 500;
-        width: 118px;
-        min-width: 118px;
-        max-width: 118px;
         color: var(--t2);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        flex-shrink: 0;
       }
       .btrk {
-        flex: 1;
+        min-width: 0;
         height: 6px;
         background: var(--d4);
         border-radius: 3px;
@@ -1177,11 +1054,17 @@
         border-radius: 3px;
         transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .bval {
+      .bmetric {
         font-family: var(--MO);
         font-size: 0.68rem;
-        min-width: 64px;
         text-align: right;
+        white-space: nowrap;
+      }
+      .bmetric.metric-pct {
+        font-weight: 700;
+      }
+      .bmetric.metric-eur {
+        color: var(--t3);
       }
       .ac {
         background: var(--d2);
@@ -1190,25 +1073,39 @@
         padding: 16px 18px;
         margin-bottom: 22px;
       }
-      .ac-explain {
+      .rank-help {
+        margin: 7px 0 4px;
         font-family: var(--SA);
-        font-size: 0.73rem;
+        font-size: 0.7rem;
         color: var(--t2);
-        line-height: 1.6;
-        margin-top: 8px;
-        padding: 10px 13px;
-        background: var(--d3);
-        border-radius: 5px;
-        border-left: 2px solid var(--acc);
       }
-      .ac-explain strong {
+      .rank-help summary {
+        display: inline-flex;
+        cursor: pointer;
+        color: var(--t3);
+        list-style: none;
+      }
+      .rank-help summary::-webkit-details-marker {
+        display: none;
+      }
+      .rank-help summary:hover {
+        color: var(--acc);
+      }
+      .rank-help span {
+        display: block;
+        margin-top: 6px;
+        color: var(--t3);
+        line-height: 1.45;
+      }
+      .rank-help strong {
         color: var(--text);
       }
       .arow {
-        display: flex;
+        display: grid;
+        grid-template-columns: 26px minmax(116px, 0.8fr) minmax(150px, 1.8fr) 42px 66px 78px auto;
         align-items: center;
-        gap: 10px;
-        padding: 7px 0;
+        gap: 9px;
+        padding: 8px 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       }
       .arow:last-child {
@@ -1216,9 +1113,8 @@
       }
       .ank {
         font-family: var(--BE);
-        font-size: 1.05rem;
+        font-size: 0.92rem;
         color: var(--t3);
-        width: 20px;
         text-align: center;
       }
       .ank.tp {
@@ -1226,35 +1122,64 @@
       }
       .anmw {
         font-family: var(--SA);
-        font-size: 0.84rem;
+        font-size: 0.78rem;
         font-weight: 600;
-        min-width: 105px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .ascw {
-        flex: 1;
+        min-width: 0;
       }
       .atrk {
-        height: 4px;
+        height: 7px;
         background: var(--d4);
-        border-radius: 3px;
+        border-radius: 999px;
       }
       .afil {
         height: 100%;
-        border-radius: 3px;
+        border-radius: 999px;
         transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .arw {
-        font-family: var(--SA);
-        font-size: 0.7rem;
-        color: var(--t2);
-        line-height: 1.5;
-        flex: 2;
       }
       .ascore-val {
         font-family: var(--MO);
-        font-size: 0.63rem;
+        font-size: 0.68rem;
+        color: var(--text);
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .arow-metric {
+        font-family: var(--MO);
+        font-size: 0.66rem;
+        white-space: nowrap;
+      }
+      .adca {
+        color: var(--t3);
+      }
+      .adca.good {
+        color: var(--go);
+      }
+      .adca.warn {
+        color: var(--em);
+      }
+      .rank-action {
+        border: 1px solid var(--rim2);
+        border-radius: 999px;
+        padding: 3px 7px;
+        font-family: var(--MO);
+        font-size: 0.6rem;
         color: var(--t3);
         white-space: nowrap;
+      }
+      .rank-action.priority {
+        color: var(--go);
+        background: var(--go2);
+        border-color: rgba(0, 229, 160, 0.2);
+      }
+      .rank-action.review {
+        color: var(--em);
+        background: var(--em2);
+        border-color: rgba(240, 192, 64, 0.2);
       }
       .gg {
         display: grid;
@@ -1307,6 +1232,309 @@
         height: 8px;
         border-radius: 50%;
         flex-shrink: 0;
+      }
+
+      /* ─ AI PORTFOLIO ADVISOR ───────────────────────────────────────── */
+      body.tab-advisor header::after {
+        background: linear-gradient(90deg, transparent, #38d9ff, transparent);
+      }
+      body.tab-advisor .sb,
+      body.tab-advisor .cw {
+        display: none;
+      }
+      #sec-advisor {
+        max-width: 1260px;
+        margin: 0 auto;
+      }
+      .adv-wrap {
+        display: grid;
+        gap: 18px;
+      }
+      .adv-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+        gap: 16px;
+        align-items: stretch;
+      }
+      .adv-panel,
+      .adv-card {
+        background: var(--d2);
+        border: 1px solid var(--rim);
+        border-radius: 8px;
+        padding: 18px;
+      }
+      .adv-panel.primary {
+        background: linear-gradient(
+          145deg,
+          rgba(56, 217, 255, 0.1),
+          rgba(155, 114, 255, 0.045) 46%,
+          var(--d2)
+        );
+        border-color: rgba(56, 217, 255, 0.22);
+      }
+      .adv-eyebrow {
+        font-family: var(--MO);
+        font-size: 0.64rem;
+        color: #38d9ff;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .adv-title {
+        font-family: var(--BE);
+        font-size: 2rem;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        color: var(--text);
+      }
+      .adv-copy {
+        color: var(--t2);
+        font-size: 0.86rem;
+        line-height: 1.7;
+        margin-top: 10px;
+        max-width: 820px;
+      }
+      .adv-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 14px;
+      }
+      .adv-badge {
+        border: 1px solid rgba(56, 217, 255, 0.22);
+        background: rgba(56, 217, 255, 0.06);
+        color: #9beeff;
+        border-radius: 999px;
+        padding: 5px 9px;
+        font-family: var(--MO);
+        font-size: 0.64rem;
+      }
+      .adv-scorebox {
+        display: grid;
+        place-items: center;
+        gap: 10px;
+        text-align: center;
+      }
+      .adv-score-ring {
+        --score: 0;
+        width: 148px;
+        height: 148px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at center, var(--d2) 0 57%, transparent 58%),
+          conic-gradient(#38d9ff calc(var(--score) * 1%), var(--d4) 0);
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(56, 217, 255, 0.24);
+      }
+      .adv-score-ring strong {
+        font-family: var(--BE);
+        font-size: 2.45rem;
+        letter-spacing: 0.03em;
+        color: #38d9ff;
+        line-height: 1;
+      }
+      .adv-score-ring span {
+        display: block;
+        font-family: var(--MO);
+        font-size: 0.62rem;
+        color: var(--t3);
+      }
+      .adv-score-label {
+        font-family: var(--SA);
+        font-weight: 700;
+        color: var(--text);
+      }
+      .adv-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .adv-grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .adv-card h3 {
+        font-family: var(--SA);
+        font-size: 0.86rem;
+        color: var(--text);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .adv-list {
+        display: grid;
+        gap: 9px;
+      }
+      .adv-item {
+        display: grid;
+        grid-template-columns: 9px 1fr;
+        gap: 9px;
+        color: var(--t2);
+        font-size: 0.78rem;
+        line-height: 1.55;
+      }
+      .adv-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        margin-top: 7px;
+        background: var(--acc);
+      }
+      .adv-dot.good {
+        background: var(--go);
+      }
+      .adv-dot.warn {
+        background: var(--em);
+      }
+      .adv-dot.risk {
+        background: var(--re);
+      }
+      .adv-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .adv-metric {
+        background: var(--d3);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        padding: 12px;
+        min-height: 82px;
+      }
+      .adv-metric span {
+        display: block;
+        font-family: var(--MO);
+        font-size: 0.62rem;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 7px;
+      }
+      .adv-metric strong {
+        font-family: var(--BE);
+        font-size: 1.35rem;
+        letter-spacing: 0.03em;
+      }
+      .adv-bars {
+        display: grid;
+        gap: 10px;
+      }
+      .adv-bar-row {
+        display: grid;
+        grid-template-columns: 118px 1fr 54px;
+        gap: 10px;
+        align-items: center;
+      }
+      .adv-bar-name {
+        color: var(--t2);
+        font-size: 0.74rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .adv-track {
+        height: 7px;
+        border-radius: 99px;
+        background: var(--d4);
+        overflow: hidden;
+      }
+      .adv-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: var(--acc);
+      }
+      .adv-bar-val {
+        font-family: var(--MO);
+        font-size: 0.68rem;
+        color: var(--t2);
+        text-align: right;
+      }
+      .adv-opps {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+        gap: 12px;
+      }
+      .adv-opp {
+        background: var(--d3);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 14px;
+        display: grid;
+        gap: 9px;
+      }
+      .adv-opp-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .adv-opp-title {
+        font-family: var(--SA);
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .adv-pill {
+        font-family: var(--MO);
+        font-size: 0.58rem;
+        padding: 3px 7px;
+        border-radius: 999px;
+        border: 1px solid var(--rim2);
+        color: var(--t2);
+        white-space: nowrap;
+      }
+      .adv-pill.low {
+        color: var(--go);
+        border-color: rgba(0, 229, 160, 0.25);
+        background: rgba(0, 229, 160, 0.06);
+      }
+      .adv-pill.med {
+        color: var(--em);
+        border-color: rgba(240, 192, 64, 0.25);
+        background: rgba(240, 192, 64, 0.06);
+      }
+      .adv-pill.high {
+        color: var(--re);
+        border-color: rgba(255, 61, 90, 0.25);
+        background: rgba(255, 61, 90, 0.06);
+      }
+      .adv-opp p {
+        color: var(--t2);
+        font-size: 0.75rem;
+        line-height: 1.55;
+      }
+      .adv-opp-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .adv-action {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .adv-action:last-child {
+        border-bottom: none;
+      }
+      .adv-check {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 1px solid var(--rim2);
+        margin-top: 2px;
+      }
+      .adv-action strong {
+        color: var(--text);
+        font-size: 0.8rem;
+      }
+      .adv-action p {
+        color: var(--t3);
+        font-size: 0.72rem;
+        line-height: 1.55;
+        margin-top: 3px;
       }
 
       /* ─ EDIT ────────────────────────────────────────────────────────── */
@@ -1474,8 +1702,31 @@
       @media (max-width: 700px) {
         .ag2,
         .gg,
-        .ew {
+        .ew,
+        .adv-hero,
+        .adv-grid,
+        .adv-grid.three {
           grid-template-columns: 1fr;
+        }
+        .adv-metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .adv-bar-row {
+          grid-template-columns: 92px 1fr 48px;
+        }
+        .arow {
+          grid-template-columns: 24px minmax(94px, 1fr) minmax(90px, 1.3fr) 36px 54px 62px;
+          gap: 6px;
+        }
+        .rank-action {
+          display: none;
+        }
+        .brow {
+          grid-template-columns: 92px minmax(0, 1fr) 64px 92px;
+          gap: 6px;
+        }
+        .bmetric {
+          font-size: 0.62rem;
         }
         header {
           padding: 0 14px;
@@ -1636,11 +1887,42 @@
         gap: 14px;
         margin-bottom: 18px;
       }
+      .bdg-decision-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      @media (max-width: 980px) {
+        .bdg-decision-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 560px) {
+        .bdg-decision-grid {
+          grid-template-columns: 1fr;
+        }
+      }
       .bdg-kpi-card {
         background: var(--d3);
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 14px;
         padding: 16px 18px;
+      }
+      .bdg-kpi-card.primary {
+        background: linear-gradient(
+          145deg,
+          rgba(249, 115, 22, 0.18),
+          rgba(255, 255, 255, 0.035)
+        );
+        border-color: rgba(249, 115, 22, 0.32);
+      }
+      .bdg-kpi-card.danger {
+        border-color: rgba(255, 61, 90, 0.28);
+        background: rgba(255, 61, 90, 0.06);
+      }
+      .bdg-kpi-card.danger .bdg-kpi-value {
+        color: var(--re);
       }
       .bdg-kpi-label {
         font-family: var(--MO);
@@ -1732,6 +2014,19 @@
       }
       .bdg-summary-panel {
         border-color: rgba(249, 115, 22, 0.22);
+      }
+      .bdg-cycle-meta {
+        margin: 8px 0 14px;
+        color: var(--t2);
+        font-family: var(--MO);
+        font-size: 0.74rem;
+        line-height: 1.7;
+      }
+      .bdg-cycle-label {
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.62rem;
       }
       .bdg-card-timeline {
         border-color: rgba(249, 115, 22, 0.18);
@@ -2172,6 +2467,12 @@
         box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.14);
         color: #f97316;
       }
+      .bdg-inp:focus-visible,
+      .bdg-mode-btn:focus-visible,
+      .bdg-custom-row .pdel:focus-visible {
+        outline: 2px solid rgba(249, 115, 22, 0.45);
+        outline-offset: 2px;
+      }
       .bdg-inp.manual {
         border-color: rgba(249, 115, 22, 0.5);
         color: #f97316;
@@ -2267,6 +2568,11 @@
         background: rgba(249, 115, 22, 0.05);
         color: #f97316;
       }
+      .bdg-chip.danger {
+        border-color: rgba(255, 61, 90, 0.3);
+        background: rgba(255, 61, 90, 0.06);
+        color: var(--re);
+      }
 
       /* breakdown */
       .bdg-brow {
@@ -2347,6 +2653,52 @@
         font-weight: 700;
         color: var(--re);
       }
+      .bdg-custom-list {
+        display: grid;
+        gap: 8px;
+      }
+      .bdg-custom-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) 142px 110px 28px;
+        gap: 8px;
+        align-items: center;
+      }
+      .bdg-custom-row input {
+        background: var(--d3);
+        border: 1px solid var(--rim2);
+        border-radius: 7px;
+        color: var(--text);
+        font-family: var(--MO);
+        font-size: 0.78rem;
+        padding: 8px 10px;
+        min-width: 0;
+        outline: none;
+      }
+      .bdg-custom-row input:focus {
+        border-color: #f97316;
+        box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
+      }
+      .bdg-custom-row input[type="number"] {
+        color: var(--em);
+        text-align: right;
+      }
+      .bdg-empty-state {
+        padding: 14px 16px;
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.74rem;
+        line-height: 1.6;
+      }
+      @media (max-width: 700px) {
+        .bdg-custom-row {
+          grid-template-columns: 1fr;
+        }
+        .bdg-custom-row .pdel {
+          width: 100%;
+        }
+      }
 
       /* result */
       .bdg-res-center {
@@ -2413,6 +2765,16 @@
         flex-direction: column;
         gap: 7px;
       }
+      .bdg-formula-note {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.035);
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.7rem;
+        line-height: 1.6;
+      }
       .bdg-frow {
         display: flex;
         justify-content: space-between;
@@ -2461,6 +2823,142 @@
         padding: 6px 2px;
         line-height: 1.8;
       }
+
+      /* ─ QUALITY PASS: shared layout and component rhythm ───────────── */
+      :root {
+        --sp-1: 4px;
+        --sp-2: 8px;
+        --sp-3: 12px;
+        --sp-4: 16px;
+        --sp-5: 24px;
+        --sp-6: 32px;
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      summary:focus-visible {
+        outline: 2px solid var(--acc);
+        outline-offset: 2px;
+      }
+      .hnav {
+        min-width: 0;
+        flex: 1;
+        justify-content: flex-end;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding: 2px;
+      }
+      .hnav::-webkit-scrollbar {
+        display: none;
+      }
+      .sec {
+        padding: var(--sp-5) 28px 48px;
+      }
+      .an {
+        margin-top: var(--sp-5);
+      }
+      .anh {
+        gap: var(--sp-3);
+        margin-bottom: var(--sp-3);
+      }
+      .kg {
+        gap: var(--sp-2);
+        margin-bottom: var(--sp-5);
+      }
+      .ag2,
+      .gg {
+        gap: var(--sp-3);
+        margin-bottom: var(--sp-5);
+      }
+      .card,
+      .eb,
+      .ac,
+      .adv-panel,
+      .adv-card {
+        border-radius: var(--radius-lg);
+        padding: var(--sp-4);
+      }
+      .card-hdr {
+        margin-bottom: var(--sp-3);
+      }
+      .bdg-card,
+      .bdg-forecast-card {
+        border-radius: var(--radius-lg);
+        padding: 20px;
+      }
+      .bdg-kpi-card {
+        border-radius: var(--radius-md);
+        padding: var(--sp-3) var(--sp-4);
+      }
+      .tw {
+        border-radius: var(--radius-lg);
+      }
+      .tw table {
+        min-width: 1080px;
+      }
+      th,
+      td,
+      .kv,
+      .ks,
+      .bmetric,
+      .ascore-val,
+      .arow-metric,
+      .adv-metric strong,
+      .adv-bar-val,
+      .bdg-kpi-value,
+      .bdg-line-amount,
+      .bdg-bamt,
+      .bdg-btot-val,
+      .bdg-frow-val {
+        font-variant-numeric: tabular-nums lining-nums;
+      }
+      .brow {
+        min-height: 32px;
+      }
+      .pinp,
+      .erow input {
+        min-height: 34px;
+      }
+      @media (max-width: 1080px) {
+        .logo-sub,
+        .logo-credit {
+          display: none;
+        }
+        header {
+          padding: 0 var(--sp-4);
+        }
+        .np {
+          padding-inline: 12px;
+        }
+      }
+      @media (max-width: 700px) {
+        header {
+          gap: var(--sp-2);
+        }
+        .logo-info {
+          display: none;
+        }
+        .np {
+          padding-inline: 10px;
+          font-size: 0.74rem;
+          white-space: nowrap;
+        }
+        .nsep {
+          flex: 0 0 1px;
+          margin-inline: 1px;
+        }
+        .sec {
+          padding: var(--sp-4) var(--sp-3) var(--sp-6);
+        }
+      }
       /* ═══════════════════════════════════════════════════════════════════ */
     </style>
   </head>
@@ -2482,7 +2980,7 @@
         <div class="logo-info">
           <div class="logo-title">What-If Portfolio Simulator</div>
           <div class="logo-sub">
-            Simula DCA · Analizza PM · Ottimizza allocazione · v24
+            Simula DCA · Analizza PM · Ottimizza allocazione · v25
           </div>
           <div class="logo-credit">
             Realizzato da <span>Benedet Sergio</span>
@@ -2506,6 +3004,9 @@
         <div class="nsep"></div>
         <button class="np" id="nb-budget" onclick="switchTab('budget')">
           💰 Budget
+        </button>
+        <button class="np" id="nb-advisor" onclick="switchTab('advisor')">
+          🧠 Advisor
         </button>
         <div class="nsep"></div>
         <button class="np" id="nb-edit" onclick="switchTab('edit')">
@@ -2641,210 +3142,184 @@
     <div id="sec-all" class="sec"></div>
     <div id="sec-edit" class="sec"></div>
     <div id="sec-budget" class="sec"></div>
+    <div id="sec-advisor" class="sec"></div>
 
     <footer>
       <span>💾 Salvataggio automatico · Prezzi inseriti manualmente</span>
       <span id="fts">—</span>
     </footer>
 
+    <script src="WIPS-data.js"></script>
     <script>
       /* ═══════════════════════════════════════════════════════════════════
-            DATA & STORAGE
-            ═══════════════════════════════════════════════════════════════════ */
-      var P = {
-        crypto: [
-          {
-            name: "Bitcoin",
-            id: "bitcoin",
-            cap: 10421.05,
-            qty: 0.111319,
-            pm0: 93614.31,
-          },
-          {
-            name: "Ethereum",
-            id: "ethereum",
-            cap: 2496.07,
-            qty: 1.011205,
-            pm0: 2468.41,
-          },
-          {
-            name: "Solana",
-            id: "solana",
-            cap: 2203.83,
-            qty: 17.879551,
-            pm0: 123.26,
-          },
-          {
-            name: "Polkadot",
-            id: "polkadot",
-            cap: 1297.1,
-            qty: 386.041513,
-            pm0: 3.36,
-          },
-          {
-            name: "XRP",
-            id: "ripple",
-            cap: 399.34,
-            qty: 163.663085,
-            pm0: 2.44,
-          },
-          {
-            name: "Avalanche",
-            id: "avalanche",
-            cap: 100.01,
-            qty: 5.222532,
-            pm0: 19.15,
-          },
-          {
-            name: "Dogecoin",
-            id: "dogecoin",
-            cap: 99.99,
-            qty: 471.44,
-            pm0: 0.2121,
-          },
-          {
-            name: "Cardano",
-            id: "cardano",
-            cap: 120.03,
-            qty: 128.729413,
-            pm0: 0.9324,
-          },
-        ],
-        etf: [
-          {
-            name: "AI & Big Data",
-            id: "XAIX.DE",
-            cap: 3080.15,
-            qty: 24.341303,
-            pm0: 126.54,
-          },
-          {
-            name: "Uranium",
-            id: "WNUC.L",
-            cap: 3002.85,
-            qty: 57.558681,
-            pm0: 52.17,
-          },
-          {
-            name: "Quantum",
-            id: "QNTM.L",
-            cap: 3708.58,
-            qty: 172.012231,
-            pm0: 21.56,
-          },
-          {
-            name: "Automation",
-            id: "RBOT.L",
-            cap: 2541.53,
-            qty: 205.127457,
-            pm0: 12.39,
-          },
-          {
-            name: "Cybersecurity",
-            id: "CIBR",
-            cap: 3966.05,
-            qty: 107.890413,
-            pm0: 36.76,
-          },
-          {
-            name: "Asia EM",
-            id: "CEA1.DE",
-            cap: 1113.76,
-            qty: 5.176659,
-            pm0: 215.15,
-          },
-          {
-            name: "Copper Miners",
-            id: "COPX",
-            cap: 1763.95,
-            qty: 31.920994,
-            pm0: 55.26,
-          },
-          {
-            name: "S&P 500 Info Tech",
-            id: "QDVE",
-            cap: 500.94,
-            qty: 14.515894,
-            pm0: 34.51,
-          },
-        ],
-        fondi: [
-          {
-            name: "NEF Ethical Global Trends R",
-            id: "LU2051778178",
-            cap: 6099.97,
-            qty: 465.469,
-            pm0: 13.105,
-            isin: "LU2051778178",
-            conto: "Banca 360 BCC FriulAdria",
-          },
-        ],
-      };
-      /* Prezzi aggiornati al 12/05/2026 — fonte: screenshot TR live */
-      var prices = {
-        bitcoin: 67039.37,
-        ethereum: 1874.87,
-        solana: 74.46,
-        polkadot: 1.098,
-        ripple: 1.216,
-        avalanche: 7.98,
-        dogecoin: 0.0943,
-        cardano: 0.219,
-        "XAIX.DE": 189.82,
-        "WNUC.L": 50.15,
-        "QNTM.L": 24.99,
-        "RBOT.L": 16.81,
-        CIBR: 41.85,
-        "CEA1.DE": 249.9,
-        COPX: 55.54,
-        QDVE: 42.04,
-        LU2051778178: 20.08,
-      };
-      var hiddenCols = {};
-      /* card mode state: cardId -> 'eur'|'pct' */
-      var cardMode = {};
+        DATA & STORAGE
+      ═══════════════════════════════════════════════════════════════════ */
+
+      var DEFAULT_PORTFOLIO = window.WIPS_DATA.DEFAULT_PORTFOLIO;
+      var DEFAULT_PRICES = window.WIPS_DATA.DEFAULT_PRICES;
+
+      function deepClone(value) {
+        if (typeof structuredClone === "function")
+          return structuredClone(value);
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function deepFreeze(value) {
+        if (!value || typeof value !== "object") return value;
+        Object.freeze(value);
+        Object.keys(value).forEach(function (key) {
+          deepFreeze(value[key]);
+        });
+        return value;
+      }
+
+      deepFreeze(DEFAULT_PORTFOLIO);
+      deepFreeze(DEFAULT_PRICES);
+
+      var P = deepClone(DEFAULT_PORTFOLIO);
+      var prices = deepClone(DEFAULT_PRICES);
+
+      var STORAGE_VERSION = "v26-readonly-portfolio";
+      var PRICE_VERSION = "2026-08-26-v1";
       var STORAGE_KEY = "spm9";
-      var TAB_IDS = ["crypto", "etf", "fondi", "all", "edit", "budget"];
+
+      var TAB_IDS = [
+        "crypto",
+        "etf",
+        "fondi",
+        "all",
+        "edit",
+        "budget",
+        "advisor",
+      ];
+
       var PORTFOLIO_TYPES = ["crypto", "etf", "fondi"];
 
       function g(id) {
         return document.getElementById(id);
       }
 
+      function portfolioSnapshot(source) {
+        return deepClone(source || P);
+      }
+
+      function sameAssetShape(saved, expected) {
+        if (!saved || typeof saved !== "object") return false;
+        for (var t = 0; t < PORTFOLIO_TYPES.length; t++) {
+          var type = PORTFOLIO_TYPES[t];
+          if (!Array.isArray(saved[type])) return false;
+          if (saved[type].length !== expected[type].length) return false;
+          for (var i = 0; i < expected[type].length; i++) {
+            var a = saved[type][i];
+            var e = expected[type][i];
+            if (!a || typeof a !== "object") return false;
+            if (a.id !== e.id || a.name !== e.name) return false;
+            if (!isFiniteNumber(a.cap) || !isFiniteNumber(a.qty)) return false;
+            if (a.pm0 !== undefined && !isFiniteNumber(a.pm0)) return false;
+          }
+        }
+        return true;
+      }
+
+      function isFiniteNumber(value) {
+        return typeof value === "number" && isFinite(value) && value >= 0;
+      }
+
+      function isPlainObject(value) {
+        return (
+          value !== null && typeof value === "object" && !Array.isArray(value)
+        );
+      }
+
+      function validPrices(value) {
+        if (!isPlainObject(value)) return false;
+        var expectedIds = {};
+        PORTFOLIO_TYPES.forEach(function (type) {
+          DEFAULT_PORTFOLIO[type].forEach(function (asset) {
+            expectedIds[asset.id] = true;
+          });
+        });
+        for (var id in value) {
+          if (!expectedIds[id] || !isFiniteNumber(value[id])) return false;
+        }
+        return true;
+      }
+
+      function resetCorruptStorage(reason) {
+        console.warn("WIPS: salvataggio ignorato e rimosso", reason || "");
+        localStorage.removeItem(STORAGE_KEY);
+        P = deepClone(DEFAULT_PORTFOLIO);
+        prices = deepClone(DEFAULT_PRICES);
+      }
+
       function save() {
         try {
+          if (!sameAssetShape(P, DEFAULT_PORTFOLIO)) {
+            resetCorruptStorage("portfolio shape non valida in save()");
+            return;
+          }
           localStorage.setItem(
             STORAGE_KEY,
             JSON.stringify({
-              v: "v25",
-              P: P,
-              prices: prices,
-              hiddenCols: hiddenCols,
-              cardMode: cardMode,
+              v: STORAGE_VERSION,
+              P: portfolioSnapshot(P),
+              prices: deepClone(prices),
+              priceVersion: PRICE_VERSION,
             }),
           );
-        } catch (e) {}
+        } catch (e) {
+          console.warn("WIPS: impossibile salvare localStorage", e);
+        }
       }
       function load() {
         try {
           var d = localStorage.getItem(STORAGE_KEY);
           if (d) {
             var o = JSON.parse(d);
-            if (o.v !== "v25") {
-              localStorage.removeItem(STORAGE_KEY);
+            if (!o || o.v !== STORAGE_VERSION) {
+              resetCorruptStorage("versione storage non compatibile");
               return;
             }
-            if (o.P) {
-              P.crypto = o.P.crypto || P.crypto;
-              P.etf = o.P.etf || P.etf;
-              P.fondi = o.P.fondi || P.fondi;
+            if (!sameAssetShape(o.P, DEFAULT_PORTFOLIO)) {
+              resetCorruptStorage("struttura portafoglio non valida");
+              return;
             }
-            if (o.prices) prices = o.prices;
-            if (o.hiddenCols) hiddenCols = o.hiddenCols;
-            if (o.cardMode) cardMode = o.cardMode;
+            P = portfolioSnapshot(o.P);
+            if (o.prices !== undefined) {
+              if (o.priceVersion === PRICE_VERSION && validPrices(o.prices))
+                prices = deepClone(o.prices);
+              else if (o.priceVersion !== PRICE_VERSION)
+                prices = deepClone(DEFAULT_PRICES);
+              else {
+                resetCorruptStorage("prezzi non validi");
+                return;
+              }
+            }
           }
-        } catch (e) {}
+        } catch (e) {
+          console.warn("WIPS: impossibile leggere localStorage", e);
+          resetCorruptStorage("JSON non leggibile");
+        }
       }
+
+      /* ═══════════════════════════════════════════════════════════════════
+        INTRO OVERLAY / SPLASH
+      ═══════════════════════════════════════════════════════════════════ */
+      // Trova e modifica la durata dell'intro iniziale
+      var introTimeout = 350; // Ridotto (ad es. da 1400ms a 350ms per maggiore velocità)
+      function showIntro() {
+        var intro = document.getElementById("intro-overlay");
+        if (intro) {
+          intro.style.display = "block";
+          setTimeout(function () {
+            intro.style.display = "none";
+          }, introTimeout);
+        }
+      }
+      // Chiamata all'avvio
+      window.addEventListener("DOMContentLoaded", function () {
+        showIntro();
+      });
 
       /* ══ TOAST ═════════════════════════════════════════════════════════ */
       var toastT = null;
@@ -2857,6 +3332,92 @@
           el.classList.remove("show");
         }, 2400);
       }
+
+      /* ══ COPIA NUMERI DELLE TABELLE ════════════════════════════════════
+         Il listener e delegato: resta quindi valido anche dopo ogni render. */
+      function copyDecimalValue(value) {
+        var n = Number(value);
+        if (!isFinite(n)) return "";
+
+        if (n === 0 && 1 / n === -Infinity) return "-0";
+
+        /* String() puo produrre la notazione esponenziale: la convertiamo
+           per mantenere sempre un numero leggibile con la virgola italiana. */
+        var raw = String(n);
+        if (/e/i.test(raw)) {
+          var parts = raw.toLowerCase().split("e");
+          var coefficient = parts[0];
+          var exponent = parseInt(parts[1], 10);
+          var sign = coefficient.charAt(0) === "-" ? "-" : "";
+          if (sign) coefficient = coefficient.slice(1);
+          var decimalParts = coefficient.split(".");
+          var integer = decimalParts[0];
+          var fraction = decimalParts[1] || "";
+          var digits = integer + fraction;
+          var point = integer.length + exponent;
+          if (point <= 0)
+            raw = sign + "0." + new Array(1 - point).join("0") + digits;
+          else if (point >= digits.length)
+            raw =
+              sign + digits + new Array(point - digits.length + 1).join("0");
+          else raw = sign + digits.slice(0, point) + "." + digits.slice(point);
+        }
+        return raw.replace(".", ",");
+      }
+      function copyValueMarkup(value, text, className) {
+        var copied = copyDecimalValue(value);
+        if (!copied) return text;
+        return (
+          "<span" +
+          (className ? ' class="' + className + '"' : "") +
+          ' data-copy-value="' +
+          copied +
+          '" tabindex="0" role="button" title="Copia ' +
+          copied +
+          '">' +
+          text +
+          "</span>"
+        );
+      }
+      function writeCopiedValue(value) {
+        function legacyCopy() {
+          return new Promise(function (resolve, reject) {
+            var area = document.createElement("textarea");
+            area.value = value;
+            area.setAttribute("readonly", "");
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            var copied = document.execCommand("copy");
+            document.body.removeChild(area);
+            copied ? resolve() : reject(new Error("Copia non disponibile"));
+          });
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(value).catch(legacyCopy);
+        }
+        return legacyCopy();
+      }
+      document.addEventListener("click", function (event) {
+        var target = event.target.closest("table [data-copy-value]");
+        if (!target) return;
+        var value = target.getAttribute("data-copy-value");
+        writeCopiedValue(value)
+          .then(function () {
+            showToast("Copiato: " + value);
+          })
+          .catch(function () {
+            showToast("Impossibile copiare il numero");
+          });
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        var target = event.target.closest("table [data-copy-value]");
+        if (!target) return;
+        event.preventDefault();
+        target.click();
+      });
 
       /* ═══════════════════════════════════════════════════════════════════
             UI NAVIGATION
@@ -2871,6 +3432,7 @@
         });
         if (t === "edit") renderEditor();
         if (t === "budget") renderBudget();
+        if (t === "advisor") renderAdvisor();
       }
 
       /* ══ COLLAPSE ═══════════════════════════════════════════════════════ */
@@ -2894,11 +3456,12 @@
       /* ═══════════════════════════════════════════════════════════════════
             PRICE INPUT ENGINE
             ═══════════════════════════════════════════════════════════════════ */
-      function buildPE(type) {
+      function buildPE(type, portfolio) {
+        portfolio = portfolio || P;
         var el = document.getElementById("pe-" + type);
         var h = "";
-        for (var i = 0; i < P[type].length; i++) {
-          var a = P[type][i];
+        for (var i = 0; i < portfolio[type].length; i++) {
+          var a = portfolio[type][i];
           var v = prices[a.id];
           var val = v ? String(v).replace(".", ",") : "";
           h +=
@@ -2920,7 +3483,7 @@
           h += "</div>";
         }
         el.innerHTML = h;
-        updCC();
+        updCC(portfolio);
       }
       function onPI(inp) {
         inp.classList.toggle("fi", inp.value.trim() !== "");
@@ -2937,7 +3500,7 @@
         var r = g("pr-" + id);
         if (r) r.classList.remove("hv");
         save();
-        updCC();
+        updCC(portfolioSnapshot());
         renderAll();
       }
       function applyP(type) {
@@ -2955,18 +3518,19 @@
           }
         }
         save();
-        updCC();
+        updCC(portfolioSnapshot());
         renderAll();
         document.getElementById("fts").textContent =
           "Aggiornato: " + new Date().toLocaleTimeString("it-IT");
         showToast("✓ " + count + " prezzi applicati");
       }
-      function updCC() {
+      function updCC(portfolio) {
+        portfolio = portfolio || P;
         ["crypto", "etf", "fondi"].forEach(function (tp) {
-          var total = P[tp].length;
+          var total = portfolio[tp].length;
           var filled = 0;
-          for (var i = 0; i < P[tp].length; i++)
-            if (prices[P[tp][i].id]) filled++;
+          for (var i = 0; i < portfolio[tp].length; i++)
+            if (prices[portfolio[tp][i].id]) filled++;
           g("cm-" + tp).textContent =
             filled + " / " + total + " prezzi inseriti";
           var cf = g("cf-" + tp);
@@ -2980,34 +3544,57 @@
       /* ═══════════════════════════════════════════════════════════════════
             CALCULATION ENGINE
             ═══════════════════════════════════════════════════════════════════ */
+      function positionMean(a) {
+        if (isFiniteNumber(a.pm0) && a.pm0 > 0) return a.pm0;
+        return isFiniteNumber(a.qty) && a.qty > 0 && isFiniteNumber(a.cap)
+          ? a.cap / a.qty
+          : 0;
+      }
+
+      /* cap is retained as legacy portfolio data only.  All position maths uses
+         qty × P.M. so historical cost remains consistent with the broker. */
+      function historicalCost(a) {
+        var pm = positionMean(a);
+        return isFiniteNumber(a.qty) && a.qty > 0 && isFinite(pm)
+          ? a.qty * pm
+          : 0;
+      }
+
       function calc(a, add) {
-        var pm = a.pm0 && a.pm0 > 0 ? a.pm0 : a.qty > 0 ? a.cap / a.qty : 0;
-        var price = prices[a.id] !== undefined ? prices[a.id] : null;
-        var va = price !== null ? price * a.qty : null;
-        var rp = va !== null ? ((va - a.cap) / a.cap) * 100 : null;
-        var re = va !== null ? va - a.cap : null;
-        var ta = price !== null && add > 0 ? add / price : null;
-        var nc = a.cap + add;
-        var nq = ta !== null ? a.qty + ta : null;
-        var np = nq && nq > 0 ? nc / nq : null;
+        var pm = positionMean(a);
+        var cost = historicalCost(a);
+        var qty = isFiniteNumber(a.qty) ? a.qty : 0;
+        var rawPrice = prices[a.id];
+        var price = isFiniteNumber(rawPrice) && rawPrice > 0 ? rawPrice : null;
+        var investment = isFiniteNumber(add) && add > 0 ? add : 0;
+        var va = price !== null ? price * qty : null;
+        var rp = va !== null && cost > 0 ? ((va - cost) / cost) * 100 : null;
+        var re = va !== null ? va - cost : null;
+        var ta = price !== null ? investment / price : null;
+        var nc = cost + investment;
+        var nq = ta !== null ? qty + ta : investment === 0 ? qty : null;
+        var np = nq !== null && nq > 0 ? nc / nq : investment === 0 ? pm : null;
         var dp = np !== null ? np - pm : null;
         var dpp = pm > 0 && dp !== null ? (dp / pm) * 100 : null;
-        var dm = price !== null && np !== null ? np - price : null;
+        var dm = price !== null && np !== null ? price - np : null;
         var rs =
           price !== null && nq !== null && np !== null
             ? (price - np) * nq
             : null;
         var rc =
-          price !== null && pm > 0 && price < pm
-            ? ((pm - price) / price) * 100
+          price !== null && np !== null && np > 0 && price < np
+            ? (np / price - 1) * 100
             : null;
         return {
           pm: pm,
+          cost: cost,
           price: price,
           va: va,
           rp: rp,
           re: re,
           ta: ta,
+          nc: nc,
+          nq: nq,
           np: np,
           dp: dp,
           dpp: dpp,
@@ -3018,24 +3605,8 @@
       }
 
       /* ═══════════════════════════════════════════════════════════════════
-            FORMATTERS & INSIGHT HELPERS
+            FORMATTERS & SCORE HELPERS
             ═══════════════════════════════════════════════════════════════════ */
-      function ins(c) {
-        if (c.price === null) return { cl: "cneu", ic: "◌", lb: "No prezzo" };
-        var d = c.dpp;
-        if (d === null) return { cl: "cneu", ic: "◌", lb: "No dati" };
-        var m = c.dm;
-        if (d <= -5 && m !== null && m < 0)
-          return { cl: "cbuy", ic: "▼▼", lb: "Ottimo DCA" };
-        if (d <= -2 && m !== null && m < 0)
-          return { cl: "cbuy", ic: "▼", lb: "Buon DCA" };
-        if (d < 0 && m !== null && m < 0)
-          return { cl: "cgood", ic: "↓", lb: "DCA efficace" };
-        if (d < 0) return { cl: "cgood", ic: "↓", lb: "Riduce PM" };
-        if (d < 2) return { cl: "cneu", ic: "→", lb: "Neutro" };
-        if (d < 5) return { cl: "ccau", ic: "↑", lb: "PM sale lieve" };
-        return { cl: "ccau", ic: "↑↑", lb: "PM sale forte" };
-      }
       function asc(c) {
         if (c.price === null) return 0;
         var s = 0;
@@ -3048,110 +3619,47 @@
       /* ═══════════════════════════════════════════════════════════════════
             FORMATTERS & HELPERS
             ═══════════════════════════════════════════════════════════════════ */
+      var UI_MAX_DECIMALS = 3;
+
+      function formatDisplayNumber(value, requestedDigits) {
+        var maxDigits = Math.min(
+          requestedDigits === undefined ? UI_MAX_DECIMALS : requestedDigits,
+          UI_MAX_DECIMALS,
+        );
+        return Number(value).toLocaleString("it-IT", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: maxDigits,
+        });
+      }
+
       function N(v, d, sfx) {
         if (v === null || v === undefined || isNaN(v))
           return '<span class="mu">—</span>';
-        return (
-          v.toLocaleString("it-IT", {
-            minimumFractionDigits: d || 2,
-            maximumFractionDigits: d || 2,
-          }) + (sfx || "")
+        return copyValueMarkup(
+          v,
+          formatDisplayNumber(v, d) + (sfx || ""),
         );
       }
       function S(v, d, sfx) {
         if (v === null || v === undefined || isNaN(v))
           return '<span class="mu">—</span>';
         var cl = v > 0 ? "g" : v < 0 ? "r" : "mu";
-        return (
-          '<span class="' +
-          cl +
-          '">' +
+        return copyValueMarkup(
+          v,
           (v > 0 ? "+" : "") +
-          v.toLocaleString("it-IT", {
-            minimumFractionDigits: d || 2,
-            maximumFractionDigits: d || 2,
-          }) +
-          " " +
-          (sfx === undefined ? "€" : sfx) +
-          "</span>"
+            formatDisplayNumber(v, d) +
+            " " +
+            (sfx === undefined ? "€" : sfx),
+          cl,
         );
       }
       function Pill(v) {
         if (v === null || v === undefined || isNaN(v))
           return '<span class="mu">—</span>';
-        return (
-          '<span class="pill ' +
-          (v >= 0 ? "pg" : "pr") +
-          '">' +
-          (v >= 0 ? "+" : "") +
-          v.toFixed(2) +
-          "%</span>"
-        );
-      }
-
-      /* ═══════════════════════════════════════════════════════════════════
-            CARD MODE CONTROLS
-            ═══════════════════════════════════════════════════════════════════ */
-      function setCardMode(cid, mode) {
-        cardMode[cid] = mode;
-        save();
-        /* re-render just the card body without full re-render */
-        renderAll();
-      }
-      function modeToggle(cid) {
-        var m = cardMode[cid] || "pct";
-        return (
-          '<div class="mode-toggle">' +
-          '<button class="mode-btn' +
-          (m === "eur" ? " active" : "") +
-          '" onclick="setCardMode(\'' +
-          cid +
-          "','eur')\">€</button>" +
-          '<button class="mode-btn' +
-          (m === "pct" ? " active" : "") +
-          '" onclick="setCardMode(\'' +
-          cid +
-          "','pct')\">%</button>" +
-          "</div>"
-        );
-      }
-
-      /* ═══════════════════════════════════════════════════════════════════
-            TABLE COLUMN VISIBILITY
-            ═══════════════════════════════════════════════════════════════════ */
-      function toggleCol(idx) {
-        hiddenCols[idx] = !hiddenCols[idx];
-        save();
-        applyColVis();
-      }
-      function resetCols() {
-        hiddenCols = {};
-        save();
-        applyColVis();
-        showToast("✓ Colonne ripristinate");
-      }
-      function applyColVis() {
-        document.querySelectorAll("table").forEach(function (tbl) {
-          tbl.querySelectorAll("th,td").forEach(function (c) {
-            var ci = parseInt(c.getAttribute("data-ci"));
-            if (!isNaN(ci)) c.classList.toggle("col-hidden", !!hiddenCols[ci]);
-          });
-        });
-        /* update toggle button icons */
-        document.querySelectorAll(".col-toggle").forEach(function (b) {
-          var ci = parseInt(b.getAttribute("data-ci"));
-          b.textContent = hiddenCols[ci] ? "▶" : "▼";
-        });
-      }
-      function colBtn(idx) {
-        return (
-          '<button class="col-toggle" data-ci="' +
-          idx +
-          '" onclick="toggleCol(' +
-          idx +
-          ')" title="Nascondi/Mostra">' +
-          (hiddenCols[idx] ? "▶" : "▼") +
-          "</button>"
+        return copyValueMarkup(
+          v,
+          (v >= 0 ? "+" : "") + formatDisplayNumber(v, 3) + "%",
+          "pill " + (v >= 0 ? "pg" : "pr"),
         );
       }
 
@@ -3159,95 +3667,77 @@
       function mkTH() {
         return (
           "<thead><tr>" +
-          '<th data-ci="0">Asset</th>' +
-          '<th data-ci="1"><span class="gl ga">Portafoglio</span>Cap. Inv.' +
-          colBtn(1) +
-          "</th>" +
-          '<th data-ci="2"><span class="gl ga">Portafoglio</span>Titoli' +
-          colBtn(2) +
-          "</th>" +
-          '<th data-ci="3"><span class="gl ga">Portafoglio</span>P.M. Attuale' +
-          colBtn(3) +
-          "</th>" +
-          '<th data-ci="4"><span class="gl ga">Portafoglio</span>Prezzo Oggi' +
-          colBtn(4) +
-          "</th>" +
-          '<th data-ci="5"><span class="gl ga">Portafoglio</span>Rend. %' +
-          colBtn(5) +
-          "</th>" +
-          '<th data-ci="6"><span class="gl ga">Portafoglio</span>Rend. €' +
-          colBtn(6) +
-          "</th>" +
-          '<th data-ci="7" class="ths"><span class="gl gb">What-If</span>+ € Oggi' +
-          colBtn(7) +
-          "</th>" +
-          '<th data-ci="8"><span class="gl gb">What-If</span>Titoli Agg.' +
-          colBtn(8) +
-          "</th>" +
-          '<th data-ci="9"><span class="gl gb">What-If</span>Nuovo P.M.' +
-          colBtn(9) +
-          "</th>" +
-          '<th data-ci="10" class="ths"><span class="gl gc">Delta P.M.</span>Δ P.M. €' +
-          colBtn(10) +
-          "</th>" +
-          '<th data-ci="11"><span class="gl gc" style="color:rgba(0,229,160,.7);">negativo = ottimo ✓</span>Δ P.M. %' +
-          colBtn(11) +
-          "</th>" +
-          '<th data-ci="12"><span class="gl gc">Delta P.M.</span>Δ P.M.↔Mkt' +
-          colBtn(12) +
-          "</th>" +
-          '<th data-ci="13" class="ths"><span class="gl gd">Insight</span>Risultato €' +
-          colBtn(13) +
-          "</th>" +
-          '<th data-ci="14"><span class="gl gd">Insight</span>Recovery' +
-          colBtn(14) +
-          "</th>" +
-          '<th data-ci="15"><span class="gl gd">Insight</span>Segnale</th>' +
+          '<th>Asset</th>' +
+          '<th><span class="gl ga">Portafoglio</span>Cap. Inv.</th>' +
+          '<th><span class="gl ga">Portafoglio</span>Titoli</th>' +
+          '<th><span class="gl ga">Portafoglio</span>P.M. Attuale</th>' +
+          '<th><span class="gl ga">Portafoglio</span>Prezzo Oggi</th>' +
+          '<th><span class="gl ga">Portafoglio</span>Rend. %</th>' +
+          '<th><span class="gl ga">Portafoglio</span>Rend. €</th>' +
+          '<th class="ths"><span class="gl gb">What-If</span>+ € Oggi</th>' +
+          '<th><span class="gl gb">What-If</span>Titoli Agg.</th>' +
+          '<th><span class="gl gb">What-If</span>Nuovo P.M.</th>' +
           "</tr></thead>"
         );
       }
 
-      function srt(type) {
-        return P[type].slice().sort(function (a, b) {
-          return b.cap - a.cap;
+      function srt(type, portfolio) {
+        portfolio = portfolio || P;
+        return portfolio[type].slice().sort(function (a, b) {
+          return historicalCost(b) - historicalCost(a);
         });
       }
 
-      function rows(type, add) {
-        var list = srt(type);
+      function sortByPnlPctDesc(a, b) {
+        return Math.abs(b.c.rp) - Math.abs(a.c.rp);
+      }
+
+      function sortByDcaPctDesc(a, b) {
+        return Math.abs(b.c.dpp) - Math.abs(a.c.dpp);
+      }
+
+      function rows(type, add, portfolio) {
+        var list = srt(type, portfolio);
         var h = "";
         for (var i = 0; i < list.length; i++) {
           var a = list[i];
           var c = calc(a, add);
-          var sg = ins(c);
+          var simCap =
+            add > 0
+              ? '<div class="sim-inc" title="Valore totale simulato">' +
+                N(c.nc, 2) +
+                " €</div>"
+              : "";
+          var simQty =
+            add > 0 && c.nq !== null && isFinite(c.nq)
+              ? '<div class="sim-inc" title="Valore totale simulato">' +
+                N(c.nq, 6) +
+                "</div>"
+              : "";
+          var pmChange = "";
+          if (add > 0 && c.dpp !== null) {
+            var pmDirection = c.dpp < 0 ? "down" : c.dpp > 0 ? "up" : "flat";
+            var pmArrow = c.dpp < 0 ? "↓" : c.dpp > 0 ? "↑" : "→";
+            var pmPct =
+              (c.dpp > 0 ? "+" : "") +
+              c.dpp.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }) +
+              "%";
+            pmChange =
+              '<div class="sim-pm-change ' +
+              pmDirection +
+              '">' +
+              pmArrow +
+              " " +
+              pmPct +
+              "</div>";
+          }
           var pc =
             c.price !== null
               ? '<span class="y">' + N(c.price, 4) + " €</span>"
               : '<span class="mu">—</span>';
-          var rec = '<span class="mu">—</span>';
-          if (c.rc !== null)
-            rec =
-              '<div class="bw"><div class="bt"><div class="bf" style="width:' +
-              Math.min(100, c.rc) +
-              '%;background:var(--re);"></div></div><span class="r" style="font-size:.7rem;">+' +
-              c.rc.toFixed(1) +
-              "%</span></div>";
-          var dc = '<span class="mu">—</span>';
-          if (c.dpp !== null) {
-            var da = Math.min(100, Math.abs(c.dpp) * 8);
-            var dc2 = c.dpp < 0 ? "var(--go)" : "var(--em)";
-            dc =
-              '<div class="bw"><div class="bt"><div class="bf" style="width:' +
-              da +
-              "%;background:" +
-              dc2 +
-              '"></div></div><span style="color:' +
-              dc2 +
-              ';font-size:.7rem;">' +
-              (c.dpp >= 0 ? "+" : "") +
-              c.dpp.toFixed(2) +
-              "%</span></div>";
-          }
           var bg =
             c.rp === null
               ? ""
@@ -3255,44 +3745,31 @@
                 (c.rp >= 0 ? "rgba(0,229,160,.018)" : "rgba(255,61,90,.018)");
           h += '<tr style="' + bg + '">';
           h +=
-            '<td data-ci="0"><div class="anm">' +
+            '<td><div class="anm">' +
             a.name +
             '</div><div class="atk">' +
             a.id +
             "</div></td>";
-          h += '<td data-ci="1">' + N(a.cap, 2) + " €</td>";
-          h += '<td data-ci="2">' + N(a.qty, 4) + "</td>";
-          h += '<td data-ci="3">' + N(c.pm, 4) + " €</td>";
-          h += '<td data-ci="4">' + pc + "</td>";
-          h += '<td data-ci="5">' + Pill(c.rp) + "</td>";
-          h += '<td data-ci="6">' + S(c.re, 2, "€") + "</td>";
+          h += '<td>' + N(c.cost, 2) + " €" + simCap + "</td>";
+          h += '<td>' + N(a.qty, 4) + simQty + "</td>";
+          h += '<td>' + N(c.pm, 4) + " €</td>";
+          h += '<td>' + pc + "</td>";
+          h += '<td>' + Pill(c.rp) + "</td>";
+          h += '<td>' + S(c.re, 2, "€") + "</td>";
           h +=
-            '<td data-ci="7" class="ths"><span class="y">' +
+            '<td class="ths"><span class="y">' +
             N(add, 2) +
             " €</span></td>";
           h +=
-            '<td data-ci="8">' +
+            '<td>' +
             (c.ta !== null ? N(c.ta, 5) : '<span class="mu">—</span>') +
             "</td>";
           h +=
-            '<td data-ci="9">' +
+            '<td>' +
             (c.np !== null
-              ? '<span class="b">' + N(c.np, 4) + " €</span>"
+              ? '<span class="b">' + N(c.np, 4) + " €</span>" + pmChange
               : '<span class="mu">—</span>') +
             "</td>";
-          h += '<td data-ci="10" class="ths">' + S(c.dp, 4, "€") + "</td>";
-          h += '<td data-ci="11">' + dc + "</td>";
-          h += '<td data-ci="12">' + S(c.dm, 4, "€") + "</td>";
-          h += '<td data-ci="13" class="ths">' + S(c.rs, 2, "€") + "</td>";
-          h += '<td data-ci="14">' + rec + "</td>";
-          h +=
-            '<td data-ci="15"><span class="chip ' +
-            sg.cl +
-            '">' +
-            sg.ic +
-            " " +
-            sg.lb +
-            "</span></td>";
           h += "</tr>";
         }
         return h;
@@ -3313,85 +3790,42 @@
         );
       }
 
-      /* ══ RANK CARD with €/% toggle ══════════════════════════════════════ */
-      function rankCard(title, items, cidKey, vEurFn, vPctFn, colfn, maxShow) {
-        var mode = cardMode[cidKey] || "pct";
-        var n = Math.min(maxShow || 5, items.length);
-        var h =
-          '<div class="card"><div class="card-hdr"><h4>' +
-          title +
-          "</h4>" +
-          modeToggle(cidKey) +
-          "</div>";
-        for (var i = 0; i < n; i++) {
-          var vFn = mode === "eur" ? vEurFn : vPctFn;
-          var val = vFn(items[i].c);
-          var cl = colfn(items[i].c, mode);
-          var suf = mode === "eur" ? " €" : "%";
-          var txt =
-            val !== null
-              ? (val >= 0 ? "+" : "") +
-                val.toFixed(mode === "eur" ? 0 : 2) +
-                suf
-              : "—";
-          var tcl = items[i].t ? (items[i].t === "crypto" ? "b" : "y") : "";
-          var tnm = items[i].t
-            ? ' <span class="' +
-              tcl +
-              '" style="font-size:.56rem;">' +
-              (items[i].t === "crypto" ? "🪙" : "📈") +
-              "</span>"
-            : "";
-          h +=
-            '<div class="ri"><div class="rn2' +
-            (i === 0 ? " g1" : "") +
-            '">' +
-            (i + 1) +
-            "</div>" +
-            '<div class="ri-info"><div class="rn">' +
-            items[i].a.name +
-            tnm +
-            '</div><div class="rs">' +
-            items[i].a.id +
-            "</div></div>" +
-            '<div class="rv ' +
-            cl +
-            '">' +
-            txt +
-            "</div></div>";
-        }
-        return h + "</div>";
-      }
-
-      /* ══ BAR CARD with €/% toggle ════════════════════════════════════════ */
-      function barCard(title, items, cidKey, eurFn, pctFn, colFn) {
-        var mode = cardMode[cidKey] || "pct";
-        var fn = mode === "eur" ? eurFn : pctFn;
-        var mx = 0;
+      /* ══ BAR CARD: barra e ordinamento sulla percentuale ═══════════════ */
+      function barCard(title, items, eurFn, pctFn, colFn) {
+        var maxMagnitude = 0;
         items.forEach(function (x) {
-          if (Math.abs(fn(x.c)) > mx) mx = Math.abs(fn(x.c));
+          var pct = pctFn(x.c);
+          if (Math.abs(pct) > maxMagnitude) maxMagnitude = Math.abs(pct);
         });
-        if (!mx) mx = 1;
+        if (!maxMagnitude) maxMagnitude = 1;
         var h =
           '<div class="card"><div class="card-hdr"><h4>' +
           title +
-          "</h4>" +
-          modeToggle(cidKey) +
-          "</div>";
+          "</h4></div>";
         items.forEach(function (x) {
-          var v = fn(x.c);
-          if (v === null) {
+          var eur = eurFn(x.c);
+          var pct = pctFn(x.c);
+          if (eur === null) {
             return;
           }
-          var w = (Math.abs(v) / mx) * 100;
-          var col = colFn(x.c, mode);
-          var lbl =
-            mode === "eur"
-              ? (v >= 0 ? "+" : "") +
-                Math.round(v).toLocaleString("it-IT") +
-                " €"
-              : (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
-          var tnm = x.t ? (x.t === "crypto" ? "🪙 " : "📈 ") : "";
+          var w = (Math.abs(pct) / maxMagnitude) * 100;
+          var col = colFn(x.c);
+          var eurLabel =
+            (eur >= 0 ? "+" : "") +
+            eur.toLocaleString("it-IT", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }) +
+            " €";
+          var pctLabel =
+            pct === null ? "—" : (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%";
+          var tnm = x.t
+            ? x.t === "crypto"
+              ? "🪙 "
+              : x.t === "etf"
+                ? "📈 "
+                : "🏦 "
+            : "";
           h +=
             '<div class="brow"><div class="blbl">' +
             tnm +
@@ -3402,17 +3836,19 @@
             "%;background:" +
             col +
             '"></div></div>' +
-            '<div class="bval" style="color:' +
+            '<span class="bmetric metric-pct" style="color:' +
             col +
             '">' +
-            lbl +
-            "</div></div>";
+            pctLabel +
+            '</span><span class="bmetric metric-eur">' +
+            eurLabel +
+            "</span></div>";
         });
         return h + "</div>";
       }
 
-      /* ══ ALLOC CARD ══════════════════════════════════════════════════════ */
-      function allocCard(title, sc2, maxSc, addA, withExplain) {
+      /* ══ ALLOCATION PRIORITY RANKING ════════════════════════════════════ */
+      function allocCard(title, sc2, maxSc, addA) {
         var cols = [
           "var(--go)",
           "var(--bl)",
@@ -3420,48 +3856,36 @@
           "var(--pu)",
           "var(--or)",
         ];
-        var explain = "";
-        if (withExplain) {
-          explain =
-            '<div class="ac-explain">' +
-            "<strong>Come funziona il ranking:</strong> ogni asset riceve un punteggio 0–100 basato su tre fattori:<br>" +
-            "① <strong>+30 pt</strong> se il P.M. è sopra il prezzo attuale (sei in perdita, il DCA aiuta a recuperare) · " +
-            "② <strong>+0→40 pt</strong> in proporzione alla % di perdita corrente · " +
-            "③ <strong>+0→30 pt</strong> se il Δ P.M. è negativo, cioè l'investimento abbassa davvero il prezzo di carico." +
-            "</div>";
-        }
         var h =
           '<div class="ac"><div style="margin-bottom:10px;"><h4 style="font-family:var(--SA);font-size:.82rem;font-weight:700;color:var(--text);">' +
           title +
-          "</h4>" +
-          explain +
+          '</h4><details class="rank-help"><summary>ⓘ Come viene calcolato</summary><span><strong>0–100 pt:</strong> +30 se il P.M. è sopra il mercato, fino a +40 in base alla perdita %, fino a +30 se il DCA riduce il P.M.</span></details>' +
           "</div>";
         for (var i = 0; i < sc2.length; i++) {
           var x = sc2[i];
-          var sg = ins(x.c);
           var col = i < cols.length ? cols[i] : "var(--rim2)";
           var w = (x.sc / maxSc) * 100;
-          var reason = "";
-          if (x.c.price === null)
-            reason = "⚠ Inserisci il prezzo per analizzare";
-          else {
-            var pts = [];
-            if (x.c.rp !== null)
-              pts.push((x.c.rp >= 0 ? "+" : "") + x.c.rp.toFixed(1) + "%");
-            if (x.c.dpp !== null)
-              pts.push(
-                x.c.dpp < 0
-                  ? "DCA ↓ PM " + Math.abs(x.c.dpp).toFixed(1) + "% ✓"
-                  : "DCA ↑ PM " + Math.abs(x.c.dpp).toFixed(1) + "%",
-              );
-            if (x.c.dm !== null)
-              pts.push(x.c.dm < 0 ? "PM sotto mkt ✓" : "PM sopra mkt ⚠");
-            if (x.c.rc !== null) pts.push("Rec +" + x.c.rc.toFixed(1) + "%");
-            reason = pts.join(" · ");
-          }
+          var pnlText =
+            x.c.rp === null
+              ? "—"
+              : (x.c.rp >= 0 ? "+" : "") + x.c.rp.toFixed(1) + "%";
+          var dcaText =
+            x.c.dpp === null
+              ? "—"
+              : (x.c.dpp < 0 ? "↓ " : "↑ ") +
+                Math.abs(x.c.dpp).toFixed(1) +
+                "%";
+          var action =
+            x.c.price === null
+              ? { label: "Prezzo", cl: "review" }
+              : x.sc >= 70
+                ? { label: "Priorità", cl: "priority" }
+                : x.sc >= 40
+                  ? { label: "Valuta", cl: "review" }
+                  : { label: "Attendi", cl: "" };
           var tag = x.t
             ? ' <span style="font-size:.55rem;color:var(--t3);">' +
-              (x.t === "crypto" ? "🪙" : "📈") +
+              (x.t === "crypto" ? "🪙" : x.t === "etf" ? "📈" : "🏦") +
               "</span>"
             : "";
           h +=
@@ -3482,18 +3906,23 @@
             "%;background:" +
             col +
             '"></div></div></div>' +
-            '<div class="arw">' +
-            reason +
-            "</div>" +
-            '<span class="ascore-val">' +
+            '<span class="ascore-val" title="Score convenienza">' +
             x.sc +
-            "pt</span>" +
-            '<span class="chip ' +
-            sg.cl +
+            "/100</span>" +
+            '<span class="arow-metric ' +
+            (x.c.rp !== null && x.c.rp < 0 ? "r" : "g") +
+            '" title="P&amp;L corrente">' +
+            pnlText +
+            "</span>" +
+            '<span class="arow-metric adca ' +
+            (x.c.dpp !== null ? (x.c.dpp < 0 ? "good" : "warn") : "") +
+            '" title="Variazione del P.M. con il DCA">' +
+            dcaText +
+            "</span>" +
+            '<span class="rank-action ' +
+            action.cl +
             '">' +
-            sg.ic +
-            " " +
-            sg.lb +
+            action.label +
             "</span>" +
             "</div>";
         }
@@ -3503,9 +3932,8 @@
       /* ═══════════════════════════════════════════════════════════════════
             ANALYTICS ENGINE
             ═══════════════════════════════════════════════════════════════════ */
-      function analytics(type, add) {
-        var prefix = type + "-";
-        var list = srt(type);
+      function analytics(type, add, portfolio) {
+        var list = srt(type, portfolio);
         var calcs = list.map(function (a) {
           return { a: a, t: type, c: calc(a, add) };
         });
@@ -3515,7 +3943,7 @@
           neg = 0,
           noP = 0;
         calcs.forEach(function (x) {
-          tI += x.a.cap;
+          tI += x.c.cost;
           if (x.c.va !== null) {
             tV += x.c.va;
             if (x.c.rp >= 0) pos++;
@@ -3526,32 +3954,16 @@
           pct = tI > 0 ? (pnl / tI) * 100 : 0;
         var addA = parseFloat(document.getElementById("addAmt").value) || 0;
         var inc = tI > 0 ? (addA / tI) * 100 : 0;
-        var wP = calcs
+        var wPnl = calcs
           .filter(function (x) {
             return x.c.rp !== null;
           })
-          .sort(function (a, b) {
-            return b.c.rp - a.c.rp;
-          });
+          .sort(sortByPnlPctDesc);
         var wD = calcs
           .filter(function (x) {
             return x.c.dpp !== null;
           })
-          .sort(function (a, b) {
-            return a.c.dpp - b.c.dpp;
-          });
-        var wPnl = calcs
-          .filter(function (x) {
-            return x.c.re !== null;
-          })
-          .sort(function (a, b) {
-            return b.c.re - a.c.re;
-          });
-        var mxD = 0;
-        wD.forEach(function (x) {
-          if (Math.abs(x.c.dpp) > mxD) mxD = Math.abs(x.c.dpp);
-        });
-        if (!mxD) mxD = 0.01;
+          .sort(sortByDcaPctDesc);
         var sc2 = calcs
           .map(function (x) {
             return { a: x.a, t: type, c: x.c, sc: asc(x.c) };
@@ -3629,61 +4041,30 @@
         );
         h += "</div>";
         h += '<div class="ag2">';
-        h += rankCard(
-          "&#127942; Migliori Rendimenti",
-          wP,
-          prefix + "rend",
-          function (c) {
-            return c.re;
-          },
-          function (c) {
-            return c.rp;
-          },
-          function (c, m) {
-            return (m === "eur" ? c.re : c.rp) >= 0 ? "var(--go)" : "var(--re)";
-          },
-        );
-        h += rankCard(
-          "&#9660; Miglior DCA",
-          wD,
-          prefix + "dca",
-          function (c) {
-            return c.dp;
-          },
-          function (c) {
-            return c.dpp;
-          },
-          function (c, m) {
-            return (m === "eur" ? c.dp : c.dpp) < 0 ? "var(--go)" : "var(--em)";
-          },
-        );
         h += barCard(
           "&#128200; P&amp;L per Asset",
           wPnl,
-          prefix + "pnl",
           function (c) {
             return c.re;
           },
           function (c) {
             return c.rp;
           },
-          function (c, m) {
-            return (m === "eur" ? c.re : c.rp) >= 0 ? "var(--go)" : "var(--re)";
+          function (c) {
+            return c.re >= 0 ? "var(--go)" : "var(--re)";
           },
         );
-        var dcaItems = wD.slice();
         h += barCard(
           "&#9660; Efficacia DCA",
-          dcaItems,
-          prefix + "effdca",
+          wD,
           function (c) {
             return c.dp;
           },
           function (c) {
             return c.dpp;
           },
-          function (c, m) {
-            return (m === "eur" ? c.dp : c.dpp) < 0 ? "var(--go)" : "var(--em)";
+          function (c) {
+            return c.dp < 0 ? "var(--go)" : "var(--em)";
           },
         );
         h += "</div>";
@@ -3692,21 +4073,21 @@
           sc2,
           mxS,
           addA,
-          true,
         );
         return h + "</div>";
       }
 
       /* ══ GLOBAL ANALYTICS ════════════════════════════════════════════════ */
-      function globalAnalytics(add) {
+      function globalAnalytics(add, portfolio) {
+        portfolio = portfolio || P;
         var all = [];
-        P.crypto.forEach(function (a) {
+        portfolio.crypto.forEach(function (a) {
           all.push({ a: a, t: "crypto" });
         });
-        P.etf.forEach(function (a) {
+        portfolio.etf.forEach(function (a) {
           all.push({ a: a, t: "etf" });
         });
-        P.fondi.forEach(function (a) {
+        portfolio.fondi.forEach(function (a) {
           all.push({ a: a, t: "fondi" });
         });
         var calcs = all.map(function (x) {
@@ -3724,10 +4105,10 @@
           neg = 0,
           noP = 0;
         calcs.forEach(function (x) {
-          tI += x.a.cap;
-          if (x.t === "crypto") cI += x.a.cap;
-          else if (x.t === "etf") eI += x.a.cap;
-          else fI += x.a.cap;
+          tI += x.c.cost;
+          if (x.t === "crypto") cI += x.c.cost;
+          else if (x.t === "etf") eI += x.c.cost;
+          else fI += x.c.cost;
           if (x.c.va !== null) {
             tV += x.c.va;
             if (x.t === "crypto") cV += x.c.va;
@@ -3882,7 +4263,9 @@
           '<div class="card"><div class="card-hdr"><h4>&#10084;&#65039; Portfolio Health</h4></div>';
         h +=
           '<div class="hr"><span class="hl">Diversificazione</span><span class="hv b">' +
-          (P.crypto.length + P.etf.length + P.fondi.length) +
+          (portfolio.crypto.length +
+            portfolio.etf.length +
+            portfolio.fondi.length) +
           " asset</span></div>";
         h +=
           '<div class="hr"><span class="hl">Prezzi caricati</span><span class="hv ' +
@@ -3945,98 +4328,48 @@
         h += "</div>";
         h += "</div>"; /* gg */
 
-        /* ── Quattro card identiche alle sezioni Crypto/ETF ma su tutti gli asset ── */
+        /* ── Grafici per tutti gli asset con prezzi disponibili ── */
         var allC = calcs.filter(function (x) {
           return x.t !== "fondi";
         });
-        var wP2 = allC
+        var wPnl2 = calcs
           .filter(function (x) {
             return x.c.rp !== null;
           })
-          .sort(function (a, b) {
-            return b.c.rp - a.c.rp;
-          });
-        var wD2 = allC
-          .filter(function (x) {
-            return x.c.dpp !== null;
-          })
-          .sort(function (a, b) {
-            return a.c.dpp - b.c.dpp;
-          });
-        var wPnl2 = allC
-          .filter(function (x) {
-            return x.c.re !== null;
-          })
-          .sort(function (a, b) {
-            return b.c.re - a.c.re;
-          });
+          .sort(sortByPnlPctDesc);
 
         h +=
           '<div class="anh" style="margin-top:4px;"><div class="ant" style="font-size:1.1rem;">&#128197; Analisi per Asset</div><div class="anl"></div></div>';
         h += '<div class="ag2">';
-        h += rankCard(
-          "&#127942; Migliori Rendimenti",
-          wP2,
-          "all-rend",
-          function (c) {
-            return c.re;
-          },
-          function (c) {
-            return c.rp;
-          },
-          function (c, m) {
-            return (m === "eur" ? c.re : c.rp) >= 0 ? "var(--go)" : "var(--re)";
-          },
-          6,
-        );
-        h += rankCard(
-          "&#9660; Miglior DCA",
-          wD2,
-          "all-dca",
-          function (c) {
-            return c.dp;
-          },
-          function (c) {
-            return c.dpp;
-          },
-          function (c, m) {
-            return (m === "eur" ? c.dp : c.dpp) < 0 ? "var(--go)" : "var(--em)";
-          },
-          6,
-        );
         h += barCard(
           "&#128200; P&amp;L per Asset",
           wPnl2,
-          "all-pnl",
           function (c) {
             return c.re;
           },
           function (c) {
             return c.rp;
           },
-          function (c, m) {
-            return (m === "eur" ? c.re : c.rp) >= 0 ? "var(--go)" : "var(--re)";
+          function (c) {
+            return c.re >= 0 ? "var(--go)" : "var(--re)";
           },
         );
         var wDCAb = allC
           .filter(function (x) {
             return x.c.dpp !== null;
           })
-          .sort(function (a, b) {
-            return a.c.dpp - b.c.dpp;
-          });
+          .sort(sortByDcaPctDesc);
         h += barCard(
           "&#9660; Efficacia DCA",
           wDCAb,
-          "all-effdca",
           function (c) {
             return c.dp;
           },
           function (c) {
             return c.dpp;
           },
-          function (c, m) {
-            return (m === "eur" ? c.dp : c.dpp) < 0 ? "var(--go)" : "var(--em)";
+          function (c) {
+            return c.dp < 0 ? "var(--go)" : "var(--em)";
           },
         );
         h += "</div>";
@@ -4061,21 +4394,778 @@
           gSc,
           gMx,
           addA,
-          true,
         );
         return h + "</div>";
       }
 
+      /* ═══════════════════════════════════════════════════════════════════
+            AI PORTFOLIO ADVISOR - read-only strategic layer
+            ═══════════════════════════════════════════════════════════════════ */
+      function advEsc(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function advMoney(value) {
+        if (value === null || value === undefined || isNaN(value)) return "—";
+        return (
+          value.toLocaleString("it-IT", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          }) + " €"
+        );
+      }
+
+      function advAdd(map, key, value) {
+        if (!key) return;
+        map[key] = (map[key] || 0) + value;
+      }
+
+      function advAssetProfile(asset, type) {
+        var n = (asset.name + " " + asset.id).toLowerCase();
+        var sector = "Multi-asset";
+        var region = "Globale";
+        if (type === "crypto") {
+          sector = "Crypto asset";
+          region = "Digitale globale";
+        } else if (n.indexOf("s&p") >= 0 || n.indexOf("qdve") >= 0) {
+          sector = "Tecnologia";
+          region = "USA";
+        } else if (n.indexOf("cyber") >= 0 || n.indexOf("cibr") >= 0) {
+          sector = "Cybersecurity";
+          region = "USA";
+        } else if (n.indexOf("ai") >= 0 || n.indexOf("big data") >= 0) {
+          sector = "AI e dati";
+          region = "Globale sviluppato";
+        } else if (n.indexOf("quantum") >= 0 || n.indexOf("qntm") >= 0) {
+          sector = "Quantum computing";
+          region = "Globale sviluppato";
+        } else if (n.indexOf("automation") >= 0 || n.indexOf("rbot") >= 0) {
+          sector = "Robotica e automazione";
+          region = "Globale sviluppato";
+        } else if (n.indexOf("uran") >= 0 || n.indexOf("wnuc") >= 0) {
+          sector = "Uranio ed energia";
+          region = "Globale";
+        } else if (n.indexOf("copper") >= 0 || n.indexOf("copx") >= 0) {
+          sector = "Rame e materiali";
+          region = "Globale";
+        } else if (n.indexOf("asia") >= 0 || n.indexOf("em") >= 0) {
+          sector = "Mercati emergenti";
+          region = "Asia emergente";
+        } else if (type === "fondi") {
+          sector = "Trend globali ESG";
+          region = "Globale sviluppato";
+        }
+        return { sector: sector, region: region };
+      }
+
+      function advBudgetSnapshot() {
+        if (typeof window.bdgGetSnapshot === "function") {
+          try {
+            return window.bdgGetSnapshot();
+          } catch (e) {
+            console.warn("WIPS advisor: budget snapshot non disponibile", e);
+          }
+        }
+        try {
+          var raw = localStorage.getItem("wips_budget_cashflow_v3");
+          if (raw) return JSON.parse(raw);
+        } catch (e2) {
+          console.warn("WIPS advisor: impossibile leggere budget salvato", e2);
+        }
+        return null;
+      }
+
+      function buildAdvisorSnapshot(add, portfolio) {
+        portfolio = portfolio || P;
+        var all = [];
+        PORTFOLIO_TYPES.forEach(function (type) {
+          portfolio[type].forEach(function (asset) {
+            all.push({ a: asset, t: type });
+          });
+        });
+        var rows = all.map(function (x) {
+          var c = calc(x.a, add);
+          var value = c.va !== null ? c.va : c.cost;
+          var profile = advAssetProfile(x.a, x.t);
+          return {
+            a: x.a,
+            t: x.t,
+            c: c,
+            value: value,
+            sector: profile.sector,
+            region: profile.region,
+          };
+        });
+        var totals = {
+          invested: 0,
+          value: 0,
+          pricedValue: 0,
+          pricedInvested: 0,
+          priced: 0,
+          noPrice: 0,
+          positive: 0,
+          negative: 0,
+        };
+        var byType = { crypto: 0, etf: 0, fondi: 0 };
+        var bySector = {};
+        var byRegion = {};
+        rows.forEach(function (x) {
+          totals.invested += x.c.cost;
+          totals.value += x.value;
+          byType[x.t] += x.value;
+          advAdd(bySector, x.sector, x.value);
+          advAdd(byRegion, x.region, x.value);
+          if (x.c.va !== null) {
+            totals.priced++;
+            totals.pricedValue += x.c.va;
+            totals.pricedInvested += x.c.cost;
+            if (x.c.re >= 0) totals.positive++;
+            else totals.negative++;
+          } else totals.noPrice++;
+        });
+        rows.forEach(function (x) {
+          x.weight = totals.value > 0 ? (x.value / totals.value) * 100 : 0;
+        });
+        rows.sort(function (a, b) {
+          return b.value - a.value;
+        });
+        var budget = advBudgetSnapshot();
+        return {
+          add: add,
+          rows: rows,
+          totals: totals,
+          byType: byType,
+          bySector: bySector,
+          byRegion: byRegion,
+          budget: budget,
+          pnl: totals.pricedValue - totals.pricedInvested,
+          pnlPct:
+            totals.pricedInvested > 0
+              ? ((totals.pricedValue - totals.pricedInvested) /
+                  totals.pricedInvested) *
+                100
+              : null,
+        };
+      }
+
+      function advShare(map, key, total) {
+        return total > 0 ? ((map[key] || 0) / total) * 100 : 0;
+      }
+
+      function advTopEntry(map) {
+        var best = { key: "—", value: 0 };
+        Object.keys(map).forEach(function (key) {
+          if (map[key] > best.value) best = { key: key, value: map[key] };
+        });
+        return best;
+      }
+
+      function analyzeAdvisor(s) {
+        var total = s.totals.value;
+        var assetCount = s.rows.length;
+        var typeCount = PORTFOLIO_TYPES.filter(function (type) {
+          return s.byType[type] > 0;
+        }).length;
+        var maxAsset = s.rows[0] ? s.rows[0].weight : 0;
+        var topType = advTopEntry(s.byType);
+        var topSector = advTopEntry(s.bySector);
+        var topRegion = advTopEntry(s.byRegion);
+        var cryptoPct = advShare(s.byType, "crypto", total);
+        var etfPct = advShare(s.byType, "etf", total);
+        var fondiPct = advShare(s.byType, "fondi", total);
+        var priceCoverage =
+          assetCount > 0 ? (s.totals.priced / assetCount) * 100 : 0;
+        var liq =
+          s.budget && s.budget.liq !== undefined ? Number(s.budget.liq) : 0;
+        var investible =
+          s.budget && s.budget.investible !== undefined
+            ? Number(s.budget.investible)
+            : null;
+        var cashBase = total + Math.max(0, liq);
+        var cashPct = cashBase > 0 ? (Math.max(0, liq) / cashBase) * 100 : 0;
+        var diversificationScore =
+          Math.min(100, assetCount * 6) * 0.55 + typeCount * 15;
+        var concentrationScore = Math.max(
+          0,
+          100 - Math.max(0, maxAsset - 10) * 4,
+        );
+        var assetBalanceScore = 100;
+        if (cryptoPct > 35) assetBalanceScore -= (cryptoPct - 35) * 1.7;
+        if (etfPct < 30) assetBalanceScore -= (30 - etfPct) * 1.2;
+        if (fondiPct > 30) assetBalanceScore -= (fondiPct - 30) * 1.1;
+        assetBalanceScore = Math.max(20, Math.min(100, assetBalanceScore));
+        var geographyScore = Math.max(
+          35,
+          100 - Math.max(0, (topRegion.value / total) * 100 - 45) * 1.4,
+        );
+        var sectorScore = Math.max(
+          35,
+          100 - Math.max(0, (topSector.value / total) * 100 - 40) * 1.5,
+        );
+        var liquidityScore =
+          investible === null
+            ? 72
+            : investible < 0
+              ? 35
+              : cashPct > 35
+                ? 72
+                : cashPct < 3 && total > 0
+                  ? 62
+                  : 90;
+        var dataScore = priceCoverage;
+        var health = Math.round(
+          diversificationScore * 0.18 +
+            concentrationScore * 0.18 +
+            assetBalanceScore * 0.17 +
+            geographyScore * 0.12 +
+            sectorScore * 0.12 +
+            liquidityScore * 0.13 +
+            dataScore * 0.1,
+        );
+        health = Math.max(0, Math.min(100, health));
+        var state =
+          health >= 82
+            ? "Portafoglio solido e ben leggibile"
+            : health >= 68
+              ? "Portafoglio interessante, con alcuni sbilanciamenti"
+              : health >= 52
+                ? "Portafoglio da ribilanciare con metodo"
+                : "Portafoglio concentrato e da semplificare";
+
+        var strengths = [];
+        var risks = [];
+        var steps = [];
+        var comments = [];
+
+        if (assetCount >= 14)
+          strengths.push(
+            "Buona granularita: il capitale e distribuito su " +
+              assetCount +
+              " posizioni.",
+          );
+        else
+          risks.push(
+            "Numero di posizioni ancora limitato: la diversificazione puo migliorare.",
+          );
+        if (etfPct >= 45)
+          strengths.push(
+            "La componente ETF/fondi sostiene una base piu strutturale del portafoglio.",
+          );
+        if (cryptoPct > 30)
+          risks.push(
+            "Peso crypto elevato: volatilita e drawdown possono dominare il risultato complessivo.",
+          );
+        else if (cryptoPct >= 8)
+          strengths.push(
+            "Crypto presenti ma non isolate dal resto del portafoglio.",
+          );
+        if (maxAsset > 18)
+          risks.push(
+            "La posizione principale pesa " +
+              maxAsset.toFixed(1) +
+              "%: attenzione al rischio singolo asset.",
+          );
+        else
+          strengths.push(
+            "Nessuna posizione singola domina in modo eccessivo il portafoglio.",
+          );
+        if (priceCoverage < 100)
+          risks.push(
+            "Mancano prezzi su " +
+              s.totals.noPrice +
+              " asset: lo score resta parziale.",
+          );
+        else
+          strengths.push(
+            "Copertura prezzi completa: analisi, P&L e pesi sono coerenti.",
+          );
+        if (topSector.value / total > 0.4)
+          risks.push(
+            "Concentrazione settoriale su " +
+              topSector.key +
+              " oltre il 40% del portafoglio.",
+          );
+        if (topRegion.value / total > 0.5)
+          risks.push(
+            "Esposizione geografica prevalente su " + topRegion.key + ".",
+          );
+        if (investible !== null && investible > 0) {
+          strengths.push(
+            "Il budget segnala capitale investibile positivo: possibile accumulo graduale.",
+          );
+          steps.push({
+            title: "Allocare gradualmente il capitale investibile",
+            text: "Usa ingressi progressivi e privilegia le aree sottopesate rispetto a quelle gia dominanti.",
+          });
+        } else if (investible !== null && investible < 0) {
+          risks.push(
+            "Budget in tensione: le uscite previste superano la liquidita disponibile.",
+          );
+          steps.push({
+            title: "Sospendere nuovi acquisti finche il budget torna positivo",
+            text: "Prima proteggi liquidita e margine di sicurezza, poi rivaluta il DCA.",
+          });
+        }
+        if (maxAsset > 18 || topSector.value / total > 0.4) {
+          steps.push({
+            title: "Ribilanciare le concentrazioni principali",
+            text: "Evita nuovi acquisti automatici sulle aree gia sovrappesate e canalizza il prossimo capitale su asset decorrelati.",
+          });
+        }
+        if (priceCoverage < 100) {
+          steps.push({
+            title: "Completare i prezzi mancanti",
+            text: "Aggiornare i NAV/prezzi migliora ranking DCA, P&L e lettura del rischio.",
+          });
+        }
+        steps.push({
+          title: "Mantenere una checklist mensile",
+          text: "Controlla pesi, liquidita, performance e duplicazioni prima di ogni nuovo ingresso.",
+        });
+
+        comments.push(
+          "Il portafoglio appare orientato alla crescita, con una forte componente tematica e tecnologica.",
+        );
+        if (cashPct > 25)
+          comments.push(
+            "La liquidita disponibile e alta: puo diventare un piano di ingresso graduale invece di restare inattiva.",
+          );
+        if (cryptoPct > 25)
+          comments.push(
+            "La volatilita crypto richiede disciplina: definire un peso massimo aiuta a non inseguire il mercato.",
+          );
+        if (topSector.key !== "—")
+          comments.push(
+            "L'esposizione a " +
+              topSector.key +
+              " e il principale driver strategico da monitorare.",
+          );
+
+        return {
+          health: health,
+          state: state,
+          topType: topType,
+          topSector: topSector,
+          topRegion: topRegion,
+          cryptoPct: cryptoPct,
+          etfPct: etfPct,
+          fondiPct: fondiPct,
+          cashPct: cashPct,
+          maxAsset: maxAsset,
+          priceCoverage: priceCoverage,
+          strengths: strengths.slice(0, 6),
+          risks: risks.length
+            ? risks.slice(0, 7)
+            : ["Nessuna criticita evidente dai dati disponibili."],
+          steps: steps.slice(0, 6),
+          comments: comments,
+        };
+      }
+
+      function advisorOpportunities(s, a) {
+        var total = s.totals.value;
+        var sectorShare = function (name) {
+          return advShare(s.bySector, name, total);
+        };
+        var regionShare = function (name) {
+          return advShare(s.byRegion, name, total);
+        };
+        var opps = [
+          {
+            name: "ETF World / All Country",
+            motive:
+              "Base globale ampia per ridurre la dipendenza dai temi singoli.",
+            today:
+              a.topSector.value / total > 0.38
+                ? "Interessante per diluire la concentrazione settoriale."
+                : "Utile come nucleo stabile di lungo periodo.",
+            risk: "Basso/Medio",
+            riskClass: "low",
+            horizon: "5-10 anni",
+            role: "Core globale",
+            score: 78 + Math.max(0, a.maxAsset - 15),
+          },
+          {
+            name: "Obbligazioni governative / aggregate bond",
+            motive:
+              "Aggiungono stabilita e una fonte di rendimento diversa dall'azionario.",
+            today:
+              "Sono assenti dal portafoglio e possono ridurre volatilita complessiva.",
+            risk: "Basso/Medio",
+            riskClass: "low",
+            horizon: "2-5 anni",
+            role: "Stabilizzatore",
+            score: 74 + (a.cryptoPct > 25 ? 14 : 0),
+          },
+          {
+            name: "Oro e metalli preziosi",
+            motive:
+              "Asset reale storicamente decorrelato da azioni growth e crypto.",
+            today:
+              "Puo coprire scenari di stress, inflazione o debolezza valutaria.",
+            risk: "Medio",
+            riskClass: "med",
+            horizon: "3-7 anni",
+            role: "Hedge difensivo",
+            score: 70 + (a.topSector.value / total > 0.4 ? 10 : 0),
+          },
+          {
+            name: "Healthcare globale",
+            motive:
+              "Settore difensivo-growth con domanda strutturale meno ciclica.",
+            today:
+              "Bilancia tecnologia, AI e crypto con ricavi meno dipendenti dal ciclo.",
+            risk: "Medio",
+            riskClass: "med",
+            horizon: "5+ anni",
+            role: "Diversificazione settoriale",
+            score: 72 + (sectorShare("Tecnologia") > 18 ? 10 : 0),
+          },
+          {
+            name: "India / Asia ex-China",
+            motive: "Crescita demografica, consumi interni e digitalizzazione.",
+            today:
+              regionShare("Asia emergente") < 12
+                ? "Interessante per aumentare emergenti senza concentrare tutto su USA/Europa."
+                : "Gia parzialmente rappresentata: valutare solo incrementi disciplinati.",
+            risk: "Alto",
+            riskClass: "high",
+            horizon: "7-10 anni",
+            role: "Growth geografico",
+            score: 68 + (regionShare("Asia emergente") < 10 ? 14 : 0),
+          },
+          {
+            name: "REIT globali / infrastrutture",
+            motive:
+              "Esposizione a immobili, data center, logistica e servizi essenziali.",
+            today:
+              "Aggiunge flussi real-asset e riduce la dipendenza dal solo equity tematico.",
+            risk: "Medio",
+            riskClass: "med",
+            horizon: "4-8 anni",
+            role: "Income e real asset",
+            score: 69,
+          },
+          {
+            name: "Acqua e infrastrutture idriche",
+            motive:
+              "Tema strutturale legato a scarsita, reti e qualita delle risorse.",
+            today:
+              "Tema meno sovrapposto a crypto e semiconduttori, utile per diversificare.",
+            risk: "Medio",
+            riskClass: "med",
+            horizon: "5-10 anni",
+            role: "Tema difensivo",
+            score: 67,
+          },
+          {
+            name: "Small Cap quality",
+            motive: "Espone a societa meno presenti nei grandi indici globali.",
+            today:
+              "Potrebbe ampliare il motore di rendimento oltre mega-cap e temi tech.",
+            risk: "Alto",
+            riskClass: "high",
+            horizon: "7+ anni",
+            role: "Rendimento satellite",
+            score: 63 + (a.maxAsset < 14 ? 4 : 0),
+          },
+          {
+            name: "Difesa e cybersecurity",
+            motive: "Spesa strutturale in sicurezza fisica e digitale.",
+            today:
+              sectorShare("Cybersecurity") > 8
+                ? "Cyber gia presente: evitare duplicazioni e valutare solo strumenti complementari."
+                : "Interessante se manca esposizione security dedicata.",
+            risk: "Medio/Alto",
+            riskClass: "high",
+            horizon: "4-8 anni",
+            role: "Satellite strategico",
+            score: sectorShare("Cybersecurity") > 8 ? 55 : 69,
+          },
+          {
+            name: "Rame, uranio e materiali critici",
+            motive:
+              "Beneficiano di elettrificazione, reti, energia e supply chain industriali.",
+            today:
+              "Gia presenti in parte: utili solo se il peso resta controllato.",
+            risk: "Alto",
+            riskClass: "high",
+            horizon: "5-10 anni",
+            role: "Ciclico tematico",
+            score:
+              sectorShare("Rame e materiali") +
+                sectorShare("Uranio ed energia") >
+              14
+                ? 54
+                : 66,
+          },
+        ];
+        return opps
+          .sort(function (x, y) {
+            return y.score - x.score;
+          })
+          .slice(0, 8);
+      }
+
+      function advList(items, tone) {
+        return (
+          '<div class="adv-list">' +
+          items
+            .map(function (item) {
+              return (
+                '<div class="adv-item"><span class="adv-dot ' +
+                (tone || "") +
+                '"></span><span>' +
+                advEsc(item) +
+                "</span></div>"
+              );
+            })
+            .join("") +
+          "</div>"
+        );
+      }
+
+      function advBars(title, map, total) {
+        var rows = Object.keys(map)
+          .map(function (key) {
+            return { key: key, pct: total > 0 ? (map[key] / total) * 100 : 0 };
+          })
+          .sort(function (a, b) {
+            return b.pct - a.pct;
+          })
+          .slice(0, 7);
+        return (
+          '<div class="adv-card"><h3>' +
+          title +
+          '</h3><div class="adv-bars">' +
+          rows
+            .map(function (row) {
+              return (
+                '<div class="adv-bar-row"><div class="adv-bar-name">' +
+                advEsc(row.key) +
+                '</div><div class="adv-track"><div class="adv-fill" style="width:' +
+                Math.min(100, row.pct).toFixed(1) +
+                '%"></div></div><div class="adv-bar-val">' +
+                row.pct.toFixed(1) +
+                "%</div></div>"
+              );
+            })
+            .join("") +
+          "</div></div>"
+        );
+      }
+
+      function renderAdvisor(portfolio) {
+        portfolio = portfolio || portfolioSnapshot();
+        var add = parseFloat(g("addAmt").value) || 0;
+        var s = buildAdvisorSnapshot(add, portfolio);
+        var a = analyzeAdvisor(s);
+        var opps = advisorOpportunities(s, a);
+        var budgetLine =
+          s.budget && s.budget.investible !== undefined
+            ? "Investibile budget: " + advMoney(Number(s.budget.investible))
+            : "Budget non ancora valorizzato";
+        var el = g("sec-advisor");
+        if (!el) return;
+        el.innerHTML =
+          '<div class="adv-wrap">' +
+          '<div class="adv-hero">' +
+          '<div class="adv-panel primary">' +
+          '<div class="adv-eyebrow">AI Portfolio Advisor</div>' +
+          '<div class="adv-title">Investment Strategy Center</div>' +
+          '<p class="adv-copy">Report automatico generato dai dati gia presenti in WIPS: composizione, prezzi, performance, allocazione, esposizioni e budget investibile. Le indicazioni sono operative ma non sostituiscono una consulenza finanziaria personalizzata.</p>' +
+          '<div class="adv-badges">' +
+          '<span class="adv-badge">' +
+          s.rows.length +
+          " asset analizzati</span>" +
+          '<span class="adv-badge">Copertura prezzi ' +
+          a.priceCoverage.toFixed(0) +
+          "%</span>" +
+          '<span class="adv-badge">' +
+          budgetLine +
+          "</span>" +
+          '<span class="adv-badge">Aggiornato ora</span>' +
+          "</div></div>" +
+          '<div class="adv-panel adv-scorebox">' +
+          '<div class="adv-score-ring" style="--score:' +
+          a.health +
+          '"><div><strong>' +
+          a.health +
+          "</strong><span>/100</span></div></div>" +
+          '<div class="adv-score-label">Portfolio Health Score</div>' +
+          '<p class="adv-copy" style="margin-top:0;">' +
+          advEsc(a.state) +
+          ". Score basato su diversificazione, concentrazione, asset mix, esposizioni, liquidita e qualita dei dati.</p>" +
+          "</div></div>" +
+          '<div class="adv-metrics">' +
+          '<div class="adv-metric"><span>Valore stimato</span><strong>' +
+          advMoney(s.totals.value) +
+          "</strong></div>" +
+          '<div class="adv-metric"><span>P&L prezzi caricati</span><strong class="' +
+          (s.pnl >= 0 ? "g" : "r") +
+          '">' +
+          (s.pnl >= 0 ? "+" : "") +
+          advMoney(s.pnl) +
+          "</strong></div>" +
+          '<div class="adv-metric"><span>Asset principale</span><strong>' +
+          a.maxAsset.toFixed(1) +
+          "%</strong></div>" +
+          '<div class="adv-metric"><span>Liquidita</span><strong>' +
+          a.cashPct.toFixed(1) +
+          "%</strong></div>" +
+          "</div>" +
+          '<div class="adv-grid">' +
+          '<div class="adv-card"><h3>Executive Summary</h3>' +
+          advList([
+            a.state,
+            "Asset mix: crypto " +
+              a.cryptoPct.toFixed(1) +
+              "%, ETF " +
+              a.etfPct.toFixed(1) +
+              "%, fondi " +
+              a.fondiPct.toFixed(1) +
+              "%.",
+            "Area dominante: " +
+              a.topSector.key +
+              " (" +
+              ((a.topSector.value / s.totals.value) * 100).toFixed(1) +
+              "%).",
+            "Geografia prevalente: " +
+              a.topRegion.key +
+              " (" +
+              ((a.topRegion.value / s.totals.value) * 100).toFixed(1) +
+              "%).",
+          ]) +
+          '</div><div class="adv-card"><h3>Stato Attuale</h3>' +
+          advList(
+            [
+              "Diversificazione: " +
+                (s.rows.length >= 14 ? "buona" : "da ampliare") +
+                ".",
+              "Concentrazione principale: " +
+                a.maxAsset.toFixed(1) +
+                "% sul primo asset.",
+              "Rischio stimato: " +
+                (a.cryptoPct > 30
+                  ? "alto per peso crypto"
+                  : a.topSector.value / s.totals.value > 0.4
+                    ? "medio/alto per concentrazione settoriale"
+                    : "controllato dai dati disponibili") +
+                ".",
+              "Liquidita stimata: " +
+                a.cashPct.toFixed(1) +
+                "% del patrimonio leggibile.",
+            ],
+            "warn",
+          ) +
+          "</div></div>" +
+          '<div class="adv-card"><h3>Commenti Automatici</h3>' +
+          advList(a.comments, "warn") +
+          "</div>" +
+          '<div class="adv-grid">' +
+          '<div class="adv-card"><h3>Punti di forza</h3>' +
+          advList(a.strengths, "good") +
+          '</div><div class="adv-card"><h3>Criticita</h3>' +
+          advList(a.risks, "risk") +
+          "</div></div>" +
+          '<div class="adv-grid">' +
+          advBars("Esposizione per asset class", s.byType, s.totals.value) +
+          advBars(
+            "Esposizione settoriale stimata",
+            s.bySector,
+            s.totals.value,
+          ) +
+          "</div>" +
+          '<div class="adv-grid">' +
+          advBars(
+            "Esposizione geografica stimata",
+            s.byRegion,
+            s.totals.value,
+          ) +
+          '<div class="adv-card"><h3>Idee di diversificazione</h3>' +
+          advList(
+            [
+              "Aggiungere un core globale o obbligazionario se vuoi ridurre dipendenza da temi growth.",
+              "Usare oro, bond o infrastrutture come componenti decorrelate da tecnologia e crypto.",
+              "Limitare nuovi ingressi sulle aree gia dominanti finche il peso non rientra nel target personale.",
+              "Valutare healthcare, acqua o real asset per aumentare stabilita settoriale.",
+            ],
+            "good",
+          ) +
+          "</div></div>" +
+          '<div class="adv-card"><h3>Opportunita di mercato e ruoli possibili</h3><div class="adv-opps">' +
+          opps
+            .map(function (o) {
+              return (
+                '<div class="adv-opp"><div class="adv-opp-head"><div class="adv-opp-title">' +
+                advEsc(o.name) +
+                '</div><span class="adv-pill ' +
+                o.riskClass +
+                '">' +
+                advEsc(o.risk) +
+                "</span></div>" +
+                "<p><strong>Motivazione:</strong> " +
+                advEsc(o.motive) +
+                "</p><p><strong>Perche oggi:</strong> " +
+                advEsc(o.today) +
+                '</p><div class="adv-opp-meta"><span class="adv-pill">' +
+                advEsc(o.horizon) +
+                '</span><span class="adv-pill">' +
+                advEsc(o.role) +
+                "</span></div></div>"
+              );
+            })
+            .join("") +
+          "</div></div>" +
+          '<div class="adv-grid">' +
+          '<div class="adv-card"><h3>Next Steps</h3>' +
+          a.steps
+            .map(function (step) {
+              return (
+                '<div class="adv-action"><span class="adv-check"></span><div><strong>' +
+                advEsc(step.title) +
+                "</strong><p>" +
+                advEsc(step.text) +
+                "</p></div></div>"
+              );
+            })
+            .join("") +
+          '</div><div class="adv-card"><h3>Piano d\'azione</h3>' +
+          [
+            "Verificare prezzi/NAV mancanti.",
+            "Definire peso massimo per crypto e singolo tema.",
+            "Allocare il prossimo capitale solo dopo controllo budget.",
+            "Ribilanciare se una singola posizione supera il 20%.",
+            "Aggiornare il report dopo ogni modifica di portafoglio.",
+          ]
+            .map(function (item) {
+              return (
+                '<div class="adv-action"><span class="adv-check"></span><div><strong>' +
+                advEsc(item) +
+                "</strong></div></div>"
+              );
+            })
+            .join("") +
+          "</div></div>" +
+          "</div>";
+      }
+
       /* ══ RENDER FONDI ════════════════════════════════════════════════════ */
-      function renderFondi(add) {
+      function renderFondi(add, portfolio) {
+        portfolio = portfolio || P;
         var el = document.getElementById("sec-fondi");
         var h =
           '<div class="an"><div class="anh"><div class="ant">&#127968; Fondi Banca 360 BCC</div><div class="anl"></div></div>';
         /* KPI cards */
         var tI = 0,
           tV = 0;
-        P.fondi.forEach(function (a) {
-          tI += a.cap;
+        portfolio.fondi.forEach(function (a) {
+          tI += historicalCost(a);
           var v = prices[a.id];
           if (v) tV += v * a.qty;
         });
@@ -4125,12 +5215,13 @@
         h += "</div>";
         /* fund cards */
         h += '<div style="display:grid;grid-template-columns:1fr;gap:12px;">';
-        P.fondi.forEach(function (a) {
-          var pm = a.qty > 0 ? a.cap / a.qty : a.pm0;
-          var price = prices[a.id] || null;
-          var va = price !== null ? price * a.qty : null;
-          var rp = va !== null ? ((va - a.cap) / a.cap) * 100 : null;
-          var re = va !== null ? va - a.cap : null;
+        portfolio.fondi.forEach(function (a) {
+          var c = calc(a, add);
+          var pm = c.pm;
+          var price = c.price;
+          var va = c.va;
+          var rp = c.rp;
+          var re = c.re;
           h += '<div class="card">';
           h +=
             '<div class="card-hdr"><h4>🏦 ' +
@@ -4218,49 +5309,50 @@
       /* ═══════════════════════════════════════════════════════════════════
             TABLE RENDER ENGINE
             ═══════════════════════════════════════════════════════════════════ */
-      function renderSec(type, add) {
+      function renderSec(type, add, portfolio) {
         var el = g("sec-" + type);
         el.innerHTML =
-          '<div class="tw-actions"><button class="reset-cols-btn" onclick="resetCols()">&#8635; Ripristina colonne visibili</button></div>' +
           '<div class="tw"><table>' +
           mkTH() +
           "<tbody>" +
-          rows(type, add) +
+          rows(type, add, portfolio) +
           "</tbody></table></div>" +
-          analytics(type, add);
-        applyColVis();
+          analytics(type, add, portfolio);
       }
-      function renderTables(add) {
-        renderSec("crypto", add);
-        renderSec("etf", add);
+      function renderTables(add, portfolio) {
+        renderSec("crypto", add, portfolio);
+        renderSec("etf", add, portfolio);
       }
-      function renderAnalytics(type, add) {
-        return analytics(type, add);
+      function renderAnalytics(type, add, portfolio) {
+        return analytics(type, add, portfolio);
       }
-      function renderAllSection(add) {
+      function renderAllSection(add, portfolio) {
         var allEl = g("sec-all");
         allEl.innerHTML =
-          globalAnalytics(add) +
+          globalAnalytics(add, portfolio) +
           '<div style="margin-top:28px;"><div class="anh"><div class="ant">&#128196; Tutte le Posizioni</div><div class="anl"></div></div>' +
-          '<div class="tw-actions"><button class="reset-cols-btn" onclick="resetCols()">&#8635; Ripristina colonne visibili</button></div>' +
           '<div class="tw"><table>' +
           mkTH() +
           "<tbody>" +
-          '<tr class="sep-tr"><td colspan="16">&#129689; CRYPTO — per capitale investito</td></tr>' +
-          rows("crypto", add) +
-          '<tr class="sep-tr"><td colspan="16">&#128200; ETF — per capitale investito</td></tr>' +
-          rows("etf", add) +
-          '<tr class="sep-tr"><td colspan="16">&#127968; FONDI BCC — quote</td></tr>' +
-          rows("fondi", add) +
+          '<tr class="sep-tr"><td colspan="10">&#129689; CRYPTO — per capitale investito</td></tr>' +
+          rows("crypto", add, portfolio) +
+          '<tr class="sep-tr"><td colspan="10">&#128200; ETF — per capitale investito</td></tr>' +
+          rows("etf", add, portfolio) +
+          '<tr class="sep-tr"><td colspan="10">&#127968; FONDI BCC — quote</td></tr>' +
+          rows("fondi", add, portfolio) +
           "</tbody></table></div></div>";
-        applyColVis();
-        setTimeout(drawDonut, 80);
+        setTimeout(function () {
+          drawDonut(portfolio);
+        }, 80);
       }
       function renderAll() {
         var add = parseFloat(g("addAmt").value) || 0;
-        renderTables(add);
-        renderFondi(add);
-        renderAllSection(add);
+        var portfolio = portfolioSnapshot();
+        renderTables(add, portfolio);
+        renderFondi(add, portfolio);
+        renderAllSection(add, portfolio);
+        if (g("sec-advisor") && g("sec-advisor").classList.contains("on"))
+          renderAdvisor(portfolioSnapshot(portfolio));
       }
       function renderEditor() {
         renderEdit();
@@ -4270,7 +5362,8 @@
       }
 
       /* ══ DONUT ═══════════════════════════════════════════════════════════ */
-      function drawDonut() {
+      function drawDonut(portfolio) {
+        portfolio = portfolio || P;
         var c = document.getElementById("donut");
         if (!c) return;
         var ctx = c.getContext("2d");
@@ -4278,17 +5371,17 @@
           cI = 0,
           eI = 0,
           fI = 0;
-        P.crypto.forEach(function (a) {
-          tI += a.cap;
-          cI += a.cap;
+        portfolio.crypto.forEach(function (a) {
+          tI += historicalCost(a);
+          cI += historicalCost(a);
         });
-        P.etf.forEach(function (a) {
-          tI += a.cap;
-          eI += a.cap;
+        portfolio.etf.forEach(function (a) {
+          tI += historicalCost(a);
+          eI += historicalCost(a);
         });
-        P.fondi.forEach(function (a) {
-          tI += a.cap;
-          fI += a.cap;
+        portfolio.fondi.forEach(function (a) {
+          tI += historicalCost(a);
+          fI += historicalCost(a);
         });
         if (!tI) return;
         var slices = [
@@ -4337,8 +5430,8 @@
           P[type].forEach(function (a, i) {
             h +=
               '<div class="erow" data-type="' + type + '" data-i="' + i + '">';
-            h += '<input value="' + a.name + '" placeholder="Nome">';
-            h += '<input value="' + a.id + '" placeholder="ID">';
+            h += '<input value="' + a.name + '" placeholder="Nome" readonly>';
+            h += '<input value="' + a.id + '" placeholder="ID" readonly>';
             h +=
               '<input class="rt" type="number" value="' +
               a.cap +
@@ -4351,18 +5444,9 @@
               '<input class="rt" type="number" value="' +
               (a.pm0 || 0) +
               '" step="any">';
-            h +=
-              '<button class="edel" onclick="delA(\'' +
-              type +
-              "'," +
-              i +
-              ')">&#215;</button>';
+            h += "<span></span>";
             h += "</div>";
           });
-          h +=
-            '<button class="earb" onclick="addA(\'' +
-            type +
-            "')\">+ Aggiungi riga</button>";
           h += "</div>";
         });
         h += "</div>";
@@ -4377,8 +5461,9 @@
             '<div class="erow" data-type="fondi" data-i="' +
             i +
             '" style="grid-template-columns:1.8fr 1.3fr 1fr 1fr 1fr 24px;">';
-          h += '<input value="' + a.name + '" placeholder="Nome fondo">';
-          h += '<input value="' + a.id + '" placeholder="ISIN">';
+          h +=
+            '<input value="' + a.name + '" placeholder="Nome fondo" readonly>';
+          h += '<input value="' + a.id + '" placeholder="ISIN" readonly>';
           h +=
             '<input class="rt" type="number" value="' +
             a.cap +
@@ -4389,14 +5474,9 @@
             '<input class="rt" type="number" value="' +
             (a.pm0 || 0) +
             '" step="any">';
-          h +=
-            '<button class="edel" onclick="delA(\'fondi\',' +
-            i +
-            ')">&#215;</button>';
+          h += "<span></span>";
           h += "</div>";
         });
-        h +=
-          '<button class="earb" onclick="addA(\'fondi\')">+ Aggiungi fondo</button>';
         h += "</div>";
         h +=
           '<button class="esb" onclick="saveEdit()">&#128190; Salva Modifiche</button>';
@@ -4405,25 +5485,10 @@
         root.innerHTML = h;
       }
       function addA(type) {
-        if (type === "fondi")
-          P.fondi.push({
-            name: "Nuovo Fondo",
-            id: "",
-            cap: 0,
-            qty: 0,
-            pm0: 0,
-            isin: "",
-            conto: "Banca 360 BCC",
-          });
-        else P[type].push({ name: "Nuovo", id: "", cap: 0, qty: 0, pm0: 0 });
-        save();
-        renderEdit();
+        showToast("Lista asset protetta: modifica solo gli asset previsti");
       }
       function delA(type, i) {
-        P[type].splice(i, 1);
-        save();
-        renderEdit();
-        renderAll();
+        showToast("Lista asset protetta: eliminazione non consentita");
       }
       function saveEdit() {
         ["crypto", "etf", "fondi"].forEach(function (type) {
@@ -4432,20 +5497,21 @@
             .forEach(function (row, i) {
               if (!P[type][i]) return;
               var inps = row.querySelectorAll("input");
+              var current = P[type][i];
               if (type === "fondi") {
                 P[type][i] = {
-                  name: inps[0].value,
-                  id: inps[1].value,
+                  name: current.name,
+                  id: current.id,
                   cap: parseFloat(inps[2].value) || 0,
                   qty: parseFloat(inps[3].value) || 0,
                   pm0: parseFloat(inps[4].value) || 0,
-                  isin: inps[1].value,
-                  conto: P[type][i].conto || "Banca 360 BCC",
+                  isin: current.isin || current.id,
+                  conto: current.conto || "Banca 360 BCC",
                 };
               } else {
                 P[type][i] = {
-                  name: inps[0].value,
-                  id: inps[1].value,
+                  name: current.name,
+                  id: current.id,
                   cap: parseFloat(inps[2].value) || 0,
                   qty: parseFloat(inps[3].value) || 0,
                   pm0: parseFloat(inps[4].value) || 0,
@@ -4454,10 +5520,11 @@
             });
         });
         save();
-        buildPE("crypto");
-        buildPE("etf");
-        buildPE("fondi");
-        updCC();
+        var portfolio = portfolioSnapshot();
+        buildPE("crypto", portfolio);
+        buildPE("etf", portfolio);
+        buildPE("fondi", portfolio);
+        updCC(portfolio);
         renderAll();
         showToast("✓ Modifiche salvate");
       }
@@ -4467,20 +5534,21 @@
             ═══════════════════════════════════════════════════════════════════ */
       function exportCSV() {
         var add = parseFloat(document.getElementById("addAmt").value) || 0;
+        var portfolio = portfolioSnapshot();
         var csv =
           "Asset,Tipo,ISIN,Cap,Qty,PM,Prezzo,Rend%,RendEur,AddEur,TitoliAgg,NuovoPM,DeltaPMeur,DeltaPMpct,DeltaPMmkt,Risultato\n";
         var all = [];
-        P.crypto.forEach(function (a) {
+        portfolio.crypto.forEach(function (a) {
           all.push({ a: a, t: "Crypto" });
         });
-        P.etf.forEach(function (a) {
+        portfolio.etf.forEach(function (a) {
           all.push({ a: a, t: "ETF" });
         });
-        P.fondi.forEach(function (a) {
+        portfolio.fondi.forEach(function (a) {
           all.push({ a: a, t: "Fondo BCC" });
         });
         all.sort(function (a, b) {
-          return b.a.cap - a.a.cap;
+          return historicalCost(b.a) - historicalCost(a.a);
         });
         all.forEach(function (x) {
           var c = calc(x.a, add);
@@ -4529,234 +5597,594 @@
       }
 
       /* ══════════════════════════════════════════════════════════════════════
-      BUDGET MODULE v2 — isolato, zero dipendenze dal resto di WIPS
+      BUDGET MODULE v3 — cash-flow decisionale oggi -> prossimo stipendio
       ══════════════════════════════════════════════════════════════════════ */
       (function () {
-        /* ── Costanti ───────────────────────────────────────────────────── */
-        var AFFITTO = 500;
-        var BOLLETTE = 100;
-        var PAYDAY_DAY = 12; // giorno dello stipendio
+        var PAYDAY_DAY = 12;
         var MS_DAY = 1000 * 60 * 60 * 24;
+        var BDG_STORAGE_KEY = "wips_budget_cashflow_v3";
 
         var recurringExpenses = [
-          { name: "Affitto", amount: AFFITTO, day: 1, category: "Casa" },
-          { name: "Bollette", amount: BOLLETTE, day: 1, category: "Casa" },
-          { name: "Palestra", amount: 18, day: 1, category: "Salute" },
-          { name: "Spotify", amount: 3, day: 1, category: "Intrattenimento" },
-          { name: "MoneyCoach", amount: 3.33, day: 1, category: "Finanza" },
+          {
+            name: "Affitto",
+            amount: 500,
+            day: 1,
+            category: "Casa",
+            group: "affitto",
+          },
+          {
+            name: "Bollette",
+            amount: 100,
+            day: 1,
+            category: "Casa",
+            group: "bollette",
+          },
+          {
+            name: "Palestra",
+            amount: 18,
+            day: 1,
+            category: "Salute",
+            group: "ricorrenti",
+          },
+          {
+            name: "Spotify",
+            amount: 3,
+            day: 1,
+            category: "Intrattenimento",
+            group: "ricorrenti",
+          },
+          {
+            name: "MoneyCoach",
+            amount: 3.33,
+            day: 1,
+            category: "Finanza",
+            group: "ricorrenti",
+          },
           {
             name: "Canone Telefonico",
             amount: 15,
             day: 1,
             category: "Telefonia",
+            group: "ricorrenti",
           },
-          { name: "Internet", amount: 15, day: 6, category: "Servizi" },
-          { name: "iCloud", amount: 10, day: 23, category: "Servizi" },
-          { name: "ChatGPT", amount: 8, day: 26, category: "Produttività" },
+          {
+            name: "Internet",
+            amount: 15,
+            day: 6,
+            category: "Servizi",
+            group: "ricorrenti",
+          },
+          {
+            name: "iCloud",
+            amount: 10,
+            day: 23,
+            category: "Servizi",
+            group: "ricorrenti",
+          },
+          {
+            name: "ChatGPT",
+            amount: 8,
+            day: 26,
+            category: "Produttivita",
+            group: "ricorrenti",
+          },
         ];
 
-        var RICORR = recurringExpenses.reduce(function (sum, exp) {
-          return sum + exp.amount;
-        }, 0);
+        var state = loadState();
+        var clockTimer = null;
 
-        /* ── Stato override manuale domeniche/settimane ─────────────────── */
-        var bdgState = { domTouched: false, settTouched: false };
-        var bdgClkTimer = null;
-
-        /* ── Helpers ────────────────────────────────────────────────────── */
-        function getToday() {
-          var d = new Date();
-          d.setHours(0, 0, 0, 0);
-          return d;
-        }
-
-        function monthDate(day, ref) {
-          return new Date(ref.getFullYear(), ref.getMonth(), day);
-        }
-
-        function daysDiff(target, base) {
-          return Math.floor((target - base) / MS_DAY);
-        }
-
-        function getDaysRemainingInMonth(today) {
-          var end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-          return Math.max(0, Math.ceil((end - today) / MS_DAY));
-        }
-
-        function formatCurrency(value) {
-          return (
-            value.toLocaleString("it-IT", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }) + " €"
-          );
-        }
-
-        function expenseStatus(expense, today) {
-          var due = monthDate(expense.day, today);
-          var diff = daysDiff(due, today);
-          var status = diff < 0 ? "paid" : diff === 0 ? "today" : "upcoming";
-          var label =
-            status === "paid"
-              ? "Pagata"
-              : status === "today"
-                ? "Oggi"
-                : diff === 1
-                  ? "Domani"
-                  : "Tra " + diff + " giorni";
-          return { due: due, diff: diff, status: status, label: label };
-        }
-
-        function getRiskStatus(balance, days) {
-          if (balance < 0) {
-            return {
-              label: "Stretto",
-              type: "danger",
-              note: "Saldo negativo previsto",
-            };
-          }
-          if (!days) {
-            return {
-              label: "Sicuro",
-              type: "safe",
-              note: "Nessun giorno rimanente",
-            };
-          }
-          var daily = balance / days;
-          if (daily >= 50) {
-            return {
-              label: "Sicuro",
-              type: "safe",
-              note: "Capitale distribuito in modo bilanciato",
-            };
-          }
-          if (daily >= 25) {
-            return {
-              label: "Attenzione",
-              type: "warn",
-              note: "Margine di spesa ridotto",
-            };
-          }
-          return {
-            label: "Stretto",
-            type: "danger",
-            note: "Rischio di esaurire la liquidità",
+        function loadState() {
+          var defaults = {
+            liq: 0,
+            safety: 150,
+            bDom: 50,
+            bSp: 80,
+            nPieni: 2,
+            cPieno: 80,
+            domTouched: false,
+            settTouched: false,
+            nDom: null,
+            nSet: null,
+            custom: [],
           };
-        }
-
-        function nextPayday() {
-          var d = new Date();
-          d.setHours(0, 0, 0, 0);
-          var t = new Date(d.getFullYear(), d.getMonth(), PAYDAY_DAY);
-          if (t <= d)
-            t = new Date(d.getFullYear(), d.getMonth() + 1, PAYDAY_DAY);
-          return t;
-        }
-
-        function countSundays(from, to) {
-          var n = 0,
-            d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
-          var e = new Date(to.getFullYear(), to.getMonth(), to.getDate());
-          while (d < e) {
-            if (d.getDay() === 0) n++;
-            d.setDate(d.getDate() + 1);
+          try {
+            var raw = localStorage.getItem(BDG_STORAGE_KEY);
+            if (raw) {
+              var saved = JSON.parse(raw);
+              Object.keys(defaults).forEach(function (key) {
+                if (saved[key] !== undefined) defaults[key] = saved[key];
+              });
+            }
+          } catch (e) {
+            console.warn("WIPS budget v3: impossibile leggere lo stato", e);
           }
-          return n;
+          if (!Array.isArray(defaults.custom)) defaults.custom = [];
+          defaults.liq = Math.max(0, parseFloat(defaults.liq) || 0);
+          defaults.safety = Math.max(0, parseFloat(defaults.safety) || 0);
+          defaults.bDom = Math.max(0, parseFloat(defaults.bDom) || 0);
+          defaults.bSp = Math.max(0, parseFloat(defaults.bSp) || 0);
+          defaults.nPieni = Math.max(
+            0,
+            Math.floor(parseFloat(defaults.nPieni) || 0),
+          );
+          defaults.cPieno = Math.max(0, parseFloat(defaults.cPieno) || 0);
+          defaults.nDom =
+            defaults.nDom === null
+              ? null
+              : Math.max(0, Math.floor(parseFloat(defaults.nDom) || 0));
+          defaults.nSet =
+            defaults.nSet === null
+              ? null
+              : Math.max(0, Math.floor(parseFloat(defaults.nSet) || 0));
+          defaults.custom = defaults.custom
+            .filter(function (item) {
+              return item && typeof item === "object";
+            })
+            .map(function (item, index) {
+              var cleanId = String(item.id || "").replace(
+                /[^a-zA-Z0-9_-]/g,
+                "",
+              );
+              if (!cleanId) cleanId = "c" + Date.now() + "_" + index;
+              return {
+                id: cleanId,
+                name: String(item.name || "Spesa personalizzata").slice(0, 80),
+                amount: Math.max(0, parseFloat(item.amount) || 0),
+                date: String(item.date || ""),
+              };
+            });
+          return defaults;
         }
 
-        function countWeeks(from, to) {
-          var days = Math.ceil((to - from) / (1000 * 60 * 60 * 24));
-          return Math.ceil(days / 7);
-        }
-
-        function hasPrimoInPeriod(from, to) {
-          var d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
-          if (d < from)
-            d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
-          var cur = new Date(from.getFullYear(), from.getMonth(), 1);
-          return (cur >= from && cur < to) || (d >= from && d < to);
+        function saveState() {
+          try {
+            localStorage.setItem(BDG_STORAGE_KEY, JSON.stringify(state));
+          } catch (e) {
+            console.warn("WIPS budget v3: impossibile salvare lo stato", e);
+          }
         }
 
         function g(id) {
           return document.getElementById(id);
         }
 
-        function setText(id, v) {
-          var e = g(id);
-          if (e) e.textContent = v;
+        function setText(id, value) {
+          var el = g(id);
+          if (el) el.textContent = value;
         }
 
-        function getCyclePeriod(today) {
-          var year = today.getFullYear();
-          var month = today.getMonth();
-          var start = new Date(year, month, 12);
-          var end = new Date(year, month + 1, 12);
+        function today() {
+          var d = new Date();
+          d.setHours(0, 0, 0, 0);
+          return d;
+        }
+
+        function cloneDay(date) {
+          var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+          d.setHours(0, 0, 0, 0);
+          return d;
+        }
+
+        function dayStamp(date) {
+          return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+        }
+
+        function daysBetween(end, start) {
+          return Math.round((dayStamp(end) - dayStamp(start)) / MS_DAY);
+        }
+
+        function addDays(date, days) {
+          var d = cloneDay(date);
+          d.setDate(d.getDate() + days);
+          return d;
+        }
+
+        function nextPayday(ref) {
+          var d = cloneDay(ref || new Date());
+          var payday = new Date(d.getFullYear(), d.getMonth(), PAYDAY_DAY);
+          payday.setHours(0, 0, 0, 0);
+          if (payday <= d)
+            payday = new Date(d.getFullYear(), d.getMonth() + 1, PAYDAY_DAY);
+          payday.setHours(0, 0, 0, 0);
+          return payday;
+        }
+
+        function salaryCycle(ref) {
+          var d = cloneDay(ref);
+          var start =
+            d.getDate() >= PAYDAY_DAY
+              ? new Date(d.getFullYear(), d.getMonth(), PAYDAY_DAY)
+              : new Date(d.getFullYear(), d.getMonth() - 1, PAYDAY_DAY);
           start.setHours(0, 0, 0, 0);
-          end.setHours(0, 0, 0, 0);
-          return { start: start, end: end };
+          return { start: start, end: nextPayday(d) };
         }
 
-        function assignCycleDate(expense, cycleStart) {
-          var monthOffset = expense.day < 13 ? 1 : 0;
-          return new Date(
-            cycleStart.getFullYear(),
-            cycleStart.getMonth() + monthOffset,
-            expense.day,
-          );
+        function decisionWindow(ref) {
+          return { start: cloneDay(ref), end: nextPayday(ref) };
         }
 
-        function formatCycleLabel(date) {
+        function inWindow(date, window) {
+          return date >= window.start && date < window.end;
+        }
+
+        function clampNumber(value, opts) {
+          var o = opts || {};
+          var n = parseFloat(String(value).replace(",", "."));
+          if (isNaN(n)) n = o.fallback || 0;
+          if (o.integer) n = Math.floor(n);
+          if (o.min !== undefined) n = Math.max(o.min, n);
+          if (o.max !== undefined) n = Math.min(o.max, n);
+          return n;
+        }
+
+        function readNumber(id, fallback, opts) {
+          var el = g(id);
+          var o = opts || {};
+          o.fallback = fallback || 0;
+          var value = clampNumber(el ? el.value : fallback, o);
+          if (el && String(el.value) !== String(value)) el.value = value;
+          return value;
+        }
+
+        function formatCurrency(value) {
+          return formatDisplayNumber(value, UI_MAX_DECIMALS) + " €";
+        }
+
+        function formatDate(date) {
           return date.toLocaleDateString("it-IT", {
             day: "numeric",
             month: "long",
           });
         }
 
-        function getExpenseTimeline(today) {
-          var cycle = getCyclePeriod(today);
-          return recurringExpenses
-            .slice()
-            .sort(function (a, b) {
-              return a.day - b.day;
+        function formatFullDate(date) {
+          return date.toLocaleDateString("it-IT", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          });
+        }
+
+        function isoDate(date) {
+          return (
+            date.getFullYear() +
+            "-" +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0")
+          );
+        }
+
+        function parseDate(value) {
+          if (!value) return null;
+          var p = String(value).split("-");
+          if (p.length !== 3) return null;
+          var d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+          d.setHours(0, 0, 0, 0);
+          return isNaN(d.getTime()) ? null : d;
+        }
+
+        function escapeHtml(value) {
+          return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function daysUntil(date, base) {
+          return daysBetween(date, base);
+        }
+
+        function makeItem(name, amount, date, category, group, note) {
+          var now = today();
+          var diff = daysUntil(date, now);
+          return {
+            name: name,
+            amount: amount,
+            date: date,
+            due: date,
+            category: category,
+            group: group,
+            note: note || "",
+            diff: diff,
+            status: diff === 0 ? "today" : "upcoming",
+            label:
+              diff === 0
+                ? "Oggi"
+                : diff === 1
+                  ? "Domani"
+                  : "Tra " + diff + " giorni",
+            dateLabel: formatDate(date),
+          };
+        }
+
+        function getWeekdayDates(from, to, weekday) {
+          var dates = [];
+          var d = cloneDay(from);
+          while (d < to) {
+            if (d.getDay() === weekday) dates.push(cloneDay(d));
+            d.setDate(d.getDate() + 1);
+          }
+          return dates;
+        }
+
+        function countWeeks(from, to) {
+          var days = Math.max(0, daysBetween(to, from));
+          return days > 0 ? Math.ceil(days / 7) : 0;
+        }
+
+        function spreadDates(count, window) {
+          var n = Math.max(0, Math.floor(count || 0));
+          var dates = [];
+          var span = Math.max(1, daysBetween(window.end, window.start));
+          for (var i = 0; i < n; i++) {
+            dates.push(
+              addDays(
+                window.start,
+                Math.min(span - 1, Math.floor((i * span) / n)),
+              ),
+            );
+          }
+          return dates;
+        }
+
+        function monthlyItems(window) {
+          var items = [];
+          var seen = {};
+          var cursor = new Date(
+            window.start.getFullYear(),
+            window.start.getMonth(),
+            1,
+          );
+          var last = new Date(
+            window.end.getFullYear(),
+            window.end.getMonth(),
+            1,
+          );
+          while (cursor <= last) {
+            recurringExpenses.forEach(function (expense) {
+              var lastDay = new Date(
+                cursor.getFullYear(),
+                cursor.getMonth() + 1,
+                0,
+              ).getDate();
+              var due = new Date(
+                cursor.getFullYear(),
+                cursor.getMonth(),
+                Math.min(expense.day, lastDay),
+              );
+              due.setHours(0, 0, 0, 0);
+              var key = expense.name + "-" + isoDate(due);
+              if (inWindow(due, window) && !seen[key]) {
+                seen[key] = true;
+                items.push(
+                  makeItem(
+                    expense.name,
+                    expense.amount,
+                    due,
+                    expense.category,
+                    expense.group,
+                    "Ricorrenza mensile datata",
+                  ),
+                );
+              }
+            });
+            cursor.setMonth(cursor.getMonth() + 1);
+          }
+          return items;
+        }
+
+        function variableItems(name, amount, count, dates, group, category) {
+          var items = [];
+          var n = Math.max(0, Math.floor(count || 0));
+          for (var i = 0; i < n; i++) {
+            var date = dates[i] || dates[dates.length - 1] || today();
+            items.push(
+              makeItem(
+                name + (n > 1 ? " #" + (i + 1) : ""),
+                amount,
+                date,
+                category,
+                group,
+                "Stima limitata alla finestra prima dello stipendio",
+              ),
+            );
+          }
+          return items;
+        }
+
+        function customItems(window) {
+          return state.custom
+            .map(function (item) {
+              var date = parseDate(item.date);
+              var amount = clampNumber(item.amount, { min: 0 });
+              if (!date || amount <= 0) return null;
+              return makeItem(
+                item.name || "Spesa personalizzata",
+                amount,
+                date,
+                "Personalizzata",
+                "custom",
+                "Inserita manualmente",
+              );
             })
-            .map(function (expense) {
-              var due = assignCycleDate(expense, cycle.start);
-              var diff = daysDiff(due, today);
-              var status =
-                diff < 0 ? "paid" : diff === 0 ? "today" : "upcoming";
-              return {
-                name: expense.name,
-                amount: expense.amount,
-                day: expense.day,
-                category: expense.category,
-                due: due,
-                diff: diff,
-                status: status,
-                label:
-                  status === "paid"
-                    ? "Passata"
-                    : status === "today"
-                      ? "Oggi"
-                      : diff === 1
-                        ? "Domani"
-                        : "Tra " + diff + " giorni",
-                dateLabel: formatCycleLabel(due),
-              };
+            .filter(function (item) {
+              return item && inWindow(item.date, window);
             });
         }
 
-        function groupExpensesByDate(items) {
+        function sumGroup(items, group) {
+          return items.reduce(function (sum, item) {
+            return sum + (item.group === group ? item.amount : 0);
+          }, 0);
+        }
+
+        function excludedPreview(window) {
+          var next = {
+            start: cloneDay(window.end),
+            end: addDays(window.end, 35),
+          };
+          return monthlyItems(next).slice(0, 6);
+        }
+
+        function calculate() {
+          var now = today();
+          var win = decisionWindow(now);
+          var cycle = salaryCycle(now);
+          var sundays = getWeekdayDates(win.start, win.end, 0);
+          var autoNdom = sundays.length;
+          var autoNset = countWeeks(win.start, win.end);
+
+          state.liq = readNumber("bdg-liq", state.liq, { min: 0 });
+          state.safety = readNumber("bdg-safety", state.safety, { min: 0 });
+          state.bDom = readNumber("bdg-bdom", state.bDom, { min: 0 });
+          state.bSp = readNumber("bdg-bsp", state.bSp, { min: 0 });
+          state.nPieni = readNumber("bdg-npieni", state.nPieni, {
+            min: 0,
+            max: 10,
+            integer: true,
+          });
+          state.cPieno = readNumber("bdg-cpieni", state.cPieno, { min: 0 });
+          state.nDom = state.domTouched
+            ? readNumber("bdg-ndom", 0, { min: 0, max: 8, integer: true })
+            : autoNdom;
+          state.nSet = state.settTouched
+            ? readNumber("bdg-nset", 0, { min: 0, max: 8, integer: true })
+            : autoNset;
+
+          var items = []
+            .concat(monthlyItems(win))
+            .concat(
+              variableItems(
+                "Domenica",
+                state.bDom,
+                state.nDom,
+                sundays.concat(spreadDates(state.nDom, win)),
+                "domeniche",
+                "Weekend",
+              ),
+            )
+            .concat(
+              variableItems(
+                "Supermercato",
+                state.bSp,
+                state.nSet,
+                spreadDates(state.nSet, win),
+                "supermercato",
+                "Spesa",
+              ),
+            )
+            .concat(
+              variableItems(
+                "Pieno carburante",
+                state.cPieno,
+                state.nPieni,
+                spreadDates(state.nPieni, win),
+                "carburante",
+                "Auto",
+              ),
+            )
+            .concat(customItems(win))
+            .filter(function (item) {
+              return item.amount > 0 && inWindow(item.date, win);
+            })
+            .sort(function (a, b) {
+              return a.date - b.date || a.name.localeCompare(b.name);
+            });
+
+          var expenseTotal = items.reduce(function (sum, item) {
+            return sum + item.amount;
+          }, 0);
+          var reservedTotal = expenseTotal + state.safety;
+          var investible = state.liq - reservedTotal;
+          var days = daysBetween(win.end, win.start);
+          var pct =
+            state.liq > 0
+              ? Math.min(100, Math.max(0, (investible / state.liq) * 100))
+              : 0;
+          var barPct =
+            state.liq > 0
+              ? investible >= 0
+                ? pct
+                : Math.min(100, (reservedTotal / state.liq) * 100)
+              : reservedTotal > 0
+                ? 100
+                : 0;
+          var cycleDays = Math.max(1, daysBetween(cycle.end, cycle.start));
+          var elapsed = Math.max(
+            0,
+            Math.min(cycleDays, daysBetween(now, cycle.start)),
+          );
+          var progress = Math.round((elapsed / cycleDays) * 100);
+          var nextItem = items[0] || null;
+          var warningFloor = Math.max(50, state.safety * 0.35);
+          var statusType =
+            investible < 0
+              ? "danger"
+              : investible < warningFloor
+                ? "warn"
+                : "safe";
+          var statusLabel =
+            investible < 0
+              ? "Liquidita insufficiente"
+              : investible < warningFloor
+                ? "Margine stretto"
+                : "Investibile calcolato";
+
+          saveState();
+
+          return {
+            today: now,
+            payday: win.end,
+            windowStart: win.start,
+            windowEnd: win.end,
+            cycleStart: cycle.start,
+            cycleEnd: cycle.end,
+            days: days,
+            liq: state.liq,
+            safety: state.safety,
+            autoNdom: autoNdom,
+            autoNset: autoNset,
+            nDom: state.nDom,
+            nSet: state.nSet,
+            expenseTotal: expenseTotal,
+            reservedTotal: reservedTotal,
+            investible: investible,
+            pct: pct,
+            barPct: barPct,
+            progress: progress,
+            nextExpense: nextItem
+              ? nextItem.name + " " + nextItem.dateLabel
+              : "Nessuna uscita",
+            statusType: statusType,
+            statusLabel: statusLabel,
+            timeline: items,
+            excluded: excludedPreview(win),
+            breakdown: {
+              affitto: sumGroup(items, "affitto"),
+              bollette: sumGroup(items, "bollette"),
+              domeniche: sumGroup(items, "domeniche"),
+              supermercato: sumGroup(items, "supermercato"),
+              carburante: sumGroup(items, "carburante"),
+              ricorrenti: sumGroup(items, "ricorrenti"),
+              custom: sumGroup(items, "custom"),
+            },
+          };
+        }
+
+        window.bdgGetSnapshot = function () {
+          return calculate();
+        };
+
+        function groupByDate(items) {
           var groups = {};
           items.forEach(function (item) {
-            var key =
-              item.due.getFullYear() +
-              "-" +
-              String(item.due.getMonth() + 1).padStart(2, "0") +
-              "-" +
-              String(item.due.getDate()).padStart(2, "0");
+            var key = isoDate(item.date);
             if (!groups[key]) {
               groups[key] = {
-                date: item.due,
+                date: item.date,
                 dateLabel: item.dateLabel,
                 items: [],
                 total: 0,
@@ -4774,274 +6202,10 @@
             });
         }
 
-        function escapeTooltip(text) {
-          return String(text)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
-        }
-
-        function buildCalendarHtml(r, timeline) {
-          var expenseDays = timeline.reduce(function (map, item) {
-            var key =
-              item.due.getFullYear() +
-              "-" +
-              item.due.getMonth() +
-              "-" +
-              item.due.getDate();
-            if (!map[key]) {
-              map[key] = { total: 0, items: [] };
-            }
-            map[key].total += item.amount;
-            map[key].items.push(item);
-            return map;
-          }, {});
-
-          function renderMonth(year, month) {
-            var first = new Date(year, month, 1);
-            var daysInMonth = new Date(year, month + 1, 0).getDate();
-            var firstWeekDay = (first.getDay() + 6) % 7;
-            var monthName = first.toLocaleDateString("it-IT", {
-              month: "long",
-              year: "numeric",
-            });
-            var html = '<div class="bdg-calendar-month">';
-            html += '<div class="calendar-header">' + monthName + "</div>";
-            html +=
-              '<div class="calendar-weekdays"><span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span></div>';
-            html += '<div class="calendar-grid">';
-            for (var i = 0; i < firstWeekDay; i++) {
-              html += '<span class="calendar-day empty"></span>';
-            }
-            for (var day = 1; day <= daysInMonth; day++) {
-              var date = new Date(year, month, day);
-              var key =
-                date.getFullYear() +
-                "-" +
-                date.getMonth() +
-                "-" +
-                date.getDate();
-              var inRange = date >= r.cycleStart && date <= r.cycleEnd;
-              var isToday =
-                date.getFullYear() === r.oggi.getFullYear() &&
-                date.getMonth() === r.oggi.getMonth() &&
-                date.getDate() === r.oggi.getDate();
-              var entry = expenseDays[key];
-              var classes = ["calendar-day"];
-              if (inRange) classes.push("in-range");
-              if (isToday) classes.push("current");
-              if (entry) classes.push("expense");
-              if (date.getDay() === 6 || date.getDay() === 0)
-                classes.push("weekend");
-              var tooltip = "";
-              var amountHtml = "";
-              if (entry) {
-                var details = entry.items
-                  .map(function (expense) {
-                    return (
-                      "• " +
-                      expense.name +
-                      " → " +
-                      formatCurrency(expense.amount)
-                    );
-                  })
-                  .join("\n");
-                tooltip =
-                  day +
-                  " del mese\n" +
-                  details +
-                  "\nTotale → " +
-                  formatCurrency(entry.total);
-                amountHtml =
-                  '<span class="day-total">' +
-                  formatCurrency(entry.total) +
-                  "</span>";
-              }
-              html +=
-                '<span class="' +
-                classes.join(" ") +
-                '"' +
-                (tooltip
-                  ? ' data-tooltip="' + escapeTooltip(tooltip) + '"'
-                  : "") +
-                ">" +
-                '<span class="day-number">' +
-                day +
-                "</span>" +
-                amountHtml +
-                "</span>";
-            }
-            html += "</div>";
-            html += "</div>";
-            return html;
-          }
-
-          return (
-            '<div class="bdg-calendar-months">' +
-            renderMonth(r.cycleStart.getFullYear(), r.cycleStart.getMonth()) +
-            renderMonth(r.cycleEnd.getFullYear(), r.cycleEnd.getMonth()) +
-            "</div>"
-          );
-        }
-
-        function getNextChargeLabel(nextDiff) {
-          if (nextDiff === null) return "Nessun addebito futuro";
-          if (nextDiff === 0) return "Oggi";
-          if (nextDiff === 1) return "Domani";
-          return "Tra " + nextDiff + " giorni";
-        }
-
-        /* ── Calcolo principale ─────────────────────────────────────────── */
-        function calc() {
-          var oggi = getToday();
-          var payday = nextPayday();
-
-          var liq = parseFloat(g("bdg-liq").value) || 0;
-          var bDom = parseFloat(g("bdg-bdom").value) || 0;
-          var bSp = parseFloat(g("bdg-bsp").value) || 0;
-          var nPieni = parseFloat(g("bdg-npieni").value) || 0;
-          var cPieno = parseFloat(g("bdg-cpieni").value) || 0;
-
-          var autoNdom = countSundays(oggi, payday);
-          var autoNset = countWeeks(oggi, payday);
-          var hasPrimo = hasPrimoInPeriod(oggi, payday);
-
-          var rawNdom = parseInt(g("bdg-ndom").value);
-          var rawNset = parseInt(g("bdg-nset").value);
-          var nDom = !isNaN(rawNdom) ? rawNdom : autoNdom;
-          var nSet = !isNaN(rawNset) ? rawNset : autoNset;
-
-          var cDom = nDom * bDom;
-          var cSp = nSet * bSp;
-          var cCarb = nPieni * cPieno;
-          var cBoll = hasPrimo ? BOLLETTE : 0;
-
-          var timeline = getExpenseTimeline(oggi);
-          var totalRecurring = timeline.reduce(function (sum, item) {
-            return sum + item.amount;
-          }, 0);
-          var affittoItem = timeline.find(function (item) {
-            return item.name === "Affitto";
-          }) || { amount: 0 };
-          var cAff = affittoItem.amount;
-          var cRic = totalRecurring - cAff - cBoll;
-
-          var tot = cAff + cBoll + cDom + cSp + cRic + cCarb;
-          var inv = liq - tot;
-          var giorni = Math.ceil((payday - oggi) / MS_DAY);
-          var pct = liq > 0 ? Math.min(100, Math.max(0, (inv / liq) * 100)) : 0;
-
-          var paidTotal = timeline.reduce(function (sum, item) {
-            return sum + (item.status === "paid" ? item.amount : 0);
-          }, 0);
-          var futureTotal = timeline.reduce(function (sum, item) {
-            return sum + (item.status !== "paid" ? item.amount : 0);
-          }, 0);
-
-          var nextChargeDiff = timeline.reduce(function (min, item) {
-            if (item.status !== "paid") {
-              return Math.min(min, Math.max(0, item.diff));
-            }
-            return min;
-          }, Infinity);
-          if (nextChargeDiff === Infinity) nextChargeDiff = null;
-
-          var cycle = getCyclePeriod(oggi);
-          var cycleStart = cycle.start;
-          var cycleEnd = cycle.end;
-          var cycleDays = Math.ceil((cycleEnd - cycleStart) / MS_DAY) + 1;
-          var elapsedDays = Math.max(
-            0,
-            Math.min(cycleDays, Math.floor((oggi - cycleStart) / MS_DAY) + 1),
-          );
-          var cycleProgress = cycleDays
-            ? Math.round((elapsedDays / cycleDays) * 100)
-            : 0;
-          var cycleRange =
-            formatCycleLabel(cycleStart) + " → " + formatCycleLabel(cycleEnd);
-          var cycleRemainingDays =
-            oggi < cycleStart
-              ? Math.max(0, Math.ceil((cycleStart - oggi) / MS_DAY))
-              : Math.max(0, cycleDays - elapsedDays);
-          var cycleRemainingSuffix =
-            cycleRemainingDays === 1 ? " giorno" : " giorni";
-          var cycleStatusLabel =
-            oggi < cycleStart
-              ? "Inizia tra " + cycleRemainingDays + cycleRemainingSuffix
-              : cycleRemainingDays === 0
-                ? "Oggi"
-                : "Tra " + cycleRemainingDays + cycleRemainingSuffix;
-          var cycleStatusType =
-            cycleRemainingDays <= 3
-              ? "danger"
-              : cycleRemainingDays <= 10
-                ? "warn"
-                : "safe";
-          var nextChargeItem = timeline.find(function (item) {
-            return item.status !== "paid";
-          });
-          var nextChargeName = nextChargeItem
-            ? nextChargeItem.name + " " + nextChargeItem.dateLabel
-            : "Nessuna uscita";
-          var nextChargeLabel = nextChargeItem
-            ? getNextChargeLabel(nextChargeItem.diff)
-            : "Nessuna uscita";
-
-          var remainingDays = getDaysRemainingInMonth(oggi);
-          var forecast = liq - futureTotal;
-          var risk = getRiskStatus(forecast, remainingDays);
-
-          return {
-            oggi,
-            payday,
-            giorni,
-            liq,
-            bDom,
-            bSp,
-            nPieni,
-            cPieno,
-            autoNdom,
-            autoNset,
-            nDom,
-            nSet,
-            hasPrimo,
-            cAff,
-            cBoll,
-            cDom,
-            cSp,
-            cRic,
-            cCarb,
-            tot,
-            inv,
-            pct,
-            timeline,
-            paidTotal,
-            futureTotal,
-            totalRecurring,
-            nextChargeDiff,
-            nextChargeName,
-            nextChargeLabel,
-            cycleRange,
-            cycleProgress,
-            cycleDays,
-            elapsedDays,
-            cycleRemainingDays,
-            cycleStatusLabel,
-            cycleStatusType,
-            cycleStart,
-            cycleEnd,
-            forecast,
-            risk,
-            remainingDays,
-          };
-        }
-
-        function buildTimelineHtml(timeline) {
-          var groups = groupExpensesByDate(timeline);
+        function timelineHtml(items) {
+          var groups = groupByDate(items);
           if (!groups.length) {
-            return '<div class="bdg-empty-state">Nessuna spesa ricorrente nel ciclo corrente.</div>';
+            return '<div class="bdg-empty-state">Nessuna spesa prevista tra oggi e il prossimo stipendio.</div>';
           }
           return groups
             .map(function (group) {
@@ -5053,10 +6217,11 @@
                     '">' +
                     '<div class="bdg-line-item-left">' +
                     '<span class="bdg-line-name">' +
-                    item.name +
+                    escapeHtml(item.name) +
                     "</span>" +
                     '<span class="bdg-line-meta">' +
-                    item.category +
+                    escapeHtml(item.category) +
+                    (item.note ? " · " + escapeHtml(item.note) : "") +
                     "</span>" +
                     "</div>" +
                     '<div class="bdg-line-item-right">' +
@@ -5074,7 +6239,7 @@
                 })
                 .join("");
               return (
-                '<details class="bdg-expense-group">' +
+                '<details class="bdg-expense-group" open>' +
                 '<summary class="bdg-group-summary">' +
                 "<div>" +
                 '<span class="bdg-group-title">' +
@@ -5082,8 +6247,8 @@
                 "</span>" +
                 '<span class="bdg-group-subtitle">' +
                 group.items.length +
-                " uscita" +
-                (group.items.length > 1 ? "e" : "") +
+                " voce" +
+                (group.items.length > 1 ? "i" : "") +
                 "</span>" +
                 "</div>" +
                 "<strong>" +
@@ -5099,140 +6264,283 @@
             .join("");
         }
 
-        /* ── Aggiorna UI ────────────────────────────────────────────────── */
-        function update() {
-          var r = calc();
-          var opts = { day: "numeric", month: "long", year: "numeric" };
+        function excludedHtml(items) {
+          if (!items.length) {
+            return '<div class="bdg-empty-state">Nessuna ricorrenza immediata dopo lo stipendio.</div>';
+          }
+          return items
+            .map(function (item) {
+              return (
+                '<div class="bdg-line-item paid">' +
+                '<div class="bdg-line-item-left">' +
+                '<span class="bdg-line-name">' +
+                escapeHtml(item.name) +
+                "</span>" +
+                '<span class="bdg-line-meta">Esclusa perche cade il ' +
+                item.dateLabel +
+                ", dopo lo stipendio</span>" +
+                "</div>" +
+                '<div class="bdg-line-item-right">' +
+                '<span class="bdg-line-amount">' +
+                formatCurrency(item.amount) +
+                "</span>" +
+                '<span class="bdg-line-badge paid">Fuori periodo</span>' +
+                "</div>" +
+                "</div>"
+              );
+            })
+            .join("");
+        }
 
-          setText("bdg-oggi", r.oggi.toLocaleDateString("it-IT", opts));
-          setText("bdg-payday", r.payday.toLocaleDateString("it-IT", opts));
-          setText("bdg-giorni", r.giorni);
+        function calendarHtml(r) {
+          var expenseDays = r.timeline.reduce(function (map, item) {
+            var key = isoDate(item.date);
+            if (!map[key]) map[key] = { total: 0, items: [] };
+            map[key].total += item.amount;
+            map[key].items.push(item);
+            return map;
+          }, {});
+
+          function renderMonth(year, month) {
+            var first = new Date(year, month, 1);
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+            var firstWeekDay = (first.getDay() + 6) % 7;
+            var html = '<div class="bdg-calendar-month">';
+            html +=
+              '<div class="calendar-header">' +
+              first.toLocaleDateString("it-IT", {
+                month: "long",
+                year: "numeric",
+              }) +
+              "</div>";
+            html +=
+              '<div class="calendar-weekdays"><span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span></div>';
+            html += '<div class="calendar-grid">';
+            for (var i = 0; i < firstWeekDay; i++) {
+              html += '<span class="calendar-day empty"></span>';
+            }
+            for (var day = 1; day <= daysInMonth; day++) {
+              var date = new Date(year, month, day);
+              date.setHours(0, 0, 0, 0);
+              var key = isoDate(date);
+              var entry = expenseDays[key];
+              var classes = ["calendar-day"];
+              if (date >= r.windowStart && date < r.windowEnd)
+                classes.push("in-range");
+              if (date.getDay() === 6 || date.getDay() === 0)
+                classes.push("weekend");
+              if (entry) classes.push("expense");
+              if (isoDate(date) === isoDate(r.today)) classes.push("current");
+              var tooltip = "";
+              var amountHtml = "";
+              if (entry) {
+                tooltip =
+                  day +
+                  " del mese\n" +
+                  entry.items
+                    .map(function (item) {
+                      return item.name + " -> " + formatCurrency(item.amount);
+                    })
+                    .join("\n") +
+                  "\nTotale -> " +
+                  formatCurrency(entry.total);
+                amountHtml =
+                  '<span class="day-total">' +
+                  formatCurrency(entry.total) +
+                  "</span>";
+              }
+              html +=
+                '<span class="' +
+                classes.join(" ") +
+                '"' +
+                (tooltip ? ' data-tooltip="' + escapeHtml(tooltip) + '"' : "") +
+                '><span class="day-number">' +
+                day +
+                "</span>" +
+                amountHtml +
+                "</span>";
+            }
+            html += "</div></div>";
+            return html;
+          }
+
+          var months = [];
+          var cursor = new Date(
+            r.windowStart.getFullYear(),
+            r.windowStart.getMonth(),
+            1,
+          );
+          var endMonth = new Date(
+            r.windowEnd.getFullYear(),
+            r.windowEnd.getMonth(),
+            1,
+          );
+          while (cursor <= endMonth) {
+            months.push({
+              year: cursor.getFullYear(),
+              month: cursor.getMonth(),
+            });
+            cursor.setMonth(cursor.getMonth() + 1);
+          }
+          return (
+            '<div class="bdg-calendar-months">' +
+            months
+              .map(function (item) {
+                return renderMonth(item.year, item.month);
+              })
+              .join("") +
+            "</div>"
+          );
+        }
+
+        function customEditorHtml() {
+          if (!state.custom.length) {
+            return '<div class="bdg-empty-state">Aggiungi spese straordinarie con una data precisa. Verranno conteggiate solo se cadono prima del prossimo stipendio.</div>';
+          }
+          return state.custom
+            .map(function (item) {
+              return (
+                '<div class="bdg-custom-row">' +
+                '<input type="text" value="' +
+                escapeHtml(item.name || "") +
+                '" placeholder="Nome spesa" oninput="bdgUpdateCustom(\'' +
+                item.id +
+                "','name',this.value)\">" +
+                '<input type="date" value="' +
+                escapeHtml(item.date || isoDate(today())) +
+                '" oninput="bdgUpdateCustom(\'' +
+                item.id +
+                "','date',this.value)\">" +
+                '<input type="number" min="0" step="0.01" value="' +
+                (parseFloat(item.amount) || 0) +
+                '" oninput="bdgUpdateCustom(\'' +
+                item.id +
+                "','amount',this.value)\">" +
+                '<button class="pdel" onclick="bdgDeleteCustom(\'' +
+                item.id +
+                '\')" title="Cancella">&#215;</button>' +
+                "</div>"
+              );
+            })
+            .join("");
+        }
+
+        function update() {
+          var r = calculate();
+
+          setText("bdg-oggi", formatFullDate(r.today));
+          setText("bdg-payday", formatFullDate(r.payday));
+          setText("bdg-giorni", r.days);
+          setText("bdg-kpi-liq", formatCurrency(r.liq));
+          setText(
+            "bdg-kpi-days",
+            r.days + (r.days === 1 ? " giorno" : " giorni"),
+          );
+          setText("bdg-kpi-exp", formatCurrency(r.expenseTotal));
+          setText("bdg-kpi-safe", formatCurrency(r.safety));
+          setText("bdg-kpi-investible", formatCurrency(r.investible));
 
           var nd = g("bdg-ndom");
           if (nd) {
-            if (!bdgState.domTouched) {
-              nd.value = r.autoNdom;
-              nd.className = "bdg-inp auto-val";
-            } else {
-              nd.className = "bdg-inp manual";
-            }
+            if (!state.domTouched) nd.value = r.autoNdom;
+            nd.className =
+              "bdg-inp " + (state.domTouched ? "manual" : "auto-val");
           }
           var ns = g("bdg-nset");
           if (ns) {
-            if (!bdgState.settTouched) {
-              ns.value = r.autoNset;
-              ns.className = "bdg-inp auto-val";
-            } else {
-              ns.className = "bdg-inp manual";
-            }
+            if (!state.settTouched) ns.value = r.autoNset;
+            ns.className =
+              "bdg-inp " + (state.settTouched ? "manual" : "auto-val");
           }
 
           setText("bdg-chip-dom", r.nDom);
           setText("bdg-chip-set", r.nSet);
-          var cp = g("bdg-chip-primo");
-          if (cp) {
-            cp.textContent = r.hasPrimo
-              ? "1° del mese incluso ✓"
-              : "1° del mese non cade";
-            cp.className = "bdg-chip " + (r.hasPrimo ? "ok" : "");
+          var rule = g("bdg-chip-rule");
+          if (rule) {
+            rule.textContent = "oggi <= spesa < " + formatDate(r.payday);
+            rule.className = "bdg-chip ok";
           }
 
-          setText("bdg-recurring-total", formatCurrency(r.totalRecurring));
-          setText("bdg-paid-total", formatCurrency(r.paidTotal));
-          setText("bdg-future-total", formatCurrency(r.futureTotal));
-          setText("bdg-forecast-total", formatCurrency(r.forecast));
-          setText("bdg-next-charge", r.cycleStatusLabel);
-          setText("bdg-progress-value", r.cycleProgress + "%");
-          setText("bdg-cycle-range", r.cycleRange);
-          setText("bdg-upcoming-total", formatCurrency(r.futureTotal));
-          setText("bdg-past-total", formatCurrency(r.paidTotal));
-          setText("bdg-next-expense", r.nextChargeName);
+          setText("bdg-recurring-total", formatCurrency(r.expenseTotal));
+          setText("bdg-paid-total", formatCurrency(r.safety));
+          setText("bdg-future-total", formatCurrency(r.reservedTotal));
+          setText("bdg-next-expense", r.nextExpense);
+          setText("bdg-next-charge", r.statusLabel);
+          setText(
+            "bdg-cycle-range",
+            formatDate(r.cycleStart) + " -> " + formatDate(r.cycleEnd),
+          );
+          setText(
+            "bdg-decision-range",
+            formatDate(r.windowStart) + " -> " + formatDate(r.windowEnd),
+          );
+          setText("bdg-progress-value", r.progress + "%");
 
-          var progressFill = g("bdg-progress-fill");
-          if (progressFill) progressFill.style.width = r.cycleProgress + "%";
+          var pf = g("bdg-progress-fill");
+          if (pf) pf.style.width = r.progress + "%";
 
-          var forecastMsg = g("bdg-forecast-msg");
-          if (forecastMsg) {
-            forecastMsg.textContent =
-              r.forecast >= 0
-                ? "Previsione fino a fine mese: " + formatCurrency(r.forecast)
-                : "⚠️ Spese previste superiori alla liquidità";
-          }
+          setText(
+            "bdg-forecast-msg",
+            "Liquidita - spese future datate - margine di sicurezza.",
+          );
 
           var timelineRoot = g("bdg-timeline");
-          if (timelineRoot) {
-            timelineRoot.innerHTML = buildTimelineHtml(r.timeline);
-          }
-
+          if (timelineRoot) timelineRoot.innerHTML = timelineHtml(r.timeline);
           var calendarRoot = g("bdg-calendar");
-          if (calendarRoot) {
-            calendarRoot.innerHTML = buildCalendarHtml(r, r.timeline);
-          }
+          if (calendarRoot) calendarRoot.innerHTML = calendarHtml(r);
+          var excludedRoot = g("bdg-excluded");
+          if (excludedRoot) excludedRoot.innerHTML = excludedHtml(r.excluded);
 
-          setText("bdg-amt-aff", formatCurrency(r.cAff));
-          setText("bdg-amt-boll", formatCurrency(r.cBoll));
-          setText("bdg-amt-dom", formatCurrency(r.cDom));
-          setText("bdg-amt-sp", formatCurrency(r.cSp));
-          setText("bdg-amt-carb", formatCurrency(r.cCarb));
-          setText("bdg-amt-ric", formatCurrency(r.cRic));
-          setText("bdg-tot", formatCurrency(r.tot));
+          setText("bdg-amt-aff", formatCurrency(r.breakdown.affitto));
+          setText("bdg-amt-boll", formatCurrency(r.breakdown.bollette));
+          setText("bdg-amt-dom", formatCurrency(r.breakdown.domeniche));
+          setText("bdg-amt-sp", formatCurrency(r.breakdown.supermercato));
+          setText("bdg-amt-carb", formatCurrency(r.breakdown.carburante));
+          setText("bdg-amt-ric", formatCurrency(r.breakdown.ricorrenti));
+          setText("bdg-amt-custom", formatCurrency(r.breakdown.custom));
+          setText("bdg-amt-safe", formatCurrency(r.safety));
+          setText("bdg-tot", formatCurrency(r.reservedTotal));
 
           setText("bdg-f-liq", formatCurrency(r.liq));
-          setText("bdg-f-tot", "– " + formatCurrency(r.tot));
-          var fi = g("bdg-f-inv");
-          if (fi) {
-            fi.textContent = formatCurrency(r.inv);
-            fi.className = "bdg-frow-val " + (r.inv >= 0 ? "pos" : "neg");
+          setText("bdg-f-exp", "- " + formatCurrency(r.expenseTotal));
+          setText("bdg-f-safe", "- " + formatCurrency(r.safety));
+          var inv = g("bdg-f-inv");
+          if (inv) {
+            inv.textContent = formatCurrency(r.investible);
+            inv.className =
+              "bdg-frow-val " + (r.investible >= 0 ? "pos" : "neg");
           }
 
           var rv = g("bdg-res-val");
           if (rv) {
-            rv.textContent = formatCurrency(r.inv);
+            rv.textContent = formatCurrency(r.investible);
             rv.className =
-              "bdg-forecast-value " +
-              (r.inv > 0 ? "pos" : r.inv < 0 ? "neg" : "zero");
+              "bdg-res-val " +
+              (r.investible > 0 ? "pos" : r.investible < 0 ? "neg" : "zero");
           }
-
           setText(
             "bdg-res-msg",
-            r.inv >= 0
-              ? r.liq > 0
-                ? "Il " +
+            r.investible >= 0
+              ? "Dopo spese e margine resta investibile il " +
                   Math.round(r.pct) +
-                  "% della liquidità rimane disponibile"
-                : "Inserisci la tua liquidità"
-              : "⚠️ Le spese superano la liquidità disponibile",
+                  "% della liquidita"
+              : "Deficit previsto di " + formatCurrency(Math.abs(r.investible)),
           );
-          var bf = g("bdg-bar-fill");
-          if (bf) {
-            bf.style.width = Math.abs(r.pct) + "%";
-            bf.className = "bdg-bar-fill " + (r.inv < 0 ? "neg" : "pos");
+          var bar = g("bdg-bar-fill");
+          if (bar) {
+            bar.style.width = r.barPct + "%";
+            bar.className =
+              "bdg-bar-fill " + (r.investible < 0 ? "neg" : "pos");
           }
-
-          var statusPill = g("bdg-next-charge");
-          if (statusPill) {
-            statusPill.className =
-              "bdg-status-pill " +
-              (r.cycleStatusType === "safe"
-                ? "safe"
-                : r.cycleStatusType === "warn"
-                  ? "warn"
-                  : "danger");
+          var status = g("bdg-next-charge");
+          if (status) status.className = "bdg-status-pill " + r.statusType;
+          var card = g("bdg-kpi-investible-card");
+          if (card) {
+            card.className =
+              "bdg-kpi-card primary " + (r.investible < 0 ? "danger" : "");
           }
         }
 
-        /* ── Override manuale ───────────────────────────────────────────── */
-        window.bdgTouchDom = function () {
-          bdgState.domTouched = true;
-          update();
-        };
-
-        window.bdgTouchSett = function () {
-          bdgState.settTouched = true;
-          update();
-        };
-
-        /* ── Clock ──────────────────────────────────────────────────────── */
         function tickClock() {
           var now = new Date();
           var te = g("bdg-clk-time");
@@ -5251,22 +6559,66 @@
             month: "long",
             year: "numeric",
           });
-          var days = Math.ceil((nextPayday() - now) / (1000 * 60 * 60 * 24));
+          var days = daysBetween(nextPayday(now), today());
           pe.textContent =
-            "💰 Stipendio tra " + days + " giorn" + (days === 1 ? "o" : "i");
+            "Stipendio tra " + days + " giorn" + (days === 1 ? "o" : "i");
         }
 
-        /* ── Render HTML ────────────────────────────────────────────────── */
+        window.bdgUpdate = update;
+        window.bdgTouchDom = function () {
+          state.domTouched = true;
+          update();
+        };
+        window.bdgTouchSett = function () {
+          state.settTouched = true;
+          update();
+        };
+        window.bdgResetAuto = function () {
+          state.domTouched = false;
+          state.settTouched = false;
+          update();
+        };
+        window.bdgUpdateCustom = function (id, field, value) {
+          var item = state.custom.find(function (x) {
+            return x.id === id;
+          });
+          if (!item) return;
+          if (field === "amount") {
+            item.amount = clampNumber(value, { min: 0 });
+          } else if (field === "date") {
+            item.date = String(value || "");
+          } else if (field === "name") {
+            item.name = String(value || "").slice(0, 80);
+          }
+          update();
+        };
+        window.bdgAddCustom = function () {
+          state.custom.push({
+            id: "c" + Date.now(),
+            name: "Nuova spesa",
+            amount: 0,
+            date: isoDate(today()),
+          });
+          saveState();
+          window.bdgRender();
+        };
+        window.bdgDeleteCustom = function (id) {
+          state.custom = state.custom.filter(function (item) {
+            return item.id !== id;
+          });
+          saveState();
+          window.bdgRender();
+        };
+
         window.bdgRender = function () {
           var el = g("sec-budget");
           if (!el) return;
           el.innerHTML = [
             '<div class="bdg-wrap">',
-
             '<div class="bdg-hdr">',
             '  <div class="bdg-hdr-left">',
-            "    <h2>💰 Budget Investibile</h2>",
-            "    <p>Liquidità, spese ricorrenti reali e ciclo 12→12</p>",
+            "    <h2>💰 Cash Flow Stipendio</h2>",
+            "    <p>Investibile oggi prima del prossimo stipendio</p>",
             "  </div>",
             '  <div class="bdg-clock-box">',
             '    <div class="bdg-clk-time" id="bdg-clk-time">--:--:--</div>',
@@ -5274,181 +6626,117 @@
             '    <div class="bdg-clk-pay" id="bdg-clk-pay"></div>',
             "  </div>",
             "</div>",
-
             '<div class="bdg-grid">',
-
+            '<div class="bdg-card bdg-full bdg-card-hl">',
+            '  <div class="bdg-sect">🎯 Decisione immediata</div>',
+            '  <div class="bdg-decision-grid">',
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Liquidità attuale</div><div class="bdg-kpi-value" id="bdg-kpi-liq">—</div></div>',
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Giorni allo stipendio</div><div class="bdg-kpi-value" id="bdg-kpi-days">—</div></div>',
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Spese residue</div><div class="bdg-kpi-value" id="bdg-kpi-exp">—</div></div>',
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Margine sicurezza</div><div class="bdg-kpi-value" id="bdg-kpi-safe">—</div></div>',
+            '    <div class="bdg-kpi-card primary" id="bdg-kpi-investible-card"><div class="bdg-kpi-label">Investibile oggi</div><div class="bdg-kpi-value" id="bdg-kpi-investible">—</div></div>',
+            "  </div>",
+            '  <div class="bdg-formula-note">Regola applicata: data attuale <= data spesa < prossimo stipendio. Tutto cio che cade dal giorno dello stipendio in poi viene escluso dal calcolo attuale.</div>',
+            "</div>",
             '<div class="bdg-card bdg-card-hl bdg-summary-panel">',
-            '  <div class="bdg-sect">📊 Sintesi ciclo</div>',
+            '  <div class="bdg-sect">📊 Sintesi finestra</div>',
             '  <div class="bdg-summary-grid">',
-            '    <div class="bdg-kpi-card">',
-            '      <div class="bdg-kpi-label">Spese ricorrenti</div>',
-            '      <div class="bdg-kpi-value" id="bdg-recurring-total">—</div>',
-            "    </div>",
-            '    <div class="bdg-kpi-card">',
-            '      <div class="bdg-kpi-label">Già passate</div>',
-            '      <div class="bdg-kpi-value" id="bdg-past-total">—</div>',
-            "    </div>",
-            '    <div class="bdg-kpi-card">',
-            '      <div class="bdg-kpi-label">Entro fine periodo</div>',
-            '      <div class="bdg-kpi-value" id="bdg-future-total">—</div>',
-            "    </div>",
-            '    <div class="bdg-kpi-card">',
-            '      <div class="bdg-kpi-label">Prossima uscita</div>',
-            '      <div class="bdg-kpi-value" id="bdg-next-expense">—</div>',
-            "    </div>",
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Spese prima dello stipendio</div><div class="bdg-kpi-value" id="bdg-recurring-total">—</div></div>',
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Margine protetto</div><div class="bdg-kpi-value" id="bdg-paid-total">—</div></div>',
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Totale riservato</div><div class="bdg-kpi-value" id="bdg-future-total">—</div></div>',
+            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Prossima uscita</div><div class="bdg-kpi-value" id="bdg-next-expense">—</div></div>',
             "  </div>",
             '  <div class="bdg-cycle-meta">',
-            '    <span class="bdg-cycle-label">Ciclo</span> <strong id="bdg-cycle-range">—</strong>',
+            '    <span class="bdg-cycle-label">Ciclo stipendio</span> <strong id="bdg-cycle-range">—</strong><br>',
+            '    <span class="bdg-cycle-label">Finestra decisionale</span> <strong id="bdg-decision-range">—</strong>',
             "  </div>",
-            '  <div class="bdg-status-row">',
-            '    <span class="bdg-status-pill safe" id="bdg-next-charge">—</span>',
-            '    <span class="bdg-status-text" id="bdg-forecast-msg">Analisi futura delle uscite</span>',
-            "  </div>",
-            '  <div class="bdg-progress">',
-            '    <div class="bdg-progress-head"><span>Ciclo economico completato</span><strong id="bdg-progress-value">—</strong></div>',
-            '    <div class="bdg-progress-track"><div class="bdg-progress-fill pos" id="bdg-progress-fill" style="width:0%"></div></div>',
-            "  </div>",
+            '  <div class="bdg-status-row"><span class="bdg-status-pill safe" id="bdg-next-charge">—</span><span class="bdg-status-text" id="bdg-forecast-msg">—</span></div>',
+            '  <div class="bdg-progress"><div class="bdg-progress-head"><span>Ciclo stipendio completato</span><strong id="bdg-progress-value">—</strong></div><div class="bdg-progress-track"><div class="bdg-progress-fill pos" id="bdg-progress-fill" style="width:0%"></div></div></div>',
             "</div>",
-
             '<div class="bdg-card bdg-input-card">',
             '  <div class="bdg-sect">📥 Dati di input</div>',
-            '  <div class="bdg-irow">',
-            '    <label class="bdg-ilbl">Liquidità attuale</label>',
-            '    <input class="bdg-inp" id="bdg-liq" type="number" min="0" step="10" value="0" oninput="bdgUpdate()">',
-            '    <span class="bdg-inp-unit">€</span>',
-            "  </div>",
-            '  <div class="bdg-irow">',
-            '    <label class="bdg-ilbl">Budget domenica<small>uscita con Francesca</small></label>',
-            '    <input class="bdg-inp" id="bdg-bdom" type="number" min="0" step="5" value="50" oninput="bdgUpdate()">',
-            '    <span class="bdg-inp-unit">€</span>',
-            "  </div>",
-            '  <div class="bdg-irow">',
-            '    <label class="bdg-ilbl">Spesa supermercato<small>per settimana</small></label>',
-            '    <input class="bdg-inp" id="bdg-bsp" type="number" min="0" step="5" value="80" oninput="bdgUpdate()">',
-            '    <span class="bdg-inp-unit">€</span>',
-            "  </div>",
-            '  <div class="bdg-irow">',
-            '    <label class="bdg-ilbl">N° pieni carburante<small>Golf GTI nel periodo</small></label>',
-            '    <input class="bdg-inp" id="bdg-npieni" type="number" min="0" max="10" step="1" value="2" oninput="bdgUpdate()">',
-            '    <span class="bdg-inp-unit">pieni</span>',
-            "  </div>",
-            '  <div class="bdg-irow">',
-            '    <label class="bdg-ilbl">Costo per pieno<small>~50 litri benzina</small></label>',
-            '    <input class="bdg-inp" id="bdg-cpieni" type="number" min="0" step="5" value="80" oninput="bdgUpdate()">',
-            '    <span class="bdg-inp-unit">€</span>',
-            "  </div>",
-            '  <div class="bdg-irow">',
-            '    <label class="bdg-ilbl">N° domeniche<small>calcolato auto · modificabile</small></label>',
-            '    <input class="bdg-inp auto-val" id="bdg-ndom" type="number" min="0" max="8" step="1" value="0" oninput="bdgTouchDom();bdgUpdate()">',
-            "  </div>",
-            '  <div class="bdg-irow">',
-            '    <label class="bdg-ilbl">N° settimane<small>calcolato auto · modificabile</small></label>',
-            '    <input class="bdg-inp auto-val" id="bdg-nset" type="number" min="0" max="8" step="1" value="0" oninput="bdgTouchSett();bdgUpdate()">',
-            "  </div>",
+            '  <div class="bdg-irow"><label class="bdg-ilbl">Liquidità attuale</label><input class="bdg-inp" id="bdg-liq" type="number" min="0" step="10" value="' +
+              state.liq +
+              '" oninput="bdgUpdate()"><span class="bdg-inp-unit">€</span></div>',
+            '  <div class="bdg-irow"><label class="bdg-ilbl">Margine di sicurezza<small>liquidità da non investire</small></label><input class="bdg-inp" id="bdg-safety" type="number" min="0" step="10" value="' +
+              state.safety +
+              '" oninput="bdgUpdate()"><span class="bdg-inp-unit">€</span></div>',
+            '  <div class="bdg-irow"><label class="bdg-ilbl">Budget domenica<small>uscita con Francesca</small></label><input class="bdg-inp" id="bdg-bdom" type="number" min="0" step="5" value="' +
+              state.bDom +
+              '" oninput="bdgUpdate()"><span class="bdg-inp-unit">€</span></div>',
+            '  <div class="bdg-irow"><label class="bdg-ilbl">Spesa supermercato<small>per occorrenza prima dello stipendio</small></label><input class="bdg-inp" id="bdg-bsp" type="number" min="0" step="5" value="' +
+              state.bSp +
+              '" oninput="bdgUpdate()"><span class="bdg-inp-unit">€</span></div>',
+            '  <div class="bdg-irow"><label class="bdg-ilbl">N° pieni carburante<small>necessari prima dello stipendio</small></label><input class="bdg-inp" id="bdg-npieni" type="number" min="0" max="10" step="1" value="' +
+              state.nPieni +
+              '" oninput="bdgUpdate()"><span class="bdg-inp-unit">pieni</span></div>',
+            '  <div class="bdg-irow"><label class="bdg-ilbl">Costo per pieno<small>~50 litri benzina</small></label><input class="bdg-inp" id="bdg-cpieni" type="number" min="0" step="5" value="' +
+              state.cPieno +
+              '" oninput="bdgUpdate()"><span class="bdg-inp-unit">€</span></div>',
+            '  <div class="bdg-irow"><label class="bdg-ilbl">N° domeniche<small>automatico, modificabile</small></label><input class="bdg-inp auto-val" id="bdg-ndom" type="number" min="0" max="8" step="1" value="' +
+              (state.nDom || 0) +
+              '" oninput="bdgTouchDom()"></div>',
+            '  <div class="bdg-irow"><label class="bdg-ilbl">N° spese supermercato<small>automatico, modificabile</small></label><input class="bdg-inp auto-val" id="bdg-nset" type="number" min="0" max="8" step="1" value="' +
+              (state.nSet || 0) +
+              '" oninput="bdgTouchSett()"></div>',
+            '  <button class="bdg-mode-btn" onclick="bdgResetAuto()">Ripristina conteggi automatici</button>',
             "</div>",
-
             '<div class="bdg-card">',
             '  <div class="bdg-sect">📅 Periodo calcolato</div>',
             '  <div class="bdg-prow"><span class="bdg-plbl">Da oggi</span><span class="bdg-pval" id="bdg-oggi">—</span></div>',
-            '  <div class="bdg-prow"><span class="bdg-plbl">Al prossimo stipendio (giorno 12)</span><span class="bdg-pval" id="bdg-payday">—</span></div>',
+            '  <div class="bdg-prow"><span class="bdg-plbl">Al prossimo stipendio</span><span class="bdg-pval" id="bdg-payday">—</span></div>',
             '  <div class="bdg-prow"><span class="bdg-plbl">Giorni rimanenti</span><span class="bdg-pval accent" id="bdg-giorni">—</span></div>',
-            '  <div class="bdg-chips">',
-            '    <div class="bdg-chip">🌅 Dom: <b id="bdg-chip-dom">—</b></div>',
-            '    <div class="bdg-chip">📆 Sett: <b id="bdg-chip-set">—</b></div>',
-            '    <div class="bdg-chip" id="bdg-chip-primo">—</div>',
-            "  </div>",
+            '  <div class="bdg-chips"><div class="bdg-chip">Dom: <b id="bdg-chip-dom">—</b></div><div class="bdg-chip">Spese: <b id="bdg-chip-set">—</b></div><div class="bdg-chip" id="bdg-chip-rule">—</div></div>',
             "</div>",
-
             '<div class="bdg-card">',
-            '  <div class="bdg-sect">📤 Breakdown spese</div>',
-            '  <div class="bdg-brow off" id="bdg-brow-aff">',
-            '    <span class="bdg-bname">🏠 Affitto <span class="bdg-bbadge off" id="bdg-badge-aff">—</span></span>',
-            '    <span class="bdg-bamt" id="bdg-amt-aff">—</span>',
-            "  </div>",
-            '  <div class="bdg-brow off" id="bdg-brow-boll">',
-            '    <span class="bdg-bname">⚡ Bollette <span class="bdg-bbadge off" id="bdg-badge-boll">—</span></span>',
-            '    <span class="bdg-bamt" id="bdg-amt-boll">—</span>',
-            "  </div>",
-            '  <div class="bdg-brow on" id="bdg-brow-dom">',
-            '    <span class="bdg-bname">🚗 <span id="bdg-lbl-dom">domeniche</span></span>',
-            '    <span class="bdg-bamt var" id="bdg-amt-dom">—</span>',
-            "  </div>",
-            '  <div class="bdg-brow on" id="bdg-brow-sp">',
-            '    <span class="bdg-bname">🛒 <span id="bdg-lbl-sp">supermercato</span></span>',
-            '    <span class="bdg-bamt var" id="bdg-amt-sp">—</span>',
-            "  </div>",
-            '  <div class="bdg-brow on" id="bdg-brow-carb">',
-            '    <span class="bdg-bname">⛽ <span id="bdg-lbl-carb">carburante</span></span>',
-            '    <span class="bdg-bamt var" id="bdg-amt-carb">—</span>',
-            "  </div>",
-            '  <div class="bdg-brow on" id="bdg-brow-ric">',
-            '    <span class="bdg-bname">🔁 Spese ricorrenti</span>',
-            '    <span class="bdg-bamt" id="bdg-amt-ric">—</span>',
-            "  </div>",
-            '  <div class="bdg-btot">',
-            '    <span class="bdg-btot-lbl">Totale spese</span>',
-            '    <span class="bdg-btot-val" id="bdg-tot">—</span>',
-            "  </div>",
+            '  <div class="bdg-sect">📤 Breakdown riservato</div>',
+            '  <div class="bdg-brow off"><span class="bdg-bname">🏠 Affitto</span><span class="bdg-bamt" id="bdg-amt-aff">—</span></div>',
+            '  <div class="bdg-brow off"><span class="bdg-bname">⚡ Bollette</span><span class="bdg-bamt" id="bdg-amt-boll">—</span></div>',
+            '  <div class="bdg-brow on"><span class="bdg-bname">🚗 Domeniche</span><span class="bdg-bamt var" id="bdg-amt-dom">—</span></div>',
+            '  <div class="bdg-brow on"><span class="bdg-bname">🛒 Supermercato</span><span class="bdg-bamt var" id="bdg-amt-sp">—</span></div>',
+            '  <div class="bdg-brow on"><span class="bdg-bname">⛽ Carburante</span><span class="bdg-bamt var" id="bdg-amt-carb">—</span></div>',
+            '  <div class="bdg-brow on"><span class="bdg-bname">🔁 Ricorrenti mensili</span><span class="bdg-bamt" id="bdg-amt-ric">—</span></div>',
+            '  <div class="bdg-brow on"><span class="bdg-bname">➕ Personalizzate</span><span class="bdg-bamt var" id="bdg-amt-custom">—</span></div>',
+            '  <div class="bdg-brow on"><span class="bdg-bname">🛡️ Margine sicurezza</span><span class="bdg-bamt var" id="bdg-amt-safe">—</span></div>',
+            '  <div class="bdg-btot"><span class="bdg-btot-lbl">Totale riservato</span><span class="bdg-btot-val" id="bdg-tot">—</span></div>',
             "</div>",
-
-            '<div class="bdg-card bdg-full bdg-card-calendar bdg-card-hl">',
-            '  <div class="bdg-sect">🗓️ Calendario ciclo 12→12</div>',
-            '  <div class="bdg-calendar" id="bdg-calendar"></div>',
+            '<div class="bdg-card bdg-full">',
+            '  <div class="bdg-sect">➕ Spese straordinarie e personalizzate</div>',
+            '  <div class="bdg-custom-list" id="bdg-custom-list">' +
+              customEditorHtml() +
+              "</div>",
+            '  <button class="earb" style="margin-top:12px;" onclick="bdgAddCustom()">+ Aggiungi spesa datata</button>',
             "</div>",
-
-            '<div class="bdg-card bdg-full bdg-card-timeline">',
-            '  <div class="bdg-sect">📅 Timeline delle ricorrenze</div>',
-            '  <div class="bdg-timeline" id="bdg-timeline"></div>',
-            "</div>",
-
+            '<div class="bdg-card bdg-full bdg-card-calendar bdg-card-hl"><div class="bdg-sect">🗓️ Calendario della finestra decisionale</div><div class="bdg-calendar" id="bdg-calendar"></div></div>',
+            '<div class="bdg-card bdg-full bdg-card-timeline"><div class="bdg-sect">📅 Timeline delle spese conteggiate</div><div class="bdg-timeline" id="bdg-timeline"></div></div>',
+            '<div class="bdg-card bdg-full"><div class="bdg-sect">🚫 Spese escluse dal calcolo attuale</div><div class="bdg-timeline" id="bdg-excluded"></div></div>',
             '<div class="bdg-card bdg-card-hl">',
-            '  <div class="bdg-sect">🎯 Previsione finale</div>',
-            '  <div class="bdg-res-center">',
-            '    <div class="bdg-res-lbl">Capitale investibile oggi</div>',
-            '    <div class="bdg-res-val zero" id="bdg-res-val">0,00 €</div>',
-            '    <div class="bdg-res-msg" id="bdg-res-msg">Inserisci la tua liquidità</div>',
-            '    <div class="bdg-bar"><div class="bdg-bar-fill pos" id="bdg-bar-fill" style="width:0%"></div></div>',
-            "  </div>",
-            '  <div class="bdg-formula">',
-            '    <div class="bdg-frow"><span class="bdg-frow-lbl">Liquidità</span><span class="bdg-frow-val liq" id="bdg-f-liq">—</span></div>',
-            '    <div class="bdg-frow"><span class="bdg-frow-lbl">– Totale spese</span><span class="bdg-frow-val neg" id="bdg-f-tot">—</span></div>',
-            '    <div class="bdg-frow total"><span class="bdg-frow-lbl">= Investibile</span><span class="bdg-frow-val pos" id="bdg-f-inv">—</span></div>',
-            "  </div>",
+            '  <div class="bdg-sect">🎯 Formula finale</div>',
+            '  <div class="bdg-res-center"><div class="bdg-res-lbl">Capitale investibile oggi</div><div class="bdg-res-val zero" id="bdg-res-val">0,00 €</div><div class="bdg-res-msg" id="bdg-res-msg">Inserisci la tua liquidità</div><div class="bdg-bar"><div class="bdg-bar-fill pos" id="bdg-bar-fill" style="width:0%"></div></div></div>',
+            '  <div class="bdg-formula"><div class="bdg-frow"><span class="bdg-frow-lbl">Liquidità</span><span class="bdg-frow-val liq" id="bdg-f-liq">—</span></div><div class="bdg-frow"><span class="bdg-frow-lbl">– Spese future prima dello stipendio</span><span class="bdg-frow-val neg" id="bdg-f-exp">—</span></div><div class="bdg-frow"><span class="bdg-frow-lbl">– Margine sicurezza</span><span class="bdg-frow-val neg" id="bdg-f-safe">—</span></div><div class="bdg-frow total"><span class="bdg-frow-lbl">= Investibile</span><span class="bdg-frow-val pos" id="bdg-f-inv">—</span></div></div>',
+            '  <div class="bdg-formula-note">Le spese con data uguale o successiva al prossimo stipendio appartengono al periodo successivo.</div>',
             "</div>",
-
-            '<div class="bdg-footer">',
-            "  Spese fisse: Affitto " +
-              AFFITTO +
-              " € + Bollette " +
-              BOLLETTE +
-              " € (addebitate il 1° del mese) · Ricorrenti: " +
-              RICORR +
-              " €/mese · Carburante: n° pieni × costo/pieno · Stipendio: giorno " +
-              PAYDAY_DAY,
+            '<div class="bdg-footer">Motore v3: ogni voce viene trasformata in evento datato e filtrata con la regola oggi <= spesa < prossimo stipendio.</div>',
             "</div>",
-
-            "</div>" /* bdg-grid */,
-            "</div>" /* bdg-wrap */,
+            "</div>",
           ].join("");
 
-          bdgClkTimer = setInterval(tickClock, 1000);
-
-          // Primo aggiornamento calcoli DOPO che il DOM è stato inserito
+          if (clockTimer) clearInterval(clockTimer);
+          clockTimer = setInterval(tickClock, 1000);
+          tickClock();
           update();
         };
-
-        /* ── Espone update globalmente per oninput inline ───────────────── */
-        window.bdgUpdate = update;
-      })(); /* fine IIFE budget module */
+      })();
 
       /* ═════════════════════════════════════════════════════════════════════
             APP INITIALIZATION
             ═════════════════════════════════════════════════════════════════════ */
       load();
-      buildPE("crypto");
-      buildPE("etf");
-      buildPE("fondi");
-      updCC();
+      var initialPortfolio = portfolioSnapshot();
+      buildPE("crypto", initialPortfolio);
+      buildPE("etf", initialPortfolio);
+      buildPE("fondi", initialPortfolio);
+      updCC(initialPortfolio);
       renderAll();
 
       /* ═════════════════════════════════════════════════════════════════════ */
