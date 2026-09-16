@@ -1,0 +1,2374 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grigliata Control Center</title>
+    <style>
+      /* === DESIGN TOKENS === */
+      :root {
+        --bg: #f5f1eb;
+        --card: #fffdf9;
+        --text: #241710;
+        --muted: #76645a;
+        --line: #e6d9cd;
+        --accent: #c2410c;
+        --accent2: #9a3412;
+        --dark: #302018;
+        --soft: #fff1e3;
+        --success: #237a55;
+        --shadow: 0 18px 42px rgba(68, 39, 20, 0.09);
+        --shadow-sm: 0 5px 18px rgba(68, 39, 20, 0.06);
+        --radius: 14px;
+        --radius-sm: 9px;
+      }
+
+      /* === RESET & BASE === */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(
+            circle at 10% 0%,
+            rgba(249, 115, 22, 0.13),
+            transparent 28%
+          ),
+          radial-gradient(
+            circle at 88% 4%,
+            rgba(220, 38, 38, 0.08),
+            transparent 24%
+          ),
+          var(--bg);
+        color: var(--text);
+        font-family:
+          "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
+        line-height: 1.45;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible {
+        outline: 3px solid rgba(194, 65, 12, 0.28);
+        outline-offset: 2px;
+      }
+
+      /* === LAYOUT === */
+      .app {
+        max-width: 1480px;
+        margin: auto;
+        padding: 24px;
+      }
+      .app::before {
+        content: "";
+        display: block;
+        height: 4px;
+        width: 100%;
+        margin-bottom: 18px;
+        border-radius: 99px;
+        background: linear-gradient(
+          90deg,
+          var(--dark) 0 22%,
+          var(--accent) 22% 64%,
+          #e7b35f 64%
+        );
+      }
+
+      /* === TOPBAR === */
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 18px;
+        background: rgba(255, 250, 243, 0.9);
+        backdrop-filter: blur(14px);
+        border: 1px solid var(--line);
+        padding: 18px 20px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .brand-icon {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        background: var(--dark);
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: 25px;
+        letter-spacing: -0.5px;
+      }
+      .brand p {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      /* === BUTTONS === */
+      .btn {
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--text);
+        padding: 9px 13px;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 13px;
+        min-height: 40px;
+        transition:
+          background 0.15s,
+          transform 0.15s,
+          box-shadow 0.15s,
+          border-color 0.15s;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        border-color: #c7cdd4;
+        background: #fafafa;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn.primary {
+        background: var(--dark);
+        color: #fff;
+        border-color: #2a160d;
+      }
+      .btn.primary:hover {
+        background: linear-gradient(135deg, #3a200f, #5a2a12);
+      }
+      .btn.danger {
+        color: var(--accent);
+      }
+      .btn.danger:hover {
+        background: #fff5ef;
+        border-color: #f3b49a;
+      }
+
+      /* === DASHBOARD KPI === */
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      .kpi {
+        background: rgba(255, 250, 243, 0.96);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.18s,
+          box-shadow 0.18s;
+      }
+      .kpi:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+      .kpi::after {
+        content: "";
+        position: absolute;
+        right: -25px;
+        top: -25px;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: rgba(249, 115, 22, 0.08);
+        pointer-events: none;
+      }
+      .kpi .label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .kpi .value {
+        font-size: 24px;
+        font-weight: 800;
+        margin-top: 6px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Guest stepper inside KPI */
+      .guest-stepper {
+        display: grid;
+        grid-template-columns: 38px 1fr 38px;
+        align-items: center;
+        gap: 8px;
+        font-size: 24px;
+      }
+      .guest-stepper input {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      /* === CONTROLS BAR === */
+      .controls {
+        background: rgba(255, 250, 243, 0.96);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 14px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 14px;
+      }
+      .controls.info-strip {
+        background: #3b2a20;
+        border-color: #3b2a20;
+        color: #f9eee4;
+      }
+      .controls.info-strip .info-strip,
+      .controls.info-strip strong {
+        color: #fffaf3;
+      }
+      .control-group {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .control-group label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      /* === INPUTS === */
+      input[type="text"],
+      input[type="number"],
+      select {
+        border: 1px solid var(--line);
+        background: var(--card);
+        border-radius: 9px;
+        padding: 8px 9px;
+        outline: none;
+        color: var(--text);
+        min-width: 0;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      input:focus,
+      select:focus {
+        border-color: #fb923c;
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+      }
+      .search {
+        flex: 1;
+        min-width: 220px;
+        position: relative;
+      }
+      .search input {
+        width: 100%;
+        padding-right: 32px;
+      }
+      .search-clear {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+        display: none;
+      }
+      .search-clear.visible {
+        display: block;
+      }
+
+      /* === PROGRESS === */
+      .progress-wrap {
+        background: rgba(255, 250, 243, 0.96);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 14px;
+      }
+      .progress-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .progress {
+        height: 12px;
+        background: #f8dfc8;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        height: 100%;
+        background: var(--accent);
+        box-shadow: 0 0 12px rgba(249, 115, 22, 0.25);
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      /* === INFO STRIP === */
+      .info-strip {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .info-strip strong {
+        color: var(--text);
+      }
+      .info-pill {
+        display: inline-flex;
+        align-items: center;
+        margin: 0 3px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: #fff0dc;
+        color: #8a3a0b;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      /* === CATEGORY & TABLE === */
+      .category {
+        margin: 22px 0;
+      }
+      .category-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 9px;
+        padding: 0 3px;
+      }
+      .category-title {
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.2px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .category-title::before {
+        content: "";
+        display: inline-block;
+        width: 5px;
+        height: 17px;
+        border-radius: 5px;
+        background: var(--accent);
+        flex-shrink: 0;
+      }
+      .category-meta {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .table-wrap {
+        background: rgba(255, 250, 243, 0.96);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        overflow: auto;
+        scrollbar-color: #d6b08d transparent;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1360px;
+      }
+      th,
+      td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eef0f2;
+        text-align: left;
+        vertical-align: middle;
+      }
+      th {
+        background: #f8ecdf;
+        color: #7c2d12;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+        padding: 12px;
+      }
+      td {
+        font-size: 13px;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      tbody tr {
+        transition: background 0.12s;
+        background: #fffaf3;
+      }
+      tbody tr:hover {
+        background: #fff5e8;
+      }
+
+      /* === PRODUCT CELL === */
+      .product {
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .sub {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 2px;
+        line-height: 1.35;
+      }
+
+      /* === MINI BUTTONS === */
+      .mini {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--card);
+        color: var(--text);
+        font-size: 17px;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+        transition:
+          background 0.12s,
+          border-color 0.12s,
+          color 0.12s,
+          transform 0.1s;
+        flex-shrink: 0;
+      }
+      .mini:hover {
+        background: var(--soft);
+        border-color: #f59e0b;
+        color: var(--accent2);
+      }
+      .mini:active {
+        transform: translateY(1px) scale(0.98);
+      }
+      .guest-stepper .mini {
+        width: 38px;
+        height: 38px;
+      }
+
+      /* === PARAMETER CELL (per persona) === */
+      .parameter-cell {
+        min-width: 174px;
+      }
+      .per-person-wrap {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        padding: 8px;
+        border: 1px solid #f2c69f;
+        border-radius: 13px;
+        background: #fff1df;
+      }
+      .stepper-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .per-person-input {
+        width: 66px;
+        text-align: center;
+        border-color: #e7b17e;
+        background: var(--card);
+        color: #9a3412;
+        font-weight: 800;
+      }
+      .per-person-unit {
+        max-width: 140px;
+        color: #9a3412;
+        font-size: 11px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* === RECOMMENDED / ACTUAL === */
+      .micro-label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .dash {
+        color: #9b8172;
+        font-weight: 700;
+      }
+      .recommended {
+        font-weight: 700;
+        color: var(--accent2);
+      }
+      .recommended-box {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 96px;
+        padding: 7px 9px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+      .recommended-value {
+        color: #9a3412;
+        font-size: 14px;
+        font-weight: 800;
+      }
+      .actual-cell {
+        min-width: 178px;
+      }
+      .actual-wrap {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 8px;
+        border: 1px solid #e3e7e5;
+        border-radius: 13px;
+        background: #fff;
+      }
+      .qty-controls {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .qty-input {
+        width: 84px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+      .price-input {
+        width: 88px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* === BADGES === */
+      .equiv {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 4px;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: #fff0dc;
+        color: #8a3a0b;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .manual-badge {
+        display: inline-flex;
+        margin-left: 5px;
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #fff0c7;
+        color: #8a5700;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      /* === ROW STATES === */
+      .acquired {
+        opacity: 0.55;
+      }
+      .acquired .product {
+        text-decoration: line-through;
+      }
+
+      /* === COST CELL === */
+      .cost {
+        font-weight: 800;
+      }
+
+      /* === EMPTY STATE === */
+      .empty {
+        padding: 40px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      /* === SHOPPING LIST === */
+      .shopping-list {
+        margin-top: 26px;
+        background: rgba(255, 250, 243, 0.96);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .shopping-list-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        background: #fff0dc;
+      }
+      .shopping-list-title {
+        font-size: 17px;
+        font-weight: 800;
+      }
+      .shopping-list-sub {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .shopping-table-wrap {
+        overflow: auto;
+      }
+      .shopping-table {
+        min-width: 840px;
+      }
+      .shopping-table td,
+      .shopping-table th {
+        padding: 10px 12px;
+      }
+      .status-pill {
+        display: inline-flex;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #f3eadf;
+        color: #6b4a38;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .status-pill.done {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      /* === TOAST === */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #2a160d;
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
+        pointer-events: none;
+        z-index: 9999;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* === MODAL === */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+        width: 100%;
+        max-width: 480px;
+        transform: scale(0.97);
+        transition: transform 0.2s;
+      }
+      .modal-overlay.open .modal {
+        transform: scale(1);
+      }
+      .modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+        background: #fff0dc;
+        border-radius: 20px 20px 0 0;
+      }
+      .modal-title {
+        font-size: 17px;
+        font-weight: 800;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 22px;
+        color: var(--muted);
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        transition: background 0.15s;
+      }
+      .modal-close:hover {
+        background: rgba(0, 0, 0, 0.06);
+      }
+      .modal-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .field label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .field input,
+      .field select {
+        width: 100%;
+      }
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .modal-foot {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        padding: 14px 20px;
+        border-top: 1px solid var(--line);
+      }
+
+      /* === FOOTER === */
+      footer {
+        color: var(--muted);
+        font-size: 11px;
+        text-align: center;
+        padding: 18px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+
+      /* === RESPONSIVE === */
+      @media (max-width: 900px) {
+        .app {
+          padding: 10px;
+        }
+        .topbar {
+          padding: 14px;
+          border-radius: 17px;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .brand h1 {
+          font-size: 20px;
+        }
+        .dashboard {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .kpi {
+          padding: 13px;
+        }
+        .controls {
+          align-items: stretch;
+        }
+        .search {
+          min-width: 100%;
+        }
+        table {
+          min-width: 1360px;
+        }
+      }
+      @media (max-width: 520px) {
+        .dashboard {
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+        .kpi {
+          border-radius: 14px;
+        }
+        .kpi .value,
+        .kpi input {
+          font-size: 19px;
+        }
+        .topbar {
+          gap: 12px;
+        }
+        .actions {
+          width: 100%;
+        }
+        .btn {
+          font-size: 12px;
+          padding: 9px 8px;
+          flex: 1;
+        }
+        .per-person-input {
+          width: 52px;
+        }
+        .modal-overlay {
+          align-items: flex-end;
+          padding: 0;
+        }
+        .modal {
+          border-radius: 20px 20px 0 0;
+          max-width: 100%;
+        }
+        .modal-head {
+          border-radius: 20px 20px 0 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">🔥</div>
+          <div>
+            <h1>Grigliata Control Center</h1>
+            <p>Lista spesa parametrica per la grigliata</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="selectAll">✓ Seleziona tutto</button>
+          <button class="btn" id="deselectAll">○ Deseleziona tutto</button>
+          <button class="btn" id="resetQty">↺ Reset quantità</button>
+          <button class="btn primary" id="addProduct">
+            ＋ Aggiungi prodotto
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI DASHBOARD -->
+      <section class="dashboard" aria-label="Riepilogo">
+        <div class="kpi">
+          <div class="label">👥 Invitati</div>
+          <div class="value guest-stepper">
+            <button
+              class="mini"
+              id="guestsMinus"
+              type="button"
+              aria-label="Riduci invitati"
+            >
+              −
+            </button>
+            <input
+              id="guests"
+              type="number"
+              min="1"
+              step="1"
+              aria-label="Numero invitati"
+            />
+            <button
+              class="mini"
+              id="guestsPlus"
+              type="button"
+              aria-label="Aumenta invitati"
+            >
+              +
+            </button>
+          </div>
+        </div>
+        <div class="kpi">
+          <div class="label">🛒 Prodotti totali</div>
+          <div class="value" id="totalProducts">0</div>
+        </div>
+        <div class="kpi">
+          <div class="label">💶 Costo stimato</div>
+          <div class="value" id="totalCost">€ 0,00</div>
+        </div>
+        <div class="kpi">
+          <div class="label">💶 Costo / persona</div>
+          <div class="value" id="perPerson">€ 0,00</div>
+        </div>
+      </section>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+        <div class="control-group">
+          <label for="categoryFilter">Categoria</label>
+          <select id="categoryFilter">
+            <option value="Tutte">Tutte</option>
+          </select>
+        </div>
+        <div class="search">
+          <input
+            id="search"
+            type="text"
+            placeholder="Cerca prodotto…"
+            aria-label="Cerca prodotto"
+          />
+          <button
+            class="search-clear"
+            id="searchClear"
+            aria-label="Cancella ricerca"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="control-group">
+          <label>Visualizzati</label>
+          <strong id="visibleCount">0</strong>
+        </div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="progress-wrap">
+        <div class="progress-head">
+          <span>Spesa completata</span>
+          <span id="progressText">0 / 0 · 0%</span>
+        </div>
+        <div
+          class="progress"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          id="progressBarWrap"
+        >
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <!-- INFO STRIP -->
+      <div class="controls info-strip">
+        <div>
+          <strong>💡 Quantità intelligenti:</strong>
+          <span class="info-pill">Per persona</span> controlla la quantità
+          consigliata finale: ad esempio
+          <span class="info-pill">4 ossa/persona × 7 persone = 28 ossa</span>.
+          Cambiando gli invitati, la consigliata si aggiorna automaticamente.
+          <span class="info-pill">Quantità effettiva</span> è ciò che intendi
+          acquistare e può essere modificata manualmente. Il badge
+          <span class="info-pill">MANUALE</span> segnala che hai sovrascritta la
+          quantità automatica.
+        </div>
+      </div>
+
+      <!-- PRODUCT LIST -->
+      <main id="list"></main>
+
+      <!-- SHOPPING LIST -->
+      <section class="shopping-list" aria-labelledby="shoppingListTitle">
+        <div class="shopping-list-head">
+          <div>
+            <div class="shopping-list-title" id="shoppingListTitle">
+              Lista della spesa
+            </div>
+            <div class="shopping-list-sub" id="shoppingListMeta">
+              Riepilogo pronto da scaricare
+            </div>
+          </div>
+          <button class="btn primary" id="downloadShoppingList">
+            ⬇ Scarica lista della spesa
+          </button>
+        </div>
+        <div class="shopping-table-wrap">
+          <table class="shopping-table">
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Prodotto</th>
+                <th>Per persona</th>
+                <th>Quantità</th>
+                <th>Equivalenza</th>
+                <th>Stato</th>
+              </tr>
+            </thead>
+            <tbody id="shoppingListBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        Salvataggio automatico nel browser · documento DOCX generato localmente
+        · tutto modificabile
+      </footer>
+    </div>
+
+    <!-- MODAL AGGIUNGI PRODOTTO -->
+    <div
+      class="modal-overlay"
+      id="modalOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-title" id="modalTitle">➕ Aggiungi prodotto</div>
+          <button class="modal-close" id="modalClose" aria-label="Chiudi">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label for="mName">Nome prodotto</label>
+            <input id="mName" type="text" placeholder="es. Arrosticini" />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="mCategory">Categoria</label>
+              <input id="mCategory" type="text" placeholder="es. Carne" />
+            </div>
+            <div class="field">
+              <label for="mUnit">Unità di misura</label>
+              <input id="mUnit" type="text" placeholder="es. kg, unità, L" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="mPerPerson"
+              >Quantità per persona (lascia 0 per usare quantità base)</label
+            >
+            <input id="mPerPerson" type="number" min="0" step="0.1" value="0" />
+          </div>
+          <div class="field">
+            <label for="mBase" id="mBaseLabel"
+              >Quantità base per <span id="mBaseGuests">7</span> persone</label
+            >
+            <input id="mBase" type="number" min="0" step="0.1" value="1" />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="mPrice">Prezzo unitario (€)</label>
+              <input id="mPrice" type="number" min="0" step="0.01" value="0" />
+            </div>
+            <div class="field">
+              <label for="mEquiv">Unità equivalente (opz.)</label>
+              <input
+                id="mEquiv"
+                type="text"
+                placeholder="es. bottiglie 1,5 L"
+              />
+            </div>
+          </div>
+          <div class="field" id="equivFactorField" style="display: none">
+            <label for="mEquivFactor"
+              >Fattore equivalenza (unità equiv. per 1 unità principale)</label
+            >
+            <input
+              id="mEquivFactor"
+              type="number"
+              min="0"
+              step="0.01"
+              value="1"
+            />
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn" id="modalCancel">Annulla</button>
+          <button class="btn primary" id="modalConfirm">Aggiungi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script>
+      /* ============================================================
+         COSTANTI
+      ============================================================ */
+      const INITIAL_GUESTS = 7;
+      const STORAGE_KEY = "grigliata-rauscedo-control-v1";
+
+      const REMOVED_PRODUCTS = new Set([
+        "Salse::Senape",
+        "Frutta::Frutta fresca",
+      ]);
+      const CONVERTED_UNIT_PRODUCTS = new Set([
+        "Contorni::Polenta",
+        "Pane::Pane",
+        "Alcolici::Birra standard",
+        "Alcolici::Birra gluten free",
+        "Alcolici::Vino rosso",
+        "Alcolici::Vino bianco",
+      ]);
+      const CATEGORY_ORDER = [
+        "Carne",
+        "Antipasti",
+        "Contorni",
+        "Pane",
+        "Salse",
+        "Bevande",
+        "Alcolici",
+        "Dolci",
+        "Ghiaccio",
+        "Materiale usa e getta",
+        "Varie",
+      ];
+
+      const INITIAL_PRODUCTS = [
+        {
+          category: "Carne",
+          name: "Costine",
+          base: 28,
+          perPerson: 4,
+          unit: "ossa",
+          price: 0.65,
+          note: "Prezzo indicativo per osso",
+          equiv: "kg",
+          equivFactor: 0.05,
+        },
+        {
+          category: "Carne",
+          name: "Salsicce",
+          base: 14,
+          perPerson: 2,
+          unit: "unità",
+          price: 1.1,
+          note: "",
+          equiv: "kg",
+          equivFactor: 0.11,
+        },
+        {
+          category: "Carne",
+          name: "Pollo (sovracosce)",
+          base: 7,
+          perPerson: 1,
+          unit: "unità",
+          price: 1.15,
+          note: "",
+          equiv: "kg",
+          equivFactor: 0.2,
+        },
+        {
+          category: "Carne",
+          name: "Pancetta",
+          base: 14,
+          perPerson: 2,
+          unit: "fettine",
+          price: 0.45,
+          note: "Per crostini",
+          equiv: "kg",
+          equivFactor: 0.035,
+        },
+        {
+          category: "Antipasti",
+          name: "Patatine / snack",
+          base: 4,
+          unit: "confezioni",
+          price: 2,
+          note: "Aperitivo leggero",
+        },
+        {
+          category: "Antipasti",
+          name: "Olive",
+          base: 1,
+          unit: "vasetto",
+          price: 2.5,
+          note: "Facoltative",
+        },
+        {
+          category: "Contorni",
+          name: "Cipolle",
+          base: 3,
+          perPerson: 0.4,
+          unit: "unità",
+          price: 0.6,
+          note: "Da grigliare",
+        },
+        {
+          category: "Contorni",
+          name: "Peperoni",
+          base: 3,
+          perPerson: 0.4,
+          unit: "unità",
+          price: 1.2,
+          note: "Da grigliare",
+        },
+        {
+          category: "Contorni",
+          name: "Zucchine",
+          base: 4,
+          perPerson: 0.6,
+          unit: "unità",
+          price: 0.7,
+          note: "Da grigliare",
+        },
+        {
+          category: "Contorni",
+          name: "Polenta",
+          base: 14,
+          perPerson: 2,
+          unit: "fette",
+          price: 0.2,
+          note: "Da grigliare",
+          equiv: "kg",
+          equivFactor: 0.065,
+        },
+        {
+          category: "Pane",
+          name: "Pane",
+          base: 14,
+          perPerson: 2,
+          unit: "fette",
+          price: 0.12,
+          note: "Per tavola e crostini",
+          equiv: "kg",
+          equivFactor: 0.04,
+        },
+        {
+          category: "Salse",
+          name: "Ketchup",
+          base: 1,
+          unit: "bottiglia",
+          price: 2.2,
+          note: "",
+        },
+        {
+          category: "Salse",
+          name: "Maionese",
+          base: 1,
+          unit: "bottiglia",
+          price: 2.2,
+          note: "",
+        },
+        {
+          category: "Salse",
+          name: "BBQ",
+          base: 1,
+          unit: "bottiglia",
+          price: 2.5,
+          note: "",
+        },
+        {
+          category: "Bevande",
+          name: "Acqua naturale",
+          base: 4,
+          perPerson: 0.6,
+          unit: "L",
+          price: 0.35,
+          note: "",
+          equiv: "bottiglie 1,5 L",
+          equivFactor: 1 / 1.5,
+        },
+        {
+          category: "Bevande",
+          name: "Acqua frizzante",
+          base: 3,
+          perPerson: 0.4,
+          unit: "L",
+          price: 0.35,
+          note: "",
+          equiv: "bottiglie 1,5 L",
+          equivFactor: 1 / 1.5,
+        },
+        {
+          category: "Bevande",
+          name: "Pepsi Zero",
+          base: 3,
+          perPerson: 0.4,
+          unit: "L",
+          price: 1.5,
+          note: "",
+          equiv: "bottiglie 1,5 L",
+          equivFactor: 1 / 1.5,
+        },
+        {
+          category: "Alcolici",
+          name: "Birra standard",
+          base: 9,
+          perPerson: 1.3,
+          unit: "bottiglie 33 cl",
+          price: 0.66,
+          note: "",
+          equiv: "L",
+          equivFactor: 0.33,
+        },
+        {
+          category: "Alcolici",
+          name: "Birra gluten free",
+          base: 6,
+          perPerson: 0.9,
+          unit: "bottiglie 33 cl",
+          price: 0.83,
+          note: "",
+          equiv: "L",
+          equivFactor: 0.33,
+        },
+        {
+          category: "Alcolici",
+          name: "Vino rosso",
+          base: 10,
+          perPerson: 1.5,
+          unit: "bicchieri",
+          price: 1,
+          note: "",
+          equiv: "bottiglie 750 ml",
+          equivFactor: 1 / 5,
+        },
+        {
+          category: "Alcolici",
+          name: "Vino bianco",
+          base: 10,
+          perPerson: 1.5,
+          unit: "bicchieri",
+          price: 1,
+          note: "",
+          equiv: "bottiglie 750 ml",
+          equivFactor: 1 / 5,
+        },
+        {
+          category: "Dolci",
+          name: "Dolce",
+          base: 1,
+          unit: "unità",
+          price: 10,
+          note: "Da preparare",
+        },
+        {
+          category: "Ghiaccio",
+          name: "Ghiaccio",
+          base: 4,
+          unit: "kg",
+          price: 1.5,
+          note: "",
+        },
+        {
+          category: "Materiale usa e getta",
+          name: "Piatti",
+          base: 1,
+          unit: "confezione",
+          price: 3,
+          note: "",
+        },
+        {
+          category: "Materiale usa e getta",
+          name: "Bicchieri",
+          base: 1,
+          unit: "confezione",
+          price: 3,
+          note: "",
+        },
+        {
+          category: "Materiale usa e getta",
+          name: "Posate",
+          base: 1,
+          unit: "confezione",
+          price: 2,
+          note: "",
+        },
+        {
+          category: "Materiale usa e getta",
+          name: "Tovaglioli",
+          base: 1,
+          unit: "confezione",
+          price: 2,
+          note: "",
+        },
+        {
+          category: "Varie",
+          name: "Sacchi rifiuti",
+          base: 1,
+          unit: "rotolo",
+          price: 3,
+          note: "",
+        },
+      ];
+
+      const PER_PERSON_DEFAULTS = new Map(
+        INITIAL_PRODUCTS.filter((p) => p.perPerson != null).map((p) => [
+          `${p.category}::${p.name}`,
+          p.perPerson,
+        ]),
+      );
+      const PRODUCT_DEFAULTS = new Map(
+        INITIAL_PRODUCTS.map((p) => [`${p.category}::${p.name}`, p]),
+      );
+
+      /* ============================================================
+         STATE
+      ============================================================ */
+      let state = loadState();
+
+      function loadState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (saved && Array.isArray(saved.products))
+            return migrateState(saved);
+        } catch (_) {}
+        return migrateState({
+          guests: INITIAL_GUESTS,
+          products: INITIAL_PRODUCTS.map((p) => ({
+            ...p,
+            manual: false,
+            manualQty: null,
+            acquired: false,
+          })),
+        });
+      }
+
+      function migrateState(saved) {
+        const products = saved.products
+          .filter((p) => !REMOVED_PRODUCTS.has(`${p.category}::${p.name}`))
+          .map((p) => {
+            const migrated = { ...p };
+            delete migrated["m" + "ult"];
+            const key = `${migrated.category}::${migrated.name}`;
+            const defaults = PRODUCT_DEFAULTS.get(key);
+            if (defaults) {
+              ["base", "unit", "note", "equiv", "equivFactor"].forEach(
+                (prop) => {
+                  if (defaults[prop] !== undefined)
+                    migrated[prop] = defaults[prop];
+                  else delete migrated[prop];
+                },
+              );
+              if (CONVERTED_UNIT_PRODUCTS.has(key))
+                migrated.price = defaults.price;
+            }
+            if (migrated.perPerson == null && PER_PERSON_DEFAULTS.has(key)) {
+              migrated.perPerson = PER_PERSON_DEFAULTS.get(key);
+            }
+            return migrated;
+          });
+        return {
+          guests: Math.max(1, Number(saved.guests) || INITIAL_GUESTS),
+          products,
+        };
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (_) {
+          showToast("⚠️ Impossibile salvare: spazio localStorage esaurito");
+        }
+      }
+
+      /* ============================================================
+         UTILITÀ
+      ============================================================ */
+      function fmt(n) {
+        return new Intl.NumberFormat("it-IT", {
+          maximumFractionDigits: 2,
+        }).format(Number(n) || 0);
+      }
+      function euro(n) {
+        return new Intl.NumberFormat("it-IT", {
+          style: "currency",
+          currency: "EUR",
+        }).format(Number(n) || 0);
+      }
+      function roundForUnit(q, unit) {
+        if ((Number(q) || 0) <= 0) return 0;
+        if (["kg", "L"].includes(unit)) return Math.round(q * 100) / 100;
+        return Math.max(1, Math.ceil(q));
+      }
+      function escapeHtml(s) {
+        return String(s ?? "").replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;",
+            })[m],
+        );
+      }
+
+      let toastTimer = null;
+      function showToast(msg, duration = 2000) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove("show"), duration);
+      }
+
+      /* ============================================================
+         STEP / ARROTONDAMENTO
+      ============================================================ */
+      function smartStep(p, mode = "qty") {
+        const unit = String(p.unit || "").toLowerCase();
+        const name = String(p.name || "").toLowerCase();
+        if (mode === "perPerson") {
+          if (
+            ["costine", "salsicce", "pollo (sovracosce)", "pancetta"].includes(
+              name,
+            )
+          )
+            return 1;
+          if (
+            [
+              "cipolle",
+              "peperoni",
+              "zucchine",
+              "acqua naturale",
+              "acqua frizzante",
+              "pepsi zero",
+            ].includes(name)
+          )
+            return 0.1;
+          if (["pane", "polenta"].includes(name)) return 0.5;
+          if (name.includes("birra") || name.includes("vino")) return 0.5;
+          return 0.1;
+        }
+        if (unit === "kg" || unit === "l") return 0.1;
+        if (unit === "bicchieri") return 0.5;
+        if (
+          [
+            "ossa",
+            "unità",
+            "fettine",
+            "fette",
+            "bottiglie",
+            "bottiglie 33 cl",
+            "confezione",
+            "confezioni",
+            "vasetto",
+            "rotolo",
+          ].includes(unit)
+        )
+          return 1;
+        return 1;
+      }
+      function decimalsForStep(step) {
+        const s = String(step);
+        return s.includes(".") ? s.split(".")[1].length : 0;
+      }
+      function normalizeStepValue(value, step) {
+        const decimals = Math.max(1, decimalsForStep(step));
+        const safe = Math.max(0, Number(value) || 0);
+        return Number(safe.toFixed(decimals));
+      }
+      function formatInputValue(value, step) {
+        const decimals = Math.max(1, decimalsForStep(step));
+        return (Number(value) || 0).toFixed(decimals);
+      }
+      function stepValue(current, direction, step) {
+        const next = (Number(current) || 0) + direction * step;
+        return normalizeStepValue(Math.max(0, next), step);
+      }
+
+      /* ============================================================
+         CALCOLI
+      ============================================================ */
+      function recommended(p) {
+        const planningQty =
+          p.perPerson != null
+            ? Number(p.perPerson) * state.guests
+            : (p.base / INITIAL_GUESTS) * state.guests;
+        return roundForUnit(planningQty, p.unit);
+      }
+      function effective(p) {
+        return p.manual ? Number(p.manualQty) || 0 : recommended(p);
+      }
+      function equivalence(p, qty) {
+        if (!p.equiv || !p.equivFactor) return "";
+        return `≈ ${fmt(qty * p.equivFactor)} ${p.equiv}`;
+      }
+      function categories() {
+        const present = new Set(state.products.map((p) => p.category));
+        return [
+          ...CATEGORY_ORDER.filter((category) => present.has(category)),
+          ...[...present].filter(
+            (category) => !CATEGORY_ORDER.includes(category),
+          ),
+        ];
+      }
+      function filteredProducts() {
+        const cat = document.getElementById("categoryFilter").value;
+        const q = document.getElementById("search").value.trim().toLowerCase();
+        return state.products.filter(
+          (p) =>
+            (cat === "Tutte" || p.category === cat) &&
+            (!q ||
+              `${p.name} ${p.category} ${p.note || ""}`
+                .toLowerCase()
+                .includes(q)),
+        );
+      }
+
+      /* ============================================================
+         RENDER
+      ============================================================ */
+      function rebuildFilter() {
+        const select = document.getElementById("categoryFilter");
+        const current = select.value;
+        select.innerHTML = '<option value="Tutte">Tutte</option>';
+        categories().forEach((c) => {
+          const o = document.createElement("option");
+          o.value = c;
+          o.textContent = c;
+          select.appendChild(o);
+        });
+        if (categories().includes(current)) select.value = current;
+      }
+
+      function render() {
+        document.getElementById("guests").value = state.guests;
+        rebuildFilter();
+
+        const products = filteredProducts();
+        const list = document.getElementById("list");
+        list.innerHTML = "";
+
+        if (!products.length) {
+          list.innerHTML =
+            '<div class="empty">🔍 Nessun prodotto trovato.</div>';
+          updateKPIs();
+          renderShoppingList();
+          return;
+        }
+
+        categories()
+          .filter((cat) => products.some((p) => p.category === cat))
+          .forEach((cat) => {
+            const arr = products.filter((p) => p.category === cat);
+            const sec = document.createElement("section");
+            sec.className = "category";
+            const purchased = arr.filter((p) => p.acquired).length;
+            sec.innerHTML = `<div class="category-head">
+              <div class="category-title">${escapeHtml(cat)}</div>
+              <div class="category-meta">${purchased} / ${arr.length} acquistati</div>
+            </div>`;
+
+            const wrap = document.createElement("div");
+            wrap.className = "table-wrap";
+            const table = document.createElement("table");
+            table.innerHTML = `<thead><tr>
+              <th>Prodotto</th><th>Per persona</th><th>Consigliata</th><th>Unità</th>
+              <th>Quantità effettiva</th><th>Prezzo unitario</th><th>Costo</th><th>Acquistato</th>
+            </tr></thead>`;
+            const tbody = document.createElement("tbody");
+
+            arr.forEach((p) => {
+              const tr = document.createElement("tr");
+              const perPersonStep = smartStep(p, "perPerson");
+              const qtyStep = smartStep(p, "qty");
+              const recommendedQty = recommended(p);
+              const effectiveQty = effective(p);
+
+              if (p.acquired) tr.classList.add("acquired");
+
+              tr.innerHTML = `
+                <td>
+                  <div class="product">${escapeHtml(p.name)}</div>
+                  ${p.note ? `<span class="sub">${escapeHtml(p.note)}</span>` : ""}
+                </td>
+                <td class="parameter-cell">
+                  ${
+                    p.perPerson != null
+                      ? `
+                    <span class="micro-label">Pianificazione</span>
+                    <span class="per-person-wrap">
+                      <span class="stepper-row">
+                        <button class="mini per-person-minus" type="button" aria-label="Riduci quantità per persona">−</button>
+                        <input class="per-person-input" type="number" min="0" step="${perPersonStep}"
+                          value="${formatInputValue(p.perPerson, perPersonStep)}"
+                          aria-label="Quantità per persona: ${escapeHtml(p.name)}">
+                        <button class="mini per-person-plus" type="button" aria-label="Aumenta quantità per persona">+</button>
+                      </span>
+                      <span class="per-person-unit">${escapeHtml(p.unit)}/persona</span>
+                    </span>`
+                      : `<span class="dash">—</span>`
+                  }
+                </td>
+                <td class="recommended">
+                  <span class="micro-label">Automatica</span>
+                  <span class="recommended-box">
+                    <span class="recommended-value">${fmt(recommendedQty)}</span>
+                    ${p.equiv ? `<span class="equiv">${escapeHtml(equivalence(p, recommendedQty))}</span>` : ""}
+                  </span>
+                </td>
+                <td>${escapeHtml(p.unit)}</td>
+                <td class="actual-cell">
+                  <span class="micro-label">Da acquistare</span>
+                  <span class="actual-wrap">
+                    <span class="qty-controls">
+                      <button class="mini minus" type="button" aria-label="Riduci quantità">−</button>
+                      <input class="qty-input" type="number" min="0" step="${qtyStep}"
+                        value="${formatInputValue(effectiveQty, qtyStep)}"
+                        aria-label="Quantità effettiva: ${escapeHtml(p.name)}">
+                      <button class="mini plus" type="button" aria-label="Aumenta quantità">+</button>
+                    </span>
+                    ${p.equiv ? `<span class="equiv">${escapeHtml(equivalence(p, effectiveQty))}</span>` : ""}
+                    ${p.manual ? `<span class="manual-badge">MANUALE</span>` : ""}
+                  </span>
+                </td>
+                <td><input class="price-input" type="number" min="0" step=".01" value="${p.price ?? 0}" aria-label="Prezzo unitario (€)"></td>
+                <td class="cost">${euro(effectiveQty * (Number(p.price) || 0))}</td>
+                <td><input class="acq" type="checkbox" ${p.acquired ? "checked" : ""} aria-label="Acquistato: ${escapeHtml(p.name)}"></td>
+              `;
+
+              const qtyInput = tr.querySelector(".qty-input");
+              const priceInput = tr.querySelector(".price-input");
+              const ppInput = tr.querySelector(".per-person-input");
+
+              if (ppInput) {
+                ppInput.addEventListener("change", () => {
+                  p.perPerson = normalizeStepValue(
+                    ppInput.value,
+                    perPersonStep,
+                  );
+                  save();
+                  render();
+                });
+                tr.querySelector(".per-person-minus").addEventListener(
+                  "click",
+                  () => {
+                    p.perPerson = stepValue(p.perPerson, -1, perPersonStep);
+                    save();
+                    render();
+                  },
+                );
+                tr.querySelector(".per-person-plus").addEventListener(
+                  "click",
+                  () => {
+                    p.perPerson = stepValue(p.perPerson, 1, perPersonStep);
+                    save();
+                    render();
+                  },
+                );
+              }
+
+              qtyInput.addEventListener("change", () => {
+                p.manual = true;
+                p.manualQty = normalizeStepValue(qtyInput.value, qtyStep);
+                save();
+                render();
+              });
+              tr.querySelector(".minus").addEventListener("click", () => {
+                p.manual = true;
+                p.manualQty = stepValue(effective(p), -1, qtyStep);
+                save();
+                render();
+              });
+              tr.querySelector(".plus").addEventListener("click", () => {
+                p.manual = true;
+                p.manualQty = stepValue(effective(p), 1, qtyStep);
+                save();
+                render();
+              });
+              priceInput.addEventListener("change", () => {
+                p.price = Math.max(0, Number(priceInput.value) || 0);
+                save();
+                render();
+              });
+              tr.querySelector(".acq").addEventListener("change", (e) => {
+                p.acquired = e.target.checked;
+                save();
+                render();
+              });
+
+              tbody.appendChild(tr);
+            });
+
+            table.appendChild(tbody);
+            wrap.appendChild(table);
+            sec.appendChild(wrap);
+            list.appendChild(sec);
+          });
+
+        updateKPIs();
+        renderShoppingList();
+      }
+
+      function updateKPIs() {
+        const total = state.products.length;
+        const purchased = state.products.filter((p) => p.acquired).length;
+        const cost = state.products.reduce(
+          (s, p) => s + effective(p) * (Number(p.price) || 0),
+          0,
+        );
+        const guests = Number(state.guests) || 1;
+
+        document.getElementById("totalProducts").textContent = total;
+        document.getElementById("totalCost").textContent = euro(cost);
+        document.getElementById("perPerson").textContent = euro(cost / guests);
+
+        const pct = total ? Math.round((purchased / total) * 100) : 0;
+        document.getElementById("progressText").textContent =
+          `${purchased} / ${total} · ${pct}%`;
+        document.getElementById("progressBar").style.width = pct + "%";
+        document
+          .getElementById("progressBarWrap")
+          .setAttribute("aria-valuenow", pct);
+        document.getElementById("visibleCount").textContent =
+          filteredProducts().length;
+      }
+
+      /* ============================================================
+         SHOPPING LIST
+      ============================================================ */
+      function shoppingRows() {
+        return state.products.map((p) => {
+          const qty = effective(p);
+          const equivRaw = equivalence(p, qty);
+          return {
+            category: p.category,
+            name: p.name,
+            perPerson: p.perPerson != null ? Number(p.perPerson) : null,
+            qty,
+            unit: p.unit,
+            equiv: equivRaw.replace(/^≈\s*/, ""),
+            acquired: p.acquired,
+          };
+        });
+      }
+
+      function renderShoppingList() {
+        const body = document.getElementById("shoppingListBody");
+        if (!body) return;
+        const rows = shoppingRows();
+        body.innerHTML = rows
+          .map(
+            (r) => `<tr>
+          <td>${escapeHtml(r.category)}</td>
+          <td><strong>${escapeHtml(r.name)}</strong></td>
+          <td>${r.perPerson != null ? `${fmt(r.perPerson)} ${escapeHtml(r.unit)}/persona` : "base lista"}</td>
+          <td>${fmt(r.qty)} ${escapeHtml(r.unit)}</td>
+          <td>${r.equiv ? `≈ ${escapeHtml(r.equiv)}` : "—"}</td>
+          <td><span class="status-pill ${r.acquired ? "done" : ""}">${r.acquired ? "✓ Acquistato" : "Da comprare"}</span></td>
+        </tr>`,
+          )
+          .join("");
+
+        const missing = rows.filter((r) => !r.acquired).length;
+        document.getElementById("shoppingListMeta").textContent =
+          `${rows.length} prodotti · ${missing} da comprare · include quantità per persona`;
+      }
+
+      function shoppingListText() {
+        const rows = shoppingRows();
+        const lines = [
+          "GRIGLIATA CONTROL CENTER - LISTA DELLA SPESA",
+          `Invitati: ${state.guests}`,
+          "Riepilogo senza costi, con parametri per persona",
+          "",
+        ];
+        categories().forEach((cat) => {
+          const catRows = rows.filter((r) => r.category === cat);
+          if (!catRows.length) return;
+          lines.push(cat.toUpperCase());
+          catRows.forEach((r) => {
+            const equiv = r.equiv ? ` · ≈ ${r.equiv}` : "";
+            const status = r.acquired ? "acquistato" : "da comprare";
+            const perPerson =
+              r.perPerson != null
+                ? `${fmt(r.perPerson)} ${r.unit}/persona`
+                : "base lista";
+            lines.push(
+              `- ${r.name}: ${perPerson} · totale ${fmt(r.qty)} ${r.unit}${equiv} · ${status}`,
+            );
+          });
+          lines.push("");
+        });
+        return lines.join("\n");
+      }
+
+      async function downloadShoppingList() {
+        if (!window.docx) {
+          showToast(
+            "⚠️ Libreria DOCX non disponibile: verifica la connessione",
+          );
+          return;
+        }
+
+        const {
+          AlignmentType,
+          BorderStyle,
+          Document,
+          HeadingLevel,
+          Packer,
+          Paragraph,
+          ShadingType,
+          Table,
+          TableCell,
+          TableRow,
+          TextRun,
+          VerticalAlign,
+          WidthType,
+        } = window.docx;
+        const rows = shoppingRows();
+        const totalCost = state.products.reduce(
+          (sum, p) => sum + effective(p) * (Number(p.price) || 0),
+          0,
+        );
+        const purchased = rows.filter((row) => row.acquired).length;
+        const missing = rows.length - purchased;
+        const costPerPerson = totalCost / (Number(state.guests) || 1);
+        const generatedAt = new Intl.DateTimeFormat("it-IT", {
+          dateStyle: "long",
+          timeStyle: "short",
+        }).format(new Date());
+        const colors = {
+          ink: "302018",
+          accent: "C2410C",
+          sand: "F8ECDF",
+          line: "E6D9CD",
+          muted: "76645A",
+          white: "FFFFFF",
+          green: "E7F5EC",
+          success: "237A55",
+        };
+        const cell = (text, options = {}) =>
+          new TableCell({
+            shading: options.shading
+              ? { type: ShadingType.CLEAR, fill: options.shading }
+              : undefined,
+            verticalAlign: VerticalAlign.CENTER,
+            margins: { top: 90, bottom: 90, left: 110, right: 110 },
+            children: [
+              new Paragraph({
+                alignment: options.align || AlignmentType.LEFT,
+                children: [
+                  new TextRun({
+                    text: String(text),
+                    bold: !!options.bold,
+                    color: options.color || colors.ink,
+                    size: options.size || 18,
+                  }),
+                ],
+              }),
+            ],
+          });
+        const borders = {
+          top: { style: BorderStyle.SINGLE, size: 4, color: colors.line },
+          bottom: { style: BorderStyle.SINGLE, size: 4, color: colors.line },
+          left: { style: BorderStyle.SINGLE, size: 4, color: colors.line },
+          right: { style: BorderStyle.SINGLE, size: 4, color: colors.line },
+          insideHorizontal: {
+            style: BorderStyle.SINGLE,
+            size: 4,
+            color: colors.line,
+          },
+          insideVertical: {
+            style: BorderStyle.SINGLE,
+            size: 4,
+            color: colors.line,
+          },
+        };
+        const headerRow = () =>
+          new TableRow({
+            children: [
+              "Categoria",
+              "Prodotto",
+              "Per persona",
+              "Quantità",
+              "Equivalenza",
+              "Stato",
+            ].map((label) =>
+              cell(label, {
+                bold: true,
+                color: colors.white,
+                shading: colors.ink,
+                size: 16,
+              }),
+            ),
+          });
+        const categoryBlocks = [];
+        categories().forEach((category) => {
+          const categoryRows = rows.filter((row) => row.category === category);
+          if (!categoryRows.length) return;
+          categoryBlocks.push(
+            new Paragraph({
+              text: category.toUpperCase(),
+              heading: HeadingLevel.HEADING_2,
+              spacing: { before: 260, after: 100 },
+              run: { bold: true, color: colors.accent },
+            }),
+          );
+          categoryBlocks.push(
+            new Table({
+              width: { size: 100, type: WidthType.PERCENTAGE },
+              borders,
+              rows: [
+                headerRow(),
+                ...categoryRows.map(
+                  (row, index) =>
+                    new TableRow({
+                      children: [
+                        cell(row.category, {
+                          shading: index % 2 ? colors.white : colors.sand,
+                        }),
+                        cell(row.name, {
+                          bold: true,
+                          shading: index % 2 ? colors.white : colors.sand,
+                        }),
+                        cell(
+                          row.perPerson != null
+                            ? `${fmt(row.perPerson)} ${row.unit}/persona`
+                            : "Base lista",
+                          { shading: index % 2 ? colors.white : colors.sand },
+                        ),
+                        cell(`${fmt(row.qty)} ${row.unit}`, {
+                          shading: index % 2 ? colors.white : colors.sand,
+                        }),
+                        cell(row.equiv ? `≈ ${row.equiv}` : "-", {
+                          shading: index % 2 ? colors.white : colors.sand,
+                        }),
+                        cell(row.acquired ? "Acquistato" : "Da comprare", {
+                          bold: true,
+                          color: row.acquired ? colors.success : colors.accent,
+                          shading: row.acquired
+                            ? colors.green
+                            : index % 2
+                              ? colors.white
+                              : colors.sand,
+                        }),
+                      ],
+                    }),
+                ),
+              ],
+            }),
+          );
+        });
+        const doc = new Document({
+          sections: [
+            {
+              properties: {
+                page: {
+                  margin: { top: 680, right: 700, bottom: 680, left: 700 },
+                },
+              },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  spacing: { after: 80 },
+                  children: [
+                    new TextRun({
+                      text: "GRIGLIATA",
+                      bold: true,
+                      color: colors.accent,
+                      size: 22,
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  spacing: { after: 70 },
+                  children: [
+                    new TextRun({
+                      text: "LISTA DELLA SPESA",
+                      bold: true,
+                      color: colors.ink,
+                      size: 32,
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  spacing: { after: 260 },
+                  children: [
+                    new TextRun({
+                      text: `${state.guests} invitati · Generata il ${generatedAt}`,
+                      color: colors.muted,
+                      size: 18,
+                    }),
+                  ],
+                }),
+                new Table({
+                  width: { size: 100, type: WidthType.PERCENTAGE },
+                  borders,
+                  rows: [
+                    new TableRow({
+                      children: [
+                        cell(`INVITATI\n${state.guests}`, {
+                          bold: true,
+                          shading: colors.sand,
+                        }),
+                        cell(`PRODOTTI\n${rows.length}`, {
+                          bold: true,
+                          shading: colors.sand,
+                        }),
+                        cell(`DA COMPRARE\n${missing}`, {
+                          bold: true,
+                          shading: colors.sand,
+                        }),
+                        cell(`ACQUISTATI\n${purchased}`, {
+                          bold: true,
+                          shading: colors.green,
+                        }),
+                        cell(`TOTALE\n${euro(totalCost)}`, {
+                          bold: true,
+                          shading: colors.sand,
+                        }),
+                        cell(`MEDIA\n${euro(costPerPerson)}/persona`, {
+                          bold: true,
+                          shading: colors.sand,
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  spacing: { after: 100 },
+                  children: [
+                    new TextRun({
+                      text: "Riepilogo operativo delle quantità correnti e dello stato degli acquisti.",
+                      color: colors.muted,
+                      italics: true,
+                      size: 16,
+                    }),
+                  ],
+                }),
+                ...categoryBlocks,
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  spacing: { before: 300 },
+                  children: [
+                    new TextRun({
+                      text: "Grigliata Control Center · documento generato localmente",
+                      color: colors.muted,
+                      size: 14,
+                    }),
+                  ],
+                }),
+              ],
+            },
+          ],
+        });
+        const blob = await Packer.toBlob(doc);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Lista_Spesa_Grigliata.docx";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast("✅ Documento DOCX scaricato");
+      }
+
+      /* ============================================================
+         GUEST CONTROL
+      ============================================================ */
+      function updateGuests(nextGuests) {
+        state.guests = Math.max(1, Math.round(Number(nextGuests) || 1));
+        state.products.forEach((p) => {
+          if (p.manual) {
+            p.manual = false;
+            p.manualQty = null;
+          }
+        });
+        save();
+        render();
+      }
+
+      /* ============================================================
+         MODAL AGGIUNGI PRODOTTO
+      ============================================================ */
+      function openModal() {
+        document.getElementById("mName").value = "";
+        document.getElementById("mCategory").value = "";
+        document.getElementById("mUnit").value = "";
+        document.getElementById("mPerPerson").value = "0";
+        document.getElementById("mBase").value = "1";
+        document.getElementById("mPrice").value = "0";
+        document.getElementById("mEquiv").value = "";
+        document.getElementById("mEquivFactor").value = "1";
+        document.getElementById("equivFactorField").style.display = "none";
+        document.getElementById("mBaseGuests").textContent = state.guests;
+        document.getElementById("modalOverlay").classList.add("open");
+        document.getElementById("mName").focus();
+      }
+      function closeModal() {
+        document.getElementById("modalOverlay").classList.remove("open");
+      }
+      function confirmModal() {
+        const name = document.getElementById("mName").value.trim();
+        if (!name) {
+          document.getElementById("mName").focus();
+          return;
+        }
+        const category =
+          document.getElementById("mCategory").value.trim() || "Varie";
+        const unit = document.getElementById("mUnit").value.trim() || "unità";
+        const perPersonVal =
+          Number(document.getElementById("mPerPerson").value) || 0;
+        const usePerPerson = perPersonVal > 0;
+        const base = usePerPerson
+          ? perPersonVal * state.guests
+          : Math.max(0, Number(document.getElementById("mBase").value) || 0);
+        const price = Math.max(
+          0,
+          Number(document.getElementById("mPrice").value) || 0,
+        );
+        const equiv = document.getElementById("mEquiv").value.trim();
+        const equivFactor = equiv
+          ? Number(document.getElementById("mEquivFactor").value) || 1
+          : null;
+
+        state.products.push({
+          category,
+          name,
+          base,
+          ...(usePerPerson ? { perPerson: perPersonVal } : {}),
+          unit,
+          price,
+          note: "Prodotto personalizzato",
+          equiv: equiv || undefined,
+          equivFactor: equivFactor || undefined,
+          manual: false,
+          manualQty: null,
+          acquired: false,
+        });
+        save();
+        render();
+        closeModal();
+        showToast(`✅ "${name}" aggiunto`);
+      }
+
+      /* ============================================================
+         EVENT LISTENERS
+      ============================================================ */
+      document
+        .getElementById("guests")
+        .addEventListener("change", (e) =>
+          updateGuests(Number(e.target.value) || 1),
+        );
+      document
+        .getElementById("guestsMinus")
+        .addEventListener("click", () => updateGuests(state.guests - 1));
+      document
+        .getElementById("guestsPlus")
+        .addEventListener("click", () => updateGuests(state.guests + 1));
+      document
+        .getElementById("categoryFilter")
+        .addEventListener("change", render);
+      document.getElementById("search").addEventListener("input", () => {
+        const val = document.getElementById("search").value;
+        document
+          .getElementById("searchClear")
+          .classList.toggle("visible", val.length > 0);
+        render();
+      });
+      document.getElementById("searchClear").addEventListener("click", () => {
+        document.getElementById("search").value = "";
+        document.getElementById("searchClear").classList.remove("visible");
+        render();
+      });
+      document
+        .getElementById("downloadShoppingList")
+        .addEventListener("click", downloadShoppingList);
+      document.getElementById("selectAll").addEventListener("click", () => {
+        state.products.forEach((p) => (p.acquired = true));
+        save();
+        render();
+        showToast("✅ Tutti selezionati");
+      });
+      document.getElementById("deselectAll").addEventListener("click", () => {
+        state.products.forEach((p) => (p.acquired = false));
+        save();
+        render();
+        showToast("○ Tutti deselezionati");
+      });
+      document.getElementById("resetQty").addEventListener("click", () => {
+        if (!confirm("Resettare tutte le quantità manuali?")) return;
+        state.products.forEach((p) => {
+          p.manual = false;
+          p.manualQty = null;
+        });
+        save();
+        render();
+        showToast("↺ Quantità resettate");
+      });
+      document
+        .getElementById("addProduct")
+        .addEventListener("click", openModal);
+      document
+        .getElementById("modalClose")
+        .addEventListener("click", closeModal);
+      document
+        .getElementById("modalCancel")
+        .addEventListener("click", closeModal);
+      document
+        .getElementById("modalConfirm")
+        .addEventListener("click", confirmModal);
+      document.getElementById("mEquiv").addEventListener("input", () => {
+        const val = document.getElementById("mEquiv").value.trim();
+        document.getElementById("equivFactorField").style.display = val
+          ? "flex"
+          : "none";
+      });
+      document.getElementById("modalOverlay").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("modalOverlay")) closeModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.key === "Escape" &&
+          document.getElementById("modalOverlay").classList.contains("open")
+        )
+          closeModal();
+      });
+
+      /* ============================================================
+         INIT
+      ============================================================ */
+      render();
+    </script>
+  </body>
+</html>
