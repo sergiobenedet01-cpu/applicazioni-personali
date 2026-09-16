@@ -92,7 +92,7 @@
         align-items: center;
         justify-content: center;
         gap: 0.4rem;
-        animation: splashFade 0.7s 3.8s ease forwards;
+        animation: splashFade 0.5s 1.6s ease forwards;
       }
       @keyframes splashFade {
         to {
@@ -194,7 +194,7 @@
         justify-content: space-between;
         padding: 0 1.75rem;
         opacity: 0;
-        animation: spUp 0.5s 4.2s forwards;
+        animation: spUp 0.5s 1.9s forwards;
       }
       .hdr-logo {
         font-family: "Syne", sans-serif;
@@ -284,7 +284,7 @@
         position: relative;
         z-index: 1;
         opacity: 0;
-        animation: spUp 0.5s 4.3s forwards;
+        animation: spUp 0.5s 2s forwards;
       }
 
       /* ─── SIDEBAR ─────────────────────────────────── */
@@ -1621,6 +1621,400 @@
         animation: rcFlash 0.65s ease forwards;
       }
 
+      /* ─── MODE PICKER & MOBILE EXPERIENCE ─────────── */
+      .mode-gate {
+        animation: none !important;
+        opacity: 1;
+        pointer-events: auto;
+        background:
+          radial-gradient(circle at 18% 18%, rgba(91, 141, 250, 0.15), transparent 32%),
+          radial-gradient(circle at 82% 82%, rgba(229, 192, 64, 0.12), transparent 30%),
+          var(--bg);
+        transition: opacity 0.18s ease, visibility 0.18s ease;
+      }
+      .mode-gate.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .mode-gate-shell {
+        width: min(680px, calc(100% - 2rem));
+        text-align: center;
+      }
+      .mode-gate-brand {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(2.5rem, 8vw, 4.8rem);
+        font-weight: 800;
+        letter-spacing: -0.06em;
+        line-height: 1;
+      }
+      .mode-gate-brand span { color: var(--accent); }
+      .mode-gate-kicker {
+        margin-top: 0.9rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--muted2);
+        font-size: 0.67rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .mode-gate-title {
+        margin-top: 1.3rem;
+        font-family: "Syne", sans-serif;
+        font-size: clamp(1.25rem, 3vw, 1.8rem);
+        line-height: 1.25;
+      }
+      .mode-gate-copy {
+        max-width: 430px;
+        margin: 0.6rem auto 1.4rem;
+        color: var(--muted2);
+        font-size: 0.84rem;
+        line-height: 1.55;
+      }
+      .mode-gate-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+      .mode-card {
+        min-height: 150px;
+        padding: 1.1rem;
+        text-align: left;
+        color: var(--text);
+        background: rgba(24, 24, 29, 0.9);
+        border: 1px solid var(--border2);
+        border-radius: 16px;
+        cursor: pointer;
+        transition: transform var(--t), border-color var(--t), background var(--t);
+      }
+      .mode-card:hover,
+      .mode-card:focus-visible {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+        background: var(--surface3);
+        outline: none;
+      }
+      .mode-card.is-suggested {
+        border-color: rgba(229, 192, 64, 0.6);
+        box-shadow: 0 0 0 1px rgba(229, 192, 64, 0.08);
+      }
+      .mode-card-icon { display: block; font-size: 1.8rem; margin-bottom: 0.65rem; }
+      .mode-card-title {
+        display: block;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+      .mode-card-copy {
+        display: block;
+        margin-top: 0.25rem;
+        color: var(--muted2);
+        font-size: 0.72rem;
+        line-height: 1.45;
+      }
+      .mode-card-badge {
+        display: inline-block;
+        margin-top: 0.72rem;
+        color: var(--accent);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.57rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .mode-switch {
+        border: 1px solid var(--border2);
+        border-radius: 20px;
+        padding: 0.3rem 0.7rem;
+        color: var(--muted2);
+        background: var(--surface2);
+        font: 700 0.62rem "Syne", sans-serif;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: all var(--t);
+      }
+      .mode-switch:hover,
+      .mode-switch:focus-visible {
+        color: var(--accent);
+        border-color: var(--accent);
+        outline: none;
+      }
+      .mobile-only { display: none; }
+      .mobile-bottom-nav { display: none; }
+
+      body.mode-mobile {
+        font-size: 15px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body.mode-mobile header {
+        height: 58px;
+        padding: 0 max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left));
+      }
+      body.mode-mobile header nav,
+      body.mode-mobile .hdr-credit,
+      body.mode-mobile .claude-badge-sm,
+      body.mode-mobile .sidebar {
+        display: none;
+      }
+      body.mode-mobile .hdr-right { gap: 0; }
+      body.mode-mobile .mode-switch {
+        min-height: 38px;
+        padding: 0.35rem 0.65rem;
+      }
+      body.mode-mobile .layout {
+        display: block;
+        min-height: calc(100vh - 58px);
+      }
+      body.mode-mobile main {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 1rem 1rem calc(6.7rem + env(safe-area-inset-bottom));
+      }
+      body.mode-mobile main > section {
+        display: none;
+        opacity: 1;
+        transform: none;
+      }
+      body.mode-mobile[data-mobile-view="home"] #mHome,
+      body.mode-mobile[data-mobile-view="piano"] #s01,
+      body.mode-mobile[data-mobile-view="piano"] #s03,
+      body.mode-mobile[data-mobile-view="ricette"] #s02,
+      body.mode-mobile[data-mobile-view="spesa"] #s04,
+      body.mode-mobile[data-mobile-view="altro"] #mMore {
+        display: block;
+      }
+      body.mode-mobile[data-mobile-view="piano"] #staplesBlock {
+        display: none;
+      }
+      body.mode-mobile .sec-hdr { margin-bottom: 0.9rem; }
+      body.mode-mobile .sec-num { font-size: 0.58rem; }
+      body.mode-mobile .sec-title { font-size: 1.45rem; line-height: 1.2; }
+      body.mode-mobile .sec-sub { font-size: 0.76rem; line-height: 1.45; }
+      body.mode-mobile .setup-grid,
+      body.mode-mobile .tracker-split {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      body.mode-mobile .setup-card {
+        padding: 1rem;
+        border-radius: 14px;
+      }
+      body.mode-mobile .setup-card:hover { transform: none; }
+      body.mode-mobile .setup-card .sc-desc { margin-bottom: 0.85rem; }
+      body.mode-mobile .ig { margin-bottom: 0.65rem; }
+      body.mode-mobile .nb {
+        width: 48px;
+        height: 46px;
+        font-size: 1.3rem;
+      }
+      body.mode-mobile .nv { min-height: 46px; font-size: 1.2rem; }
+      body.mode-mobile .apply-btn { min-height: 46px; }
+      body.mode-mobile .coll { border-radius: 14px; }
+      body.mode-mobile .coll-hdr { min-height: 58px; padding: 0.8rem 0.9rem; }
+      body.mode-mobile .coll-badge { display: none; }
+      body.mode-mobile .builder-layout { grid-template-columns: 1fr; gap: 0.8rem; }
+      body.mode-mobile .ba { gap: 0.45rem; }
+      body.mode-mobile .bb { min-height: 46px; }
+      body.mode-mobile .ing-search { min-height: 46px; font-size: 0.88rem; }
+      body.mode-mobile .ing-search-clear { width: 40px; height: 40px; }
+      body.mode-mobile .ing-tabs { margin: 0 -0.15rem; padding: 0 0.15rem; }
+      body.mode-mobile .itab { min-height: 42px; padding: 0.45rem 0.7rem; }
+      body.mode-mobile .ipane-cols { grid-template-columns: 1fr; gap: 0.65rem; }
+      body.mode-mobile .chip {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.75rem;
+        padding: 0.38rem 0.65rem;
+      }
+      body.mode-mobile .rcat-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        margin: 0 -1rem 0.65rem;
+        padding: 0 1rem;
+        scrollbar-width: none;
+      }
+      body.mode-mobile .rcat-tabs::-webkit-scrollbar { display: none; }
+      body.mode-mobile .rcb {
+        white-space: nowrap;
+        min-height: 40px;
+        flex-shrink: 0;
+      }
+      body.mode-mobile .recipes-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+      body.mode-mobile .rc { padding: 0.9rem; border-radius: 12px; }
+      body.mode-mobile .rc-name { font-size: 0.93rem; line-height: 1.35; }
+      body.mode-mobile .rc-actions { gap: 0.45rem; margin-top: 0.75rem; }
+      body.mode-mobile .rcb2 { min-height: 44px; font-size: 0.74rem; }
+      body.mode-mobile .rcp { width: 44px; }
+      body.mode-mobile .tcol { border-radius: 14px; }
+      body.mode-mobile .t-meal { min-height: 54px; padding: 0.6rem 0.7rem; }
+      body.mode-mobile .t-name { font-size: 0.83rem; line-height: 1.35; }
+      body.mode-mobile .t-cp,
+      body.mode-mobile .t-rm {
+        min-width: 36px;
+        min-height: 36px;
+      }
+      body.mode-mobile .shop-grid { grid-template-columns: 1fr; gap: 0.7rem; }
+      body.mode-mobile .shop-cat { border-radius: 14px; }
+      body.mode-mobile .shop-cat-hdr { padding: 0.75rem 0.9rem; }
+      body.mode-mobile .shop-items { padding: 0.38rem 0.5rem; }
+      body.mode-mobile .shop-item {
+        min-height: 52px;
+        padding: 0.48rem 0.4rem;
+        gap: 0.65rem;
+      }
+      body.mode-mobile .schk {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+      }
+      body.mode-mobile .schk.on::after { font-size: 0.85rem; }
+      body.mode-mobile .si-name { font-size: 0.92rem; }
+      body.mode-mobile .si-qty { font-size: 0.72rem; }
+      body.mode-mobile .si-copy {
+        opacity: 1;
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 0.86rem;
+      }
+      body.mode-mobile #toast {
+        z-index: 700;
+        right: 1rem;
+        left: 1rem;
+        bottom: calc(5.7rem + env(safe-area-inset-bottom));
+        text-align: center;
+      }
+      body.mode-mobile #repsModal { align-items: flex-end; padding: 0; }
+      body.mode-mobile .reps-box {
+        max-width: none;
+        min-width: 0;
+        border-radius: 18px 18px 0 0;
+        padding: 1.2rem 1rem calc(1rem + env(safe-area-inset-bottom));
+        transform: translateY(100%);
+      }
+      body.mode-mobile #repsModal.open .reps-box { transform: translateY(0); }
+      body.mode-mobile .reps-nb { width: 48px; height: 46px; font-size: 1.25rem; }
+      body.mode-mobile .reps-val { width: 44px; font-size: 1.3rem; }
+      body.mode-mobile .reps-btn { min-height: 48px; }
+      body.mode-mobile .mobile-bottom-nav {
+        position: fixed;
+        z-index: 250;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.15rem;
+        padding: 0.45rem max(0.5rem, env(safe-area-inset-right)) calc(0.45rem + env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+        background: rgba(19, 19, 22, 0.94);
+        border-top: 1px solid var(--border2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .mobile-nav-btn {
+        min-height: 48px;
+        border: 0;
+        border-radius: 10px;
+        color: var(--muted2);
+        background: transparent;
+        font: 700 0.55rem/1.15 "Syne", sans-serif;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+      }
+      .mobile-nav-btn span {
+        display: block;
+        margin-bottom: 0.15rem;
+        font-size: 1.05rem;
+      }
+      .mobile-nav-btn.active {
+        color: var(--accent);
+        background: rgba(229, 192, 64, 0.1);
+      }
+      .mobile-home-hero,
+      .mobile-more-card {
+        background: linear-gradient(145deg, rgba(32, 32, 38, 0.98), rgba(19, 19, 22, 0.98));
+        border: 1px solid var(--border2);
+        border-radius: 16px;
+        padding: 1rem;
+      }
+      .mobile-home-label {
+        color: var(--muted);
+        font: 700 0.6rem "JetBrains Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .mobile-home-meal {
+        margin-top: 0.45rem;
+        font: 800 1.15rem/1.3 "Syne", sans-serif;
+      }
+      .mobile-home-meta {
+        margin-top: 0.3rem;
+        color: var(--muted2);
+        font-size: 0.76rem;
+      }
+      .mobile-home-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.55rem;
+        margin-top: 0.8rem;
+      }
+      .mobile-quick {
+        min-height: 58px;
+        padding: 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        background: var(--surface2);
+        font: 700 0.7rem/1.25 "Syne", sans-serif;
+        text-align: left;
+        cursor: pointer;
+      }
+      .mobile-quick span { display: block; margin-bottom: 0.2rem; font-size: 1.05rem; }
+      .mobile-quick.primary { border-color: rgba(229, 192, 64, 0.45); color: var(--accent); }
+      .mobile-progress {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 0.8rem;
+        color: var(--muted2);
+        font-size: 0.75rem;
+      }
+      .mobile-progress strong { color: var(--text); font-family: "Syne", sans-serif; }
+      .mobile-more-grid { display: grid; gap: 0.7rem; }
+      .mobile-more-btn {
+        width: 100%;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.7rem 0.8rem;
+        color: var(--text);
+        background: var(--surface2);
+        font: 700 0.78rem "Syne", sans-serif;
+        cursor: pointer;
+      }
+      .mobile-staples { margin-top: 0.75rem; }
+      .mobile-staple-group + .mobile-staple-group { margin-top: 0.65rem; }
+      .mobile-staple-title { color: var(--muted); font: 700 0.6rem "JetBrains Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+      .mobile-staple-items { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+      .mobile-staple {
+        min-height: 34px;
+        padding: 0.35rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        color: var(--muted2);
+        background: var(--surface2);
+        font: 600 0.68rem "Plus Jakarta Sans", sans-serif;
+        cursor: pointer;
+      }
+      @media (max-width: 380px) {
+        .mode-gate-cards { gap: 0.5rem; }
+        .mode-card { min-height: 138px; padding: 0.85rem; }
+        body.mode-mobile main { padding-right: 0.75rem; padding-left: 0.75rem; }
+        body.mode-mobile .rc-actions { gap: 0.3rem; }
+        body.mode-mobile .rcb2 { font-size: 0.67rem; }
+      }
+
       /* ─── SECTION FADE-IN ─────────────────────────── */
       section {
         opacity: 0;
@@ -1675,14 +2069,26 @@
     <div class="particles" id="particles"></div>
 
     <!-- SPLASH -->
-    <div id="splash">
-      <div class="sp-logo">Fork<span>folio</span></div>
-      <div class="sp-sub">Piano Pasti Settimanale</div>
-      <div class="sp-credit">Creato da <em>Sergio Benedet</em></div>
-      <div class="sp-line"></div>
-      <div class="sp-claude">
-        <span class="sp-claude-dot">C</span>
-        Realizzato con Claude · Anthropic
+    <div id="splash" class="mode-gate" role="dialog" aria-modal="true" aria-labelledby="modeGateTitle">
+      <div class="mode-gate-shell">
+        <div class="mode-gate-brand">Fork<span>folio</span></div>
+        <div class="mode-gate-kicker">Piano pasti settimanale</div>
+        <h1 class="mode-gate-title" id="modeGateTitle">Come vuoi organizzarti oggi?</h1>
+        <p class="mode-gate-copy" id="modeGateCopy">Scegli l'esperienza più comoda per questo dispositivo.</p>
+        <div class="mode-gate-cards">
+          <button class="mode-card" id="modeMobileCard" type="button" onclick="selectMode('mobile')">
+            <span class="mode-card-icon">📱</span>
+            <span class="mode-card-title">Mobile</span>
+            <span class="mode-card-copy">Piano, ricette e spesa a portata di pollice.</span>
+            <span class="mode-card-badge" id="modeMobileHint"></span>
+          </button>
+          <button class="mode-card" id="modeDesktopCard" type="button" onclick="selectMode('desktop')">
+            <span class="mode-card-icon">🖥️</span>
+            <span class="mode-card-title">Desktop</span>
+            <span class="mode-card-copy">Panoramica completa per pianificare con calma.</span>
+            <span class="mode-card-badge" id="modeDesktopHint"></span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1714,6 +2120,9 @@
         <button class="nav-btn" onclick="goTo('s04', this)">Spesa</button>
       </nav>
       <div class="hdr-right">
+        <button class="mode-switch" type="button" onclick="showModePicker()" title="Cambia modalità">
+          ⇄ Modalità
+        </button>
         <div class="hdr-credit">
           <strong
             style="
@@ -1784,6 +2193,26 @@
 
       <!-- ─── MAIN ─────────────────────────────────── -->
       <main>
+        <section class="mobile-only" id="mHome" aria-label="ForkFolio Today">
+          <div class="sec-hdr">
+            <div class="sec-num">// OGGI</div>
+            <div class="sec-title">ForkFolio <span class="hl">Today</span></div>
+            <div class="sec-sub">Il punto di partenza rapido per la tua settimana.</div>
+          </div>
+          <div class="mobile-home-hero">
+            <div class="mobile-home-label">Prossimo pasto</div>
+            <div class="mobile-home-meal" id="mTodayMeal">Pianifica il tuo primo pasto</div>
+            <div class="mobile-home-meta" id="mTodayMeta">Nessun pasto inserito per ora.</div>
+            <div class="mobile-progress"><span>Piano settimanale</span><strong id="mTodayProgress">0 / 0</strong></div>
+            <div class="mobile-home-actions">
+              <button class="mobile-quick primary" type="button" onclick="setMobileView('ricette')"><span>＋</span>Aggiungi pasto</button>
+              <button class="mobile-quick" type="button" onclick="setMobileView('piano')"><span>📅</span>Apri il piano</button>
+              <button class="mobile-quick" type="button" onclick="setMobileView('spesa')"><span>🛒</span>Lista spesa</button>
+              <button class="mobile-quick" type="button" onclick="openMobileBuilder()"><span>🧩</span>Crea un pasto</button>
+            </div>
+          </div>
+        </section>
+
         <!-- ══ 01 SETUP ═════════════════════════════════ -->
         <section id="s01">
           <div class="sec-hdr">
@@ -2037,7 +2466,7 @@
           </div>
 
           <!-- Staples -->
-          <div style="margin-top: 1.5rem">
+          <div id="staplesBlock" style="margin-top: 1.5rem">
             <div class="sec-hdr" style="margin-bottom: 0.85rem">
               <div class="sec-num">// 03b</div>
               <div class="sec-title" style="font-size: 1.1rem">
@@ -2101,8 +2530,33 @@
             </div>
           </div>
         </section>
+
+        <section class="mobile-only" id="mMore" aria-label="Altre funzioni">
+          <div class="sec-hdr">
+            <div class="sec-num">// ALTRO</div>
+            <div class="sec-title">Più <span class="hl">strumenti</span></div>
+            <div class="sec-sub">Ricorrenti e passaggio rapido di modalità.</div>
+          </div>
+          <div class="mobile-more-grid">
+            <div class="mobile-more-card">
+              <button class="mobile-more-btn" type="button" onclick="openMobileBuilder()"><span>🧩 Cucina modulare</span><span>›</span></button>
+              <button class="mobile-more-btn" type="button" onclick="showModePicker()"><span>⇄ Cambia modalità</span><span>›</span></button>
+            </div>
+            <div class="mobile-more-card">
+              <div class="mobile-home-label">Ingredienti ricorrenti</div>
+              <div class="mobile-staples" id="mobileStaples"></div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
+    <nav class="mobile-bottom-nav" aria-label="Navigazione mobile">
+      <button class="mobile-nav-btn active" type="button" data-mobile-nav="home" onclick="setMobileView('home')"><span>⌂</span>Home</button>
+      <button class="mobile-nav-btn" type="button" data-mobile-nav="piano" onclick="setMobileView('piano')"><span>◫</span>Piano</button>
+      <button class="mobile-nav-btn" type="button" data-mobile-nav="ricette" onclick="setMobileView('ricette')"><span>🍽️</span>Ricette</button>
+      <button class="mobile-nav-btn" type="button" data-mobile-nav="spesa" onclick="setMobileView('spesa')"><span>🛒</span>Spesa</button>
+      <button class="mobile-nav-btn" type="button" data-mobile-nav="altro" onclick="setMobileView('altro')"><span>•••</span>Altro</button>
+    </nav>
     <div id="toast"></div>
 
     <!-- REPS MODAL -->
@@ -2139,959 +2593,20 @@
       </div>
     </div>
 
+    <script src="forkfolio-data.js"></script>
     <script>
       /* ═══════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════ */
 
-      const STAPLES = {
-        Colazione: ["Avena", "Cacao", "Uova (scorta)", "Miele"],
-        "Snack & Dolci": [
-          "Banane",
-          "Mela",
-          "Frutta varia",
-          "Burro di arachidi",
-          "Pavesini",
-          "Dolcetti",
-        ],
-        Bevande: ["Caffè", "Acqua frizzante", "Succo di frutta 100%"],
-        "Dispensa Base": ["Olio EVO (scorta)", "Sale", "Pepe"],
-        Latticini: ["Latte", "Yogurt bianco"],
-        "Pane & Carboidrati": ["Pane in cassetta", "Grissini"],
-      };
+      const { STAPLES, INGREDIENTS, RECIPES, SHOP_CATS } =
+        window.FORKFOLIO_DATA;
 
-      const INGREDIENTS = {
-        "🥩 Carni": {
-          "🐔 Pollo": [
-            "Petto di pollo",
-            "Sovracosce di pollo",
-            "Ali di pollo",
-            "Pollo intero",
-            "Straccetti di pollo",
-            "Pollo marinato",
-          ],
-          "🥩 Manzo": [
-            "Bistecca di manzo",
-            "Straccetti di manzo",
-            "Hamburger di manzo",
-            "Carpaccio di manzo",
-            "Bresaola",
-            "Polpette di manzo",
-            "Manzo spezzatino",
-            "Tagliata di manzo",
-            "Tartare di manzo",
-          ],
-          "🐖 Maiale": [
-            "Lonza di maiale",
-            "Filetto di maiale",
-            "Prosciutto crudo",
-            "Prosciutto cotto",
-            "Pancetta/guanciale",
-            "Polpette di suino",
-            "Speck",
-          ],
-          "🦃 Tacchino": [
-            "Fesa di tacchino",
-            "Arrosto di tacchino",
-            "Polpette di tacchino",
-            "Tacchino alla griglia",
-          ],
-        },
-        "🐟 Pesce": {
-          Freschi: [
-            "Orata",
-            "Branzino",
-            "Salmone fresco",
-            "Trota salmonata",
-            "Merluzzo",
-            "Sgombro fresco",
-            "Tonno fresco",
-            "Calamari",
-            "Gamberetti",
-          ],
-          Conserve: [
-            "Tonno al naturale",
-            "Tonno in olio",
-            "Sgombro in scatola",
-            "Salmone affumicato",
-            "Acciughe",
-            "Sardine",
-            "Polpo precotto",
-          ],
-        },
-        "🥚 Uova & Formaggi": {
-          Uova: [
-            "Uova strapazzate",
-            "Uova sode",
-            "Frittata",
-            "Uova all'occhio di bue",
-            "Uovo alla coque",
-            "Frittata al forno",
-          ],
-          Formaggi: [
-            "Ricotta vaccina",
-            "Ricotta di pecora",
-            "Mozzarella",
-            "Mozzarella light",
-            "Fiocchi di latte",
-            "Primo sale",
-            "Feta",
-            "Pecorino",
-            "Parmigiano/Grana",
-            "Scamorza",
-            "Sottilette",
-          ],
-        },
-        "🫘 Legumi & Veg.": {
-          Legumi: [
-            "Ceci",
-            "Lenticchie rosse",
-            "Lenticchie verdi",
-            "Fagioli cannellini",
-            "Fagioli borlotti",
-            "Fagioli rossi",
-            "Edamame",
-            "Soia gialla",
-            "Piselli",
-          ],
-          "Proteine vegetali": [
-            "Tofu naturale",
-            "Tofu affumicato",
-            "Tempeh",
-            "Seitan",
-            "Burger vegetali",
-            "Hummus di ceci",
-            "Hummus di barbabietola",
-          ],
-        },
-        "🍚 Carboidrati": {
-          Pasta: [
-            "Spaghetti",
-            "Penne",
-            "Trofie",
-            "Rigatoni",
-            "Fusilli",
-            "Pasta integrale",
-            "Pasta ai legumi",
-            "Lasagne",
-            "Orecchiette",
-            "Tagliatelle",
-          ],
-          "Riso & Cereali": [
-            "Riso basmati",
-            "Riso integrale",
-            "Riso venere",
-            "Riso jasmine",
-            "Cous cous",
-            "Cous cous integrale",
-            "Bulgur",
-            "Farro",
-            "Orzo",
-            "Quinoa",
-            "Miglio",
-          ],
-          "Pane & Altro": [
-            "Pane integrale",
-            "Pane ai cereali",
-            "Pane di segale",
-            "Piadina",
-            "Piadina integrale",
-            "Pita",
-            "Wrap",
-            "Gnocchi di patate",
-            "Polenta",
-            "Crackers integrali",
-            "Grissini",
-            "Fiocchi d'avena",
-            "Crostini di pane",
-            "Pangrattato",
-            "Saikebon",
-          ],
-          Tuberi: ["Patate", "Patate dolci", "Zucca (autunno)", "Topinambur"],
-        },
-        "🥦 Verdure": {
-          "☀️ Estate": [
-            "Zucchine",
-            "Melanzane",
-            "Peperoni",
-            "Peperoncino fresco",
-            "Pomodorini ciliegino",
-            "Pomodori ramati",
-            "Cetrioli",
-            "Mais",
-          ],
-          "🍂 Autunno-Inverno": [
-            "Spinaci",
-            "Finocchi",
-            "Broccoli",
-            "Cavolfiore",
-            "Cavolo verza",
-            "Cavolo nero",
-            "Bietole",
-            "Radicchio",
-            "Cavolo cappuccio",
-            "Porri",
-          ],
-          "🌿 Primavera": [
-            "Asparagi",
-            "Fagiolini",
-            "Piselli freschi",
-            "Carciofi",
-            "Fave fresche",
-          ],
-          "🔄 Tutto l'anno": [
-            "Carote",
-            "Cipolla rossa",
-            "Cipolla bianca",
-            "Cipolla di Tropea",
-            "Sedano",
-            "Barbabietola",
-            "Funghi champignon",
-            "Funghi porcini",
-            "Avocado",
-            "Rucola",
-            "Lattuga/misticanza",
-            "Songino",
-          ],
-        },
-        "🥄 Salse": {
-          Basi: [
-            "Olio EVO",
-            "Salsa di pomodoro",
-            "Passata di pomodoro",
-            "Pesto basilico",
-            "Pesto rucola",
-            "Pesto pistacchio",
-            "Crema di peperoni",
-          ],
-          "Salse internazionali": [
-            "Salsa di soia",
-            "Salsa tahina",
-            "Yogurt greco",
-            "Yogurt magro",
-            "Tzatziki",
-            "Guacamole",
-            "Hummus",
-            "Glassa balsamica",
-            "Aceto balsamico",
-            "Aceto di mele",
-            "Maionese light",
-            "Senape Dijon",
-            "Senape al miele",
-            "Panna",
-          ],
-          "Agrumi & Freschezza": [
-            "Limone",
-            "Lime",
-            "Arancia",
-            "Succo di limone",
-          ],
-        },
-        "🧄 Aromi & Topping": {
-          "Aromi freschi": [
-            "Aglio",
-            "Prezzemolo",
-            "Basilico",
-            "Menta",
-            "Erba cipollina",
-            "Rosmarino",
-            "Timo",
-            "Salvia",
-            "Zenzero fresco",
-            "Peperoncino fresco",
-          ],
-          "Spezie secche": [
-            "Origano",
-            "Paprika dolce",
-            "Paprika affumicata",
-            "Curry",
-            "Cumino",
-            "Curcuma",
-            "Peperoncino secco",
-            "Cannella",
-            "Noce moscata",
-            "Za'atar",
-          ],
-          "Topping & Frutta secca": [
-            "Olive nere",
-            "Olive verdi",
-            "Olive taggiasche",
-            "Capperi",
-            "Pomodori secchi",
-            "Parmigiano grattugiato",
-            "Semi di sesamo",
-            "Semi di zucca",
-            "Semi di girasole",
-            "Semi di lino",
-            "Noci",
-            "Mandorle",
-            "Pistacchi",
-            "Anacardi",
-            "Pinoli",
-          ],
-        },
-      };
+      const MODE_STORAGE_KEY = "forkfolio-ui-mode";
+      let currentMode = null;
 
-      const RECIPES = [
-        // 🍝 Pasta & Cereali
-        {
-          id: 1,
-          cat: "🍝 Pasta & Cereali",
-          name: "Trofie zucchina, cipolla, panna e pancetta",
-          tags: ["pasta", "pancetta", "cremosa"],
-          ing: {
-            proteine: ["Pancetta/guanciale"],
-            carb: ["Trofie"],
-            verd: ["Zucchine", "Cipolla bianca"],
-            salse: ["Panna", "Olio EVO"],
-          },
-        },
-        {
-          id: 2,
-          cat: "🍝 Pasta & Cereali",
-          name: "Spaghetti al pomodoro, olive e acciughe",
-          tags: ["pasta", "pesce", "mediterraneo"],
-          ing: {
-            proteine: ["Acciughe"],
-            carb: ["Spaghetti"],
-            verd: ["Pomodorini ciliegino"],
-            aromi: ["Olive nere", "Origano", "Aglio"],
-          },
-        },
-        {
-          id: 3,
-          cat: "🍝 Pasta & Cereali",
-          name: "Pasta fredda tonno, mais e pomodorini",
-          tags: ["pasta fredda", "tonno", "estate"],
-          ing: {
-            proteine: ["Tonno al naturale"],
-            carb: ["Penne"],
-            verd: ["Pomodorini ciliegino", "Mais"],
-            aromi: ["Olive nere", "Basilico"],
-          },
-        },
-        {
-          id: 4,
-          cat: "🍝 Pasta & Cereali",
-          name: "Spaghetti aglio, olio, acciughe e pangrattato croccante",
-          tags: ["pasta", "veloce", "acciughe"],
-          ing: {
-            proteine: ["Acciughe"],
-            carb: ["Spaghetti"],
-            aromi: ["Aglio", "Peperoncino fresco", "Prezzemolo"],
-          },
-        },
-        {
-          id: 5,
-          cat: "🍝 Pasta & Cereali",
-          name: "Orzo freddo con salmone affumicato, avocado e cetriolo",
-          tags: ["orzo", "salmone", "fresco"],
-          ing: {
-            proteine: ["Salmone affumicato"],
-            carb: ["Orzo"],
-            verd: ["Avocado", "Cetrioli"],
-            salse: ["Limone", "Olio EVO"],
-          },
-        },
-        {
-          id: 6,
-          cat: "🍝 Pasta & Cereali",
-          name: "Farro con verdure grigliate, feta e menta",
-          tags: ["farro", "feta", "estate"],
-          ing: {
-            proteine: ["Feta"],
-            carb: ["Farro"],
-            verd: ["Zucchine", "Peperoni", "Cipolla rossa"],
-            salse: ["Olio EVO", "Aceto balsamico"],
-            aromi: ["Menta"],
-          },
-        },
-        {
-          id: 7,
-          cat: "🍝 Pasta & Cereali",
-          name: "Quinoa con gamberetti, avocado e lime",
-          tags: ["quinoa", "gamberetti", "bowl"],
-          ing: {
-            proteine: ["Gamberetti"],
-            carb: ["Quinoa"],
-            verd: ["Avocado", "Pomodorini ciliegino"],
-            salse: ["Lime", "Olio EVO"],
-            aromi: ["Erba cipollina", "Peperoncino fresco"],
-          },
-        },
-        // 🌾 Cous Cous & Riso
-        {
-          id: 8,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Cous cous mozzarella, pomodorini, basilico e acciughe",
-          tags: ["cous cous", "mozzarella", "estate"],
-          ing: {
-            proteine: ["Mozzarella", "Acciughe"],
-            carb: ["Cous cous"],
-            verd: ["Pomodorini ciliegino"],
-            aromi: ["Basilico"],
-          },
-        },
-        {
-          id: 9,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Cous cous zucchine, trota salmonata e acciughe",
-          tags: ["cous cous", "pesce"],
-          ing: {
-            proteine: ["Trota salmonata", "Acciughe"],
-            carb: ["Cous cous"],
-            verd: ["Zucchine"],
-            salse: ["Olio EVO", "Limone"],
-          },
-        },
-        {
-          id: 10,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Cous cous tonno, olive nere, pomodorini e melanzane",
-          tags: ["cous cous", "tonno", "estate"],
-          ing: {
-            proteine: ["Tonno al naturale", "Acciughe"],
-            carb: ["Cous cous"],
-            verd: ["Pomodorini ciliegino", "Melanzane"],
-            aromi: ["Olive nere", "Origano", "Peperoncino secco"],
-          },
-        },
-        {
-          id: 11,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Cous cous pollo aromatizzato, carote e zucchine",
-          tags: ["cous cous", "pollo", "forno"],
-          ing: {
-            proteine: ["Sovracosce di pollo"],
-            carb: ["Cous cous"],
-            verd: ["Carote", "Cipolla rossa", "Zucchine"],
-            aromi: ["Paprika dolce", "Rosmarino", "Olio EVO"],
-          },
-        },
-        {
-          id: 12,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Riso basmati, straccetti di manzo, broccolo e salsa di soia",
-          tags: ["riso", "manzo", "asiatico"],
-          ing: {
-            proteine: ["Straccetti di manzo"],
-            carb: ["Riso basmati"],
-            verd: ["Broccoli", "Carote", "Cipolla bianca"],
-            salse: ["Salsa di soia", "Olio EVO"],
-          },
-        },
-        {
-          id: 13,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Riso venere con salmone in padella, zucchine e limone",
-          tags: ["riso venere", "salmone", "elegante"],
-          ing: {
-            proteine: ["Salmone fresco"],
-            carb: ["Riso venere"],
-            verd: ["Zucchine"],
-            salse: ["Limone", "Olio EVO"],
-            aromi: ["Erba cipollina"],
-          },
-        },
-        {
-          id: 14,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Poke bowl: riso, salmone, avocado ed edamame",
-          tags: ["poke", "salmone", "bowl"],
-          ing: {
-            proteine: ["Salmone fresco", "Edamame"],
-            carb: ["Riso basmati"],
-            verd: ["Avocado", "Carote", "Cetrioli"],
-            salse: ["Salsa di soia"],
-            aromi: ["Semi di sesamo", "Zenzero fresco"],
-          },
-        },
-        {
-          id: 15,
-          cat: "🌾 Cous Cous & Riso",
-          name: "Bulgur con pollo alla curcuma, spinaci e yogurt",
-          tags: ["bulgur", "pollo", "speziato"],
-          ing: {
-            proteine: ["Petto di pollo"],
-            carb: ["Bulgur"],
-            verd: ["Spinaci"],
-            salse: ["Yogurt greco"],
-            aromi: ["Curcuma", "Cumino", "Limone"],
-          },
-        },
-        // 🥩 Proteine Protagoniste
-        {
-          id: 16,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Petto di pollo alla griglia con riso e finocchio",
-          tags: ["pollo", "riso", "leggero"],
-          ing: {
-            proteine: ["Petto di pollo"],
-            carb: ["Riso basmati"],
-            verd: ["Finocchi"],
-            salse: ["Olio EVO", "Limone"],
-          },
-        },
-        {
-          id: 17,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Cheeseburger artigianale con insalata mista",
-          tags: ["manzo", "burger", "casual"],
-          ing: {
-            proteine: ["Hamburger di manzo", "Mozzarella"],
-            carb: ["Pane ai cereali"],
-            verd: ["Lattuga/misticanza", "Pomodori ramati"],
-            salse: ["Senape Dijon", "Maionese light"],
-          },
-        },
-        {
-          id: 18,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Wrap sovracoscia di pollo, cipolla, yogurt e curry",
-          tags: ["wrap", "pollo", "fusion"],
-          ing: {
-            proteine: ["Sovracosce di pollo"],
-            carb: ["Wrap"],
-            verd: ["Cipolla rossa", "Peperoncino fresco", "Lattuga/misticanza"],
-            salse: ["Yogurt greco"],
-            aromi: ["Curry"],
-          },
-        },
-        {
-          id: 19,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Orata al cartoccio con pomodorini, olive e capperi",
-          tags: ["pesce", "forno", "mediterraneo"],
-          ing: {
-            proteine: ["Orata"],
-            verd: ["Pomodorini ciliegino"],
-            aromi: ["Olive nere", "Capperi", "Aglio", "Prezzemolo", "Olio EVO"],
-          },
-        },
-        {
-          id: 20,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Salmone in padella con quinoa e spinaci saltati",
-          tags: ["salmone", "quinoa", "fit"],
-          ing: {
-            proteine: ["Salmone fresco"],
-            carb: ["Quinoa"],
-            verd: ["Spinaci"],
-            salse: ["Limone", "Olio EVO"],
-            aromi: ["Zenzero fresco"],
-          },
-        },
-        {
-          id: 21,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Tonno scottato, insalata di avocado e lime",
-          tags: ["tonno", "avocado", "fresco"],
-          ing: {
-            proteine: ["Tonno fresco"],
-            verd: ["Avocado", "Pomodorini ciliegino", "Rucola"],
-            salse: ["Lime"],
-            aromi: ["Semi di sesamo"],
-          },
-        },
-        {
-          id: 22,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Tagliata di manzo su rucola, parmigiano e balsamico",
-          tags: ["manzo", "rucola", "elegante"],
-          ing: {
-            proteine: ["Tagliata di manzo"],
-            verd: ["Rucola"],
-            aromi: ["Parmigiano/Grana", "Pomodori secchi"],
-            salse: ["Glassa balsamica", "Olio EVO"],
-          },
-        },
-        {
-          id: 23,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Lonza di maiale al vino bianco con patate al forno",
-          tags: ["maiale", "patate", "forno"],
-          ing: {
-            proteine: ["Lonza di maiale"],
-            carb: ["Patate"],
-            aromi: ["Rosmarino", "Aglio", "Olio EVO"],
-          },
-        },
-        {
-          id: 24,
-          cat: "🥩 Proteine Protagoniste",
-          name: "Branzino al sale con patate dolci e asparagi",
-          tags: ["pesce", "forno", "dietetico"],
-          ing: {
-            proteine: ["Branzino"],
-            carb: ["Patate dolci"],
-            verd: ["Asparagi"],
-            salse: ["Limone", "Olio EVO"],
-          },
-        },
-        // 🥚 Uova & Formaggi
-        {
-          id: 25,
-          cat: "🥚 Uova & Formaggi",
-          name: "Uova strapazzate con zucchine trifolate e riso",
-          tags: ["uova", "zucchine", "quick"],
-          ing: {
-            proteine: ["Uova strapazzate"],
-            carb: ["Riso basmati"],
-            verd: ["Zucchine"],
-            salse: ["Olio EVO"],
-            aromi: ["Erba cipollina"],
-          },
-        },
-        {
-          id: 26,
-          cat: "🥚 Uova & Formaggi",
-          name: "Frittata al forno con spinaci e feta",
-          tags: ["uova", "feta", "forno"],
-          ing: {
-            proteine: ["Frittata al forno", "Feta"],
-            verd: ["Spinaci", "Cipolla bianca"],
-            salse: ["Olio EVO"],
-            aromi: ["Origano"],
-          },
-        },
-        {
-          id: 27,
-          cat: "🥚 Uova & Formaggi",
-          name: "Panino ricotta, tacchino, rucola e glassa balsamica",
-          tags: ["panino", "tacchino", "ricotta"],
-          ing: {
-            proteine: [
-              "Fesa di tacchino",
-              "Ricotta vaccina",
-              "Uova strapazzate",
-            ],
-            carb: ["Pane ai cereali"],
-            verd: ["Rucola"],
-            salse: ["Glassa balsamica"],
-          },
-        },
-        {
-          id: 28,
-          cat: "🥚 Uova & Formaggi",
-          name: "Frittata di verdure al forno con feta e erbe",
-          tags: ["uova", "verdure", "light"],
-          ing: {
-            proteine: ["Frittata al forno", "Feta"],
-            verd: ["Peperoni", "Zucchine", "Cipolla rossa"],
-            aromi: ["Origano", "Timo", "Olio EVO"],
-          },
-        },
-        // 🫘 Legumi & Verdure
-        {
-          id: 29,
-          cat: "🫘 Legumi & Verdure",
-          name: "Hummus di ceci con pane integrale e melanzane grigliate",
-          tags: ["legumi", "vegan", "pane"],
-          ing: {
-            proteine: ["Ceci", "Hummus di ceci"],
-            carb: ["Pane integrale"],
-            verd: ["Melanzane"],
-            salse: ["Olio EVO", "Limone"],
-            aromi: ["Paprika dolce"],
-          },
-        },
-        {
-          id: 30,
-          cat: "🫘 Legumi & Verdure",
-          name: "Lenticchie al pomodoro con cipolla e acciughe",
-          tags: ["legumi", "umido", "rustico"],
-          ing: {
-            proteine: ["Lenticchie verdi", "Acciughe"],
-            carb: ["Riso basmati"],
-            verd: ["Cipolla rossa"],
-            salse: ["Salsa di pomodoro", "Olio EVO"],
-          },
-        },
-        {
-          id: 31,
-          cat: "🫘 Legumi & Verdure",
-          name: "Bowl di ceci al curry, riso basmati e spinaci",
-          tags: ["legumi", "curry", "bowl"],
-          ing: {
-            proteine: ["Ceci"],
-            carb: ["Riso basmati"],
-            verd: ["Spinaci", "Cipolla bianca"],
-            salse: ["Salsa di pomodoro"],
-            aromi: ["Curry", "Curcuma", "Zenzero fresco"],
-          },
-        },
-        {
-          id: 32,
-          cat: "🫘 Legumi & Verdure",
-          name: "Zuppa di fagioli cannellini con rosmarino e pane tostato",
-          tags: ["legumi", "zuppa", "invernale"],
-          ing: {
-            proteine: ["Fagioli cannellini"],
-            carb: ["Pane ai cereali"],
-            verd: ["Cipolla bianca", "Sedano", "Carote"],
-            aromi: ["Rosmarino", "Aglio", "Olio EVO"],
-          },
-        },
-        {
-          id: 33,
-          cat: "🫘 Legumi & Verdure",
-          name: "Lenticchie rosse con cocco e zenzero su riso integrale",
-          tags: ["legumi", "fusion", "vegan"],
-          ing: {
-            proteine: ["Lenticchie rosse"],
-            carb: ["Riso integrale"],
-            verd: ["Cipolla bianca"],
-            aromi: ["Zenzero fresco", "Curcuma", "Curry"],
-          },
-        },
-        // 🥗 Bowl & Insalate
-        {
-          id: 34,
-          cat: "🥗 Bowl & Insalate",
-          name: "Bowl mediterranea: bulgur, feta, olive e pomodorini",
-          tags: ["bulgur", "feta", "estate"],
-          ing: {
-            proteine: ["Feta"],
-            carb: ["Bulgur"],
-            verd: ["Pomodorini ciliegino", "Cetrioli", "Cipolla rossa"],
-            aromi: ["Olive nere", "Menta", "Olio EVO"],
-          },
-        },
-        {
-          id: 35,
-          cat: "🥗 Bowl & Insalate",
-          name: "Insalata tiepida di lenticchie, radicchio e noci",
-          tags: ["legumi", "insalata", "autunno"],
-          ing: {
-            proteine: ["Lenticchie verdi"],
-            verd: ["Radicchio", "Cipolla rossa"],
-            salse: ["Glassa balsamica", "Olio EVO"],
-            aromi: ["Noci"],
-          },
-        },
-        {
-          id: 36,
-          cat: "🥗 Bowl & Insalate",
-          name: "Insalata di sgombro, fagiolini e uova sode",
-          tags: ["pesce", "uova", "estate"],
-          ing: {
-            proteine: ["Sgombro in scatola", "Uova sode"],
-            verd: ["Fagiolini", "Pomodorini ciliegino"],
-            salse: ["Olio EVO", "Aceto di mele"],
-          },
-        },
-        {
-          id: 37,
-          cat: "🥗 Bowl & Insalate",
-          name: "Caesar salad con petto di pollo e parmigiano",
-          tags: ["pollo", "insalata", "classica"],
-          ing: {
-            proteine: ["Petto di pollo"],
-            verd: ["Lattuga/misticanza"],
-            aromi: ["Parmigiano grattugiato", "Aglio"],
-            salse: ["Maionese light", "Limone"],
-          },
-        },
-      ];
 
-      const SHOP_CATS = {
-        "🥩 Carni": [
-          "Petto di pollo",
-          "Sovracosce di pollo",
-          "Ali di pollo",
-          "Pollo intero",
-          "Straccetti di pollo",
-          "Pollo marinato",
-          "Fesa di tacchino",
-          "Arrosto di tacchino",
-          "Polpette di tacchino",
-          "Tacchino alla griglia",
-          "Bistecca di manzo",
-          "Straccetti di manzo",
-          "Hamburger di manzo",
-          "Carpaccio di manzo",
-          "Bresaola",
-          "Polpette di manzo",
-          "Manzo spezzatino",
-          "Tagliata di manzo",
-          "Tartare di manzo",
-          "Lonza di maiale",
-          "Filetto di maiale",
-          "Prosciutto crudo",
-          "Prosciutto cotto",
-          "Pancetta/guanciale",
-          "Polpette di suino",
-          "Speck",
-        ],
-        "🐟 Pesce": [
-          "Orata",
-          "Branzino",
-          "Salmone fresco",
-          "Trota salmonata",
-          "Merluzzo",
-          "Sgombro fresco",
-          "Tonno fresco",
-          "Calamari",
-          "Gamberetti",
-          "Tonno al naturale",
-          "Tonno in olio",
-          "Sgombro in scatola",
-          "Salmone affumicato",
-          "Acciughe",
-          "Sardine",
-          "Polpo precotto",
-        ],
-        "🥚 Uova & Latticini": [
-          "Uova strapazzate",
-          "Uova sode",
-          "Frittata",
-          "Frittata al forno",
-          "Ricotta vaccina",
-          "Ricotta di pecora",
-          "Mozzarella",
-          "Mozzarella light",
-          "Fiocchi di latte",
-          "Primo sale",
-          "Feta",
-          "Pecorino",
-          "Parmigiano/Grana",
-          "Scamorza",
-          "Parmigiano grattugiato",
-          "Sottilette",
-        ],
-        "🫘 Legumi": [
-          "Ceci",
-          "Lenticchie rosse",
-          "Lenticchie verdi",
-          "Fagioli cannellini",
-          "Fagioli borlotti",
-          "Fagioli rossi",
-          "Edamame",
-          "Soia gialla",
-          "Piselli",
-          "Tofu naturale",
-          "Tofu affumicato",
-          "Tempeh",
-          "Hummus di ceci",
-          "Hummus di barbabietola",
-        ],
-        "🍚 Carboidrati": [
-          "Spaghetti",
-          "Penne",
-          "Trofie",
-          "Rigatoni",
-          "Fusilli",
-          "Pasta integrale",
-          "Pasta ai legumi",
-          "Orecchiette",
-          "Tagliatelle",
-          "Riso basmati",
-          "Riso integrale",
-          "Riso venere",
-          "Cous cous",
-          "Bulgur",
-          "Farro",
-          "Orzo",
-          "Quinoa",
-          "Miglio",
-          "Pane integrale",
-          "Pane ai cereali",
-          "Piadina",
-          "Pita",
-          "Wrap",
-          "Gnocchi di patate",
-          "Crackers integrali",
-          "Crostini di pane",
-          "Pangrattato",
-          "Saikebon",
-        ],
-        "🥦 Frutta & Verdura": [
-          "Zucchine",
-          "Melanzane",
-          "Peperoni",
-          "Peperoncino fresco",
-          "Pomodorini ciliegino",
-          "Pomodori ramati",
-          "Cetrioli",
-          "Mais",
-          "Spinaci",
-          "Finocchi",
-          "Broccoli",
-          "Cavolfiore",
-          "Cavolo verza",
-          "Bietole",
-          "Radicchio",
-          "Asparagi",
-          "Fagiolini",
-          "Carote",
-          "Cipolla rossa",
-          "Cipolla bianca",
-          "Sedano",
-          "Barbabietola",
-          "Funghi champignon",
-          "Avocado",
-          "Rucola",
-          "Lattuga/misticanza",
-          "Patate",
-          "Patate dolci",
-          "Porri",
-        ],
-        "🥄 Salse & Condimenti": [
-          "Olio EVO",
-          "Salsa di pomodoro",
-          "Passata di pomodoro",
-          "Pesto basilico",
-          "Pesto rucola",
-          "Salsa di soia",
-          "Salsa tahina",
-          "Yogurt greco",
-          "Tzatziki",
-          "Hummus",
-          "Glassa balsamica",
-          "Aceto balsamico",
-          "Aceto di mele",
-          "Maionese light",
-          "Senape Dijon",
-          "Senape al miele",
-          "Panna",
-          "Limone",
-          "Lime",
-        ],
-        "🧄 Aromi & Spezie": [
-          "Aglio",
-          "Prezzemolo",
-          "Basilico",
-          "Menta",
-          "Erba cipollina",
-          "Rosmarino",
-          "Timo",
-          "Salvia",
-          "Zenzero fresco",
-          "Peperoncino fresco",
-          "Origano",
-          "Paprika dolce",
-          "Paprika affumicata",
-          "Curry",
-          "Cumino",
-          "Curcuma",
-          "Peperoncino secco",
-          "Cannella",
-        ],
-        "🫙 Dispensa": [
-          "Olive nere",
-          "Olive verdi",
-          "Olive taggiasche",
-          "Capperi",
-          "Pomodori secchi",
-          "Semi di sesamo",
-          "Semi di zucca",
-          "Noci",
-          "Mandorle",
-          "Pistacchi",
-          "Anacardi",
-          "Pinoli",
-        ],
-      };
+
 
       /* ═══════════════════════════════════════════════
    STATE
@@ -3116,8 +2631,107 @@
         renderRecCatTabs();
         renderRecipes();
         renderStaples();
+        renderMobileStaples();
         renderAll();
         observeSections();
+        prepareModePicker();
+      }
+
+      /* ─── APP MODE ────────────────────────────────── */
+      function getSuggestedMode() {
+        const compactViewport = window.matchMedia("(max-width: 700px)").matches;
+        const touchPrimary = window.matchMedia("(pointer: coarse)").matches;
+        return compactViewport || touchPrimary ? "mobile" : "desktop";
+      }
+      function readSavedMode() {
+        try {
+          const saved = localStorage.getItem(MODE_STORAGE_KEY);
+          return saved === "mobile" || saved === "desktop" ? saved : null;
+        } catch {
+          return null;
+        }
+      }
+      function prepareModePicker() {
+        const suggested = getSuggestedMode();
+        const saved = readSavedMode();
+        const preferred = saved || suggested;
+        const copy = document.getElementById("modeGateCopy");
+        const mobileCard = document.getElementById("modeMobileCard");
+        const desktopCard = document.getElementById("modeDesktopCard");
+        document.getElementById("modeMobileHint").textContent =
+          preferred === "mobile" ? saved ? "Ultima scelta" : "Consigliata per questo dispositivo" : "";
+        document.getElementById("modeDesktopHint").textContent =
+          preferred === "desktop" ? saved ? "Ultima scelta" : "Consigliata per questo dispositivo" : "";
+        mobileCard.classList.toggle("is-suggested", preferred === "mobile");
+        desktopCard.classList.toggle("is-suggested", preferred === "desktop");
+        copy.textContent = saved
+          ? `Ultima scelta: ${saved === "mobile" ? "Mobile" : "Desktop"}. Puoi cambiarla in qualsiasi momento.`
+          : `Ti suggeriamo ${suggested === "mobile" ? "Mobile" : "Desktop"}, ma la scelta è sempre tua.`;
+      }
+      function selectMode(mode) {
+        if (mode !== "mobile" && mode !== "desktop") return;
+        currentMode = mode;
+        document.body.classList.remove("mode-mobile", "mode-desktop");
+        document.body.classList.add(`mode-${mode}`);
+        if (mode === "mobile") {
+          setMobileView(document.body.dataset.mobileView || "home", false);
+        }
+        try {
+          localStorage.setItem(MODE_STORAGE_KEY, mode);
+        } catch {}
+        document.getElementById("splash").classList.add("is-hidden");
+        document.querySelectorAll("section").forEach((section) =>
+          section.classList.add("visible"),
+        );
+      }
+      function showModePicker() {
+        prepareModePicker();
+        document.getElementById("splash").classList.remove("is-hidden");
+      }
+      function setMobileView(view, shouldScroll = true) {
+        if (!["home", "piano", "ricette", "spesa", "altro"].includes(view))
+          return;
+        document.body.dataset.mobileView = view;
+        document.querySelectorAll("[data-mobile-nav]").forEach((button) =>
+          button.classList.toggle("active", button.dataset.mobileNav === view),
+        );
+        if (view === "ricette") document.getElementById("cB").classList.add("open");
+        if (shouldScroll) window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      function openMobileBuilder() {
+        setMobileView("ricette");
+        const builder = document.getElementById("cA");
+        builder.classList.add("open");
+        setTimeout(() => builder.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+      }
+      function renderMobileHome() {
+        const total = ST.sM + ST.dM;
+        const planned = ST.meals.reduce((sum, meal) => sum + (meal.reps || 1), 0);
+        const next = ST.meals[0];
+        document.getElementById("mTodayMeal").textContent = next
+          ? next.name
+          : "Pianifica il tuo primo pasto";
+        document.getElementById("mTodayMeta").textContent = next
+          ? `${next.type === "single" ? "👤 Pasto singolo" : "👥 Pasto di coppia"} · ${next.reps || 1}× questa settimana`
+          : "Apri le ricette e aggiungi quello che ti va oggi.";
+        document.getElementById("mTodayProgress").textContent = `${planned} / ${total}`;
+      }
+      function renderMobileStaples() {
+        const container = document.getElementById("mobileStaples");
+        container.innerHTML = Object.entries(STAPLES)
+          .map(
+            ([category, items]) =>
+              `<div class="mobile-staple-group"><div class="mobile-staple-title">${escHtml(category)}</div><div class="mobile-staple-items">${items
+                .map(
+                  (item) =>
+                    `<button type="button" class="mobile-staple" data-staple="${escHtml(item)}">${escHtml(item)}</button>`,
+                )
+                .join("")}</div></div>`,
+          )
+          .join("");
+        container.querySelectorAll("[data-staple]").forEach((button) =>
+          button.addEventListener("click", () => copyItem(button.dataset.staple, button)),
+        );
       }
 
       /* ─── PARTICLES ───────────────────────────────── */
@@ -3180,12 +2794,33 @@
           `💡 ${dm} pasti · ${dr} ricette → ogni ricetta ${fmtRep(dm, dr)}`;
       }
       function applySetup() {
-        ST.sM = parseInt(document.getElementById("sM").value) || 0;
-        ST.sR = Math.max(1, parseInt(document.getElementById("sR").value) || 1);
-        ST.dM = parseInt(document.getElementById("dM").value) || 0;
-        ST.dR = Math.max(1, parseInt(document.getElementById("dR").value) || 1);
+        const clamp = (value, min) =>
+          Math.max(min, Math.min(21, parseInt(value) || 0));
+        const planned = (type) =>
+          ST.meals
+            .filter((meal) => meal.type === type)
+            .reduce((total, meal) => total + (meal.reps || 1), 0);
+        const singlePlanned = planned("single");
+        const doublePlanned = planned("double");
+        const requestedSingles = clamp(document.getElementById("sM").value, 0);
+        const requestedDoubles = clamp(document.getElementById("dM").value, 0);
+
+        // Never make an existing plan exceed the configured weekly capacity.
+        ST.sM = Math.max(requestedSingles, singlePlanned);
+        ST.sR = clamp(document.getElementById("sR").value, 1);
+        ST.dM = Math.max(requestedDoubles, doublePlanned);
+        ST.dR = clamp(document.getElementById("dR").value, 1);
+        document.getElementById("sM").value = ST.sM;
+        document.getElementById("sR").value = ST.sR;
+        document.getElementById("dM").value = ST.dM;
+        document.getElementById("dR").value = ST.dR;
+        hints();
         renderAll();
-        toast("✅ Impostazioni aggiornate");
+        toast(
+          requestedSingles < singlePlanned || requestedDoubles < doublePlanned
+            ? "⚠️ Limite mantenuto almeno pari ai pasti già pianificati"
+            : "✅ Impostazioni aggiornate",
+        );
       }
 
       /* ─── INGREDIENT PANEL ────────────────────────── */
@@ -3263,22 +2898,22 @@
         results.style.display = "";
 
         // Collect all matching ingredients across all categories
-        const matches = [];
+        const matches = new Set();
         Object.entries(INGREDIENTS).forEach(([cat, subs]) => {
           Object.entries(subs).forEach(([sub, items]) => {
             items.forEach((item) => {
-              if (item.toLowerCase().includes(q)) matches.push(item);
+              if (item.toLowerCase().includes(q)) matches.add(item);
             });
           });
         });
 
-        if (!matches.length) {
+        if (!matches.size) {
           results.innerHTML = `<div class="ing-search-empty">Nessun ingrediente trovato per "<strong>${escHtml(query)}</strong>"</div>`;
           return;
         }
 
         // Build chips from matches, preserving sel state
-        results.innerHTML = `<div class="ing-search-count">${matches.length} risultat${matches.length === 1 ? "o" : "i"}</div>`;
+        results.innerHTML = `<div class="ing-search-count">${matches.size} risultat${matches.size === 1 ? "o" : "i"}</div>`;
         const chipsWrap = document.createElement("div");
         chipsWrap.className = "chips";
         matches.forEach((item) => {
@@ -3368,7 +3003,11 @@
       }
 
       /* ─── RECIPES ─────────────────────────────────── */
-      const REC_CATS = ["all", ...new Set(RECIPES.map((r) => r.cat))];
+      const recipeCategory = (recipe) => recipe.cat || "Senza categoria";
+      const REC_CATS = [
+        "all",
+        ...new Set(RECIPES.map((recipe) => recipeCategory(recipe))),
+      ];
       function renderRecCatTabs() {
         const el = document.getElementById("rcatTabs");
         el.innerHTML = "";
@@ -3395,15 +3034,15 @@
         const list =
           ST.activeRCat === "all"
             ? RECIPES
-            : RECIPES.filter((r) => r.cat === ST.activeRCat);
+            : RECIPES.filter((r) => recipeCategory(r) === ST.activeRCat);
         list.forEach((r) => {
           const card = document.createElement("div");
           card.className = "rc";
           card.id = "rc" + r.id;
-          const allIng = Object.values(r.ing).flat();
+          const tags = Array.isArray(r.tags) ? r.tags : [];
           card.innerHTML = `
       <div class="rc-name">${r.name}</div>
-      <div class="rc-tags">${r.tags.map((t) => `<span class="rc-tag">${t}</span>`).join("")}</div>
+      <div class="rc-tags">${tags.map((t) => `<span class="rc-tag">${t}</span>`).join("")}</div>
       <div class="rc-actions">
         <button class="rcb2 rcs" onclick="addRec(${r.id},'single')">👤 Singolo</button>
         <button class="rcb2 rcd" onclick="addRec(${r.id},'double')">👥 Coppia</button>
@@ -3415,6 +3054,10 @@
       function addRec(id, type) {
         // Opens reps modal — type pre-selects the button highlight
         const rec = RECIPES.find((r) => r.id === id);
+        if (!rec) {
+          toast("⚠️ Ricetta non disponibile");
+          return;
+        }
         openRepsModal(rec, type);
       }
 
@@ -3423,6 +3066,10 @@
       let _repsType = null;
 
       function openRepsModal(rec, preferredType) {
+        if (!rec || !rec.name || !rec.ing) {
+          toast("⚠️ Ricetta non valida");
+          return;
+        }
         _repsRec = rec;
         _repsType = preferredType;
         document.getElementById("repsRecName").textContent = rec.name;
@@ -3497,9 +3144,13 @@
       });
       function copyRecipe(id, btn) {
         const rec = RECIPES.find((r) => r.id === id);
-        const allIng = Object.values(rec.ing).flat();
+        if (!rec) {
+          toast("⚠️ Ricetta non disponibile");
+          return;
+        }
+        const allIng = Object.values(rec.ing || {}).flat();
         const text = `📖 ${rec.name}\n\nIngredienti:\n${allIng.map((i) => `• ${i}`).join("\n")}`;
-        navigator.clipboard.writeText(text).then(() => {
+        copyText(text).then(() => {
           const orig = btn.textContent;
           btn.textContent = "✓";
           btn.style.color = "var(--green)";
@@ -3508,7 +3159,7 @@
             btn.style.color = "";
           }, 1600);
           toast("📋 Ricetta copiata!");
-        });
+        }).catch(() => toast("⚠️ Copia non riuscita"));
       }
 
       /* ─── MEAL MANAGEMENT ─────────────────────────── */
@@ -3537,6 +3188,7 @@
         renderSidebar();
         renderTracker();
         renderShop();
+        renderMobileHome();
       }
 
       /* ─── SIDEBAR ─────────────────────────────────── */
@@ -3655,6 +3307,14 @@
           upd.addEventListener("click", () => {
             const newReps =
               parseInt(document.getElementById("repsVal").textContent) || 1;
+            const limit = meal.type === "single" ? ST.sM : ST.dM;
+            const others = ST.meals
+              .filter((item) => item.type === meal.type && item.id !== meal.id)
+              .reduce((total, item) => total + (item.reps || 1), 0);
+            if (others + newReps > limit) {
+              toast("⚠️ Le ripetizioni supererebbero il limite impostato");
+              return;
+            }
             meal.reps = newReps;
             closeRepsModal();
             btns.querySelector(".update-reps")?.remove();
@@ -3780,7 +3440,7 @@
 
       /* ─── UTILS ───────────────────────────────────── */
       function escHtml(str) {
-        return str
+        return String(str ?? "")
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
@@ -3795,8 +3455,7 @@
         el.closest(".shop-item").classList.toggle("done");
       }
       function copyItem(name, btn) {
-        navigator.clipboard
-          .writeText(name)
+        copyText(name)
           .then(() => {
             const orig = btn.textContent;
             btn.textContent = "✓";
@@ -3825,8 +3484,7 @@
         btn.classList.add("active");
       }
       function copyMealName(name, btn) {
-        navigator.clipboard
-          .writeText(name)
+        copyText(name)
           .then(() => {
             const orig = btn.textContent;
             btn.textContent = "✓";
@@ -3844,6 +3502,18 @@
         t.classList.add("show");
         clearTimeout(t._t);
         t._t = setTimeout(() => t.classList.remove("show"), 3000);
+      }
+      function copyText(text) {
+        if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.cssText = "position:fixed;opacity:0;pointer-events:none";
+        document.body.appendChild(area);
+        area.select();
+        const copied = document.execCommand("copy");
+        area.remove();
+        return copied ? Promise.resolve() : Promise.reject(new Error("Copy failed"));
       }
 
       /* ─── START ───────────────────────────────────── */
