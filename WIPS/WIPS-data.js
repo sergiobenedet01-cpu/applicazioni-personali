@@ -134,14 +134,14 @@ window.WIPS_DATA = {
   },
 
   DEFAULT_PRICES: {
-    bitcoin: 68635.21,
-    ethereum: 2241.18,
-    solana: 90.47,
-    polkadot: 0.8914,
-    ripple: 1.2842,
-    avalanche: 6.69,
-    dogecoin: 0.0741,
-    cardano: 0.1859,
+    bitcoin: 67451.6,
+    ethereum: 2162.7,
+    solana: 91.81,
+    polkadot: 0.9985,
+    ripple: 1.15117,
+    avalanche: 6.882,
+    dogecoin: 0.0733274,
+    cardano: 0.186103,
 
     "XAIX.DE": 208.05,
     "WNUC.L": 43.74,

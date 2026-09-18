@@ -467,13 +467,47 @@
         transform: rotate(180deg);
         color: var(--acc);
       }
+      .crypto-quick-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--sp-3);
+        padding: 0 0 var(--sp-2);
+      }
+      .crypto-quick-refresh {
+        flex: 0 0 auto;
+        min-height: 30px;
+        padding: 6px 11px;
+        border: 1px solid rgba(0, 229, 160, 0.3);
+        border-radius: 6px;
+        background: var(--go2);
+        color: var(--go);
+        cursor: pointer;
+        font-family: var(--SA);
+        font-size: 0.69rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+      .crypto-quick-refresh:hover:not(:disabled) {
+        background: rgba(0, 229, 160, 0.18);
+      }
+      .crypto-quote-summary {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.61rem;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .cb {
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .cb.open {
-        max-height: 700px;
+        max-height: 1000px;
       }
 
       /* ─ PRICE PANEL ─────────────────────────────────────────────────── */
@@ -504,6 +538,22 @@
       .prow.hv {
         border-color: rgba(0, 229, 160, 0.16);
         background: rgba(0, 229, 160, 0.025);
+      }
+      .prow.crypto-prow {
+        grid-template-columns: minmax(150px, 1fr) minmax(118px, 140px) minmax(118px, 140px) 28px;
+        gap: var(--sp-2);
+      }
+      .quote-input-field {
+        min-width: 0;
+      }
+      .quote-input-label {
+        display: block;
+        margin: 0 0 3px 1px;
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.56rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
       }
       .plbl {
         font-family: var(--SA);
@@ -539,6 +589,61 @@
       .pinp.fi {
         border-color: rgba(0, 229, 160, 0.4);
         color: var(--go);
+      }
+      .trinp {
+        color: var(--bl);
+      }
+      .trinp.fi {
+        border-color: rgba(79, 141, 255, 0.45);
+        color: var(--bl);
+      }
+      .quote-compare {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 3px var(--sp-3);
+        min-height: 18px;
+        padding: 1px 1px 0;
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.61rem;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+      }
+      .quote-compare strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .quote-compare .quote-delta {
+        font-weight: 700;
+      }
+      .quote-delta.above {
+        color: var(--go);
+      }
+      .quote-delta.below {
+        color: var(--re);
+      }
+      .quote-delta.equal {
+        color: var(--t3);
+      }
+      @media (max-width: 720px) {
+        .crypto-quick-row {
+          justify-content: space-between;
+        }
+        .crypto-quote-summary {
+          text-align: left;
+        }
+        .prow.crypto-prow {
+          grid-template-columns: 1fr 28px;
+        }
+        .crypto-prow .quote-input-field {
+          grid-column: 1 / 2;
+        }
+        .crypto-prow .pdel {
+          grid-column: 2;
+          grid-row: 1;
+        }
       }
       .pdel {
         background: transparent;
@@ -3076,6 +3181,12 @@
 
     <!-- ══════════════════════════ PREZZI CRYPTO ═══════════════════════ -->
     <div class="cw">
+      <div class="crypto-quick-row">
+        <span class="crypto-quote-summary" id="cryptoQuoteSummary"></span>
+        <button class="crypto-quick-refresh" id="cryptoQuoteQuickBtn" data-crypto-refresh data-label="↻ Aggiorna Kraken" type="button" onclick="refreshCryptoQuotes()">
+          ↻ Aggiorna Kraken
+        </button>
+      </div>
       <button class="ct" id="ct-crypto" onclick="toggleC('crypto')">
         <div class="ct-l">
           <div class="ct-ic">🪙</div>
@@ -3091,7 +3202,7 @@
         <div class="pp">
           <div class="ppg" id="pe-crypto"></div>
           <div class="quote-actions">
-            <button class="pab quote-refresh" id="cryptoQuoteBtn" type="button" onclick="refreshCryptoQuotes()">
+            <button class="pab quote-refresh" id="cryptoQuoteBtn" data-crypto-refresh data-label="↻ Aggiorna quotazioni Crypto" type="button" onclick="refreshCryptoQuotes()">
               ↻ Aggiorna quotazioni Crypto
             </button>
             <button class="pab" type="button" onclick="applyP('crypto')">
@@ -3520,9 +3631,11 @@
             CRYPTO QUOTES — indicativi EUR, separati dai dati statici
             ═══════════════════════════════════════════════════════════════════ */
       var CRYPTO_QUOTE_META_KEY = "wips_crypto_quote_meta_v1";
+      var TRADE_REPUBLIC_QUOTES_KEY = "wips_trade_republic_quotes_v1";
       var CRYPTO_QUOTE_TIMEOUT_MS = 10000;
       var cryptoQuoteRefreshInFlight = false;
       var cryptoQuoteMeta = null;
+      var tradeRepublicQuotes = {};
       var KRAKEN_CRYPTO_PAIRS = {
         bitcoin: { pair: "XBTEUR", aliases: ["XXBTZEUR", "XBTEUR", "BTCEUR"] },
         ethereum: { pair: "ETHEUR", aliases: ["XETHZEUR", "ETHEUR"] },
@@ -3562,10 +3675,151 @@
             typeof saved.updatedAt === "string" &&
             !isNaN(Date.parse(saved.updatedAt))
           )
-            cryptoQuoteMeta = saved;
+            cryptoQuoteMeta = {
+              source: saved.source,
+              updatedAt: saved.updatedAt,
+              quotes: sanitiseQuoteMap(saved.quotes),
+            };
         } catch (e) {
           console.warn("WIPS: metadati quotazioni crypto non leggibili", e);
         }
+      }
+
+      function sanitiseQuoteMap(value) {
+        var clean = {};
+        if (!value || typeof value !== "object") return clean;
+        for (var id in KRAKEN_CRYPTO_PAIRS) {
+          var quote = Number(value[id]);
+          if (isFinite(quote) && quote > 0) clean[id] = quote;
+        }
+        return clean;
+      }
+
+      function saveTradeRepublicQuotes() {
+        try {
+          localStorage.setItem(
+            TRADE_REPUBLIC_QUOTES_KEY,
+            JSON.stringify(tradeRepublicQuotes),
+          );
+        } catch (e) {
+          console.warn("WIPS: impossibile salvare quotazioni Trade Republic", e);
+        }
+      }
+
+      function loadTradeRepublicQuotes() {
+        try {
+          var raw = localStorage.getItem(TRADE_REPUBLIC_QUOTES_KEY);
+          if (!raw) return;
+          var saved = JSON.parse(raw);
+          if (!saved || typeof saved !== "object") return;
+          var clean = {};
+          for (var id in KRAKEN_CRYPTO_PAIRS) {
+            var entry = saved[id];
+            var quote = entry && Number(entry.price);
+            if (
+              isFinite(quote) &&
+              quote > 0 &&
+              entry &&
+              typeof entry.updatedAt === "string" &&
+              !isNaN(Date.parse(entry.updatedAt))
+            )
+              clean[id] = { price: quote, updatedAt: entry.updatedAt };
+          }
+          tradeRepublicQuotes = clean;
+        } catch (e) {
+          console.warn("WIPS: quotazioni Trade Republic non leggibili", e);
+          tradeRepublicQuotes = {};
+        }
+      }
+
+      function quoteDisplay(value) {
+        return formatDisplayNumber(value, UI_MAX_DECIMALS) + " €";
+      }
+
+      function quoteTimeDisplay(timestamp) {
+        var when = new Date(timestamp);
+        return isNaN(when.getTime()) ? "—" : when.toLocaleString("it-IT");
+      }
+
+      function cryptoQuoteComparisonMarkup(id) {
+        var krakenQuote =
+          cryptoQuoteMeta && cryptoQuoteMeta.quotes
+            ? Number(cryptoQuoteMeta.quotes[id])
+            : NaN;
+        var trQuote = tradeRepublicQuotes[id];
+        if (!isFinite(krakenQuote) || krakenQuote <= 0) {
+          if (trQuote)
+            return (
+              '<span>Fallback Trade Republic <strong>' +
+              quoteDisplay(trQuote.price) +
+              "</strong> · " +
+              quoteTimeDisplay(trQuote.updatedAt) +
+              '</span><span>Kraken: aggiorna le quotazioni per il confronto.</span>'
+            );
+          return '<span>Kraken: aggiorna le quotazioni per confrontare con Trade Republic.</span>';
+        }
+        var kraken =
+          '<span>Kraken <strong>' +
+          quoteDisplay(krakenQuote) +
+          "</strong> · " +
+          quoteTimeDisplay(cryptoQuoteMeta.updatedAt) +
+          "</span>";
+        if (!trQuote)
+          return kraken + '<span>Trade Republic: inserisci il prezzo manuale.</span>';
+        var delta = krakenQuote - trQuote.price;
+        var deltaPct = (delta / trQuote.price) * 100;
+        var direction = delta > 0 ? "above" : delta < 0 ? "below" : "equal";
+        var symbol = delta > 0 ? "↑" : delta < 0 ? "↓" : "=";
+        var signedEuro = (delta > 0 ? "+" : "") + quoteDisplay(delta);
+        var signedPct =
+          (deltaPct > 0 ? "+" : "") +
+          formatDisplayNumber(deltaPct, UI_MAX_DECIMALS) +
+          "%";
+        return (
+          kraken +
+          '<span>Trade Republic <strong>' +
+          quoteDisplay(trQuote.price) +
+          "</strong> · " +
+          quoteTimeDisplay(trQuote.updatedAt) +
+          "</span>" +
+          '<span class="quote-delta ' +
+          direction +
+          '">Δ Kraken − TR: ' +
+          symbol +
+          " " +
+          signedEuro +
+          " (" +
+          signedPct +
+          ")</span>"
+        );
+      }
+
+      function renderCryptoQuoteComparison(id) {
+        var target = g("quote-compare-" + id);
+        if (target) target.innerHTML = cryptoQuoteComparisonMarkup(id);
+      }
+
+      function setTradeRepublicQuote(input) {
+        var id = input.dataset.id;
+        var raw = input.value.trim();
+        if (!raw) {
+          delete tradeRepublicQuotes[id];
+          input.classList.remove("fi");
+          saveTradeRepublicQuotes();
+          renderCryptoQuoteComparison(id);
+          renderCryptoQuoteSummary();
+          return;
+        }
+        var quote = Number(raw.replace(",", "."));
+        if (!isFinite(quote) || quote <= 0) {
+          showToast("⚠ Inserisci un prezzo Trade Republic valido");
+          return;
+        }
+        tradeRepublicQuotes[id] = { price: quote, updatedAt: new Date().toISOString() };
+        input.classList.add("fi");
+        saveTradeRepublicQuotes();
+        renderCryptoQuoteComparison(id);
+        renderCryptoQuoteSummary();
       }
 
       function setCryptoQuoteStatus(message, state) {
@@ -3575,10 +3829,34 @@
         status.textContent = message || "";
       }
 
+      function renderCryptoQuoteSummary() {
+        var summary = g("cryptoQuoteSummary");
+        if (!summary) return;
+        var ids = Object.keys(tradeRepublicQuotes);
+        if (!ids.length) {
+          summary.textContent = "Fallback Trade Republic locale: nessun prezzo";
+          return;
+        }
+        var latest = ids.reduce(function (current, id) {
+          var candidate = tradeRepublicQuotes[id];
+          return !current || Date.parse(candidate.updatedAt) > Date.parse(current.updatedAt)
+            ? candidate
+            : current;
+        }, null);
+        summary.textContent =
+          "Fallback Trade Republic locale: " +
+          ids.length +
+          "/" +
+          P.crypto.length +
+          " · ultimo " +
+          quoteTimeDisplay(latest.updatedAt);
+      }
+
       function renderCryptoQuoteStatus() {
+        renderCryptoQuoteSummary();
         if (!cryptoQuoteMeta || !cryptoQuoteMeta.updatedAt) {
           setCryptoQuoteStatus(
-            "Kraken · quotazioni spot EUR indicative, non prezzi ufficiali Trade Republic.",
+            "Kraken · quotazioni spot EUR indicative. I valori Trade Republic restano disponibili come fallback locale.",
           );
           return;
         }
@@ -3650,10 +3928,10 @@
         }
 
         cryptoQuoteRefreshInFlight = true;
-        var button = g("cryptoQuoteBtn");
-        if (button) {
-          button.disabled = true;
-          button.textContent = "↻ Aggiornamento quotazioni…";
+        var buttons = document.querySelectorAll("[data-crypto-refresh]");
+        for (var buttonIndex = 0; buttonIndex < buttons.length; buttonIndex++) {
+          buttons[buttonIndex].disabled = true;
+          buttons[buttonIndex].textContent = "↻ Aggiornamento…";
         }
         setCryptoQuoteStatus("Recupero quotazioni spot EUR da Kraken…");
 
@@ -3673,6 +3951,7 @@
 
             var updated = [];
             var missing = [];
+            var quoteSnapshot = {};
             cryptoAssets.forEach(function (asset) {
               var quote = tickerLastPrice(payload.result, asset.id);
               if (quote === null) {
@@ -3680,6 +3959,7 @@
                 return;
               }
               prices[asset.id] = quote;
+              quoteSnapshot[asset.id] = quote;
               updated.push(asset.id);
             });
             if (!updated.length)
@@ -3688,6 +3968,7 @@
             cryptoQuoteMeta = {
               source: "Kraken",
               updatedAt: new Date().toISOString(),
+              quotes: quoteSnapshot,
             };
             save();
             saveCryptoQuoteMeta();
@@ -3730,9 +4011,9 @@
           })
           .finally(function () {
             cryptoQuoteRefreshInFlight = false;
-            if (button) {
-              button.disabled = false;
-              button.textContent = "↻ Aggiorna quotazioni Crypto";
+            for (var buttonIndex = 0; buttonIndex < buttons.length; buttonIndex++) {
+              buttons[buttonIndex].disabled = false;
+              buttons[buttonIndex].textContent = buttons[buttonIndex].dataset.label;
             }
           });
       }
@@ -3749,21 +4030,53 @@
           var v = prices[a.id];
           var val = v ? String(v).replace(".", ",") : "";
           h +=
-            '<div class="prow' + (v ? " hv" : "") + '" id="pr-' + a.id + '">';
+            '<div class="prow' +
+            (type === "crypto" ? " crypto-prow" : "") +
+            (v ? " hv" : "") +
+            '" id="pr-' +
+            a.id +
+            '">';
           h +=
             '<div class="plbl">' + a.name + "<small>" + a.id + "</small></div>";
-          h +=
-            '<input class="pinp' +
-            (v ? " fi" : "") +
-            '" type="text" data-id="' +
-            a.id +
-            '" placeholder="prezzo \u20AC" value="' +
-            val +
-            '" oninput="onPI(this)">';
+          if (type === "crypto") {
+            var tr = tradeRepublicQuotes[a.id];
+            var trVal = tr ? String(tr.price).replace(".", ",") : "";
+            h +=
+              '<div class="quote-input-field"><span class="quote-input-label">Prezzo WIPS</span><input class="pinp' +
+              (v ? " fi" : "") +
+              '" type="text" data-id="' +
+              a.id +
+              '" placeholder="prezzo €" value="' +
+              val +
+              '" oninput="onPI(this)"></div>';
+            h +=
+              '<div class="quote-input-field"><span class="quote-input-label">Trade Republic</span><input class="pinp trinp' +
+              (tr ? " fi" : "") +
+              '" type="text" data-id="' +
+              a.id +
+              '" placeholder="prezzo €" value="' +
+              trVal +
+              '" onchange="setTradeRepublicQuote(this)"></div>';
+          } else
+            h +=
+              '<input class="pinp' +
+              (v ? " fi" : "") +
+              '" type="text" data-id="' +
+              a.id +
+              '" placeholder="prezzo \u20AC" value="' +
+              val +
+              '" oninput="onPI(this)">';
           h +=
             '<button class="pdel" onclick="clearP(\'' +
             a.id +
             '\')" title="Cancella">&#215;</button>';
+          if (type === "crypto")
+            h +=
+              '<div class="quote-compare" id="quote-compare-' +
+              a.id +
+              '">' +
+              cryptoQuoteComparisonMarkup(a.id) +
+              "</div>";
           h += "</div>";
         }
         el.innerHTML = h;
@@ -3794,6 +4107,7 @@
         var count = 0;
         for (var i = 0; i < inps.length; i++) {
           var inp = inps[i];
+          if (inp.classList.contains("trinp")) continue;
           if (inp.value.trim() === "") continue;
           var v = parseFloat(inp.value.replace(",", "."));
           if (!isNaN(v) && v > 0) {
@@ -7027,6 +7341,7 @@
             ═════════════════════════════════════════════════════════════════════ */
       load();
       loadCryptoQuoteMeta();
+      loadTradeRepublicQuotes();
       var initialPortfolio = portfolioSnapshot();
       buildPE("crypto", initialPortfolio);
       buildPE("etf", initialPortfolio);
