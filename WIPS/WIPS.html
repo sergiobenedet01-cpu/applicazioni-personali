@@ -3637,6 +3637,13 @@
         var cryptoAssets = P.crypto.filter(function (asset) {
           return !!KRAKEN_CRYPTO_PAIRS[asset.id];
         });
+        var unsupportedAssets = P.crypto
+          .filter(function (asset) {
+            return !KRAKEN_CRYPTO_PAIRS[asset.id];
+          })
+          .map(function (asset) {
+            return asset.name;
+          });
         if (!cryptoAssets.length) {
           setCryptoQuoteStatus("Nessuna criptovaluta supportata per l'aggiornamento.", "warn");
           return;
@@ -3693,14 +3700,15 @@
             if (footer)
               footer.textContent =
                 "Crypto aggiornate: Kraken · " + new Date().toLocaleTimeString("it-IT");
-            if (missing.length) {
+            var notUpdated = missing.concat(unsupportedAssets);
+            if (notUpdated.length) {
               setCryptoQuoteStatus(
                 "Aggiornate " +
                   updated.length +
                   "/" +
-                  cryptoAssets.length +
+                  P.crypto.length +
                   " quotazioni. Valori precedenti mantenuti per: " +
-                  missing.join(", ") +
+                  notUpdated.join(", ") +
                   ".",
                 "warn",
               );
