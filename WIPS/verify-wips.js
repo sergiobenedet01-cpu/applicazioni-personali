@@ -29,6 +29,7 @@ const REQUIRED_APP_FUNCTIONS = [
   "refreshCryptoQuotes",
   "renderAdvisor",
   "renderBudget",
+  "exportFullBackup",
   "exportCSV",
 ];
 

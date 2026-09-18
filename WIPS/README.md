@@ -44,6 +44,16 @@ update-wips-etf-prices.js         Updater locale manuale delle quotazioni ETF
 `WIPS-data.js` contiene solo i valori iniziali. Le modifiche effettuate nella
 pagina vivono nel `localStorage` del browser e hanno precedenza al reload.
 
+## Backup locale completo
+
+Il pulsante **💾 Backup** nell'header scarica un file JSON con portfolio,
+prezzi, metadati crypto, confronti Trade Republic, Budget e importo What-If
+attuale. L'export legge soltanto lo stato: non modifica il browser, i dati
+iniziali o GitHub.
+
+Conserva il file in un luogo privato: contiene i dati finanziari personali
+presenti nel browser. Il ripristino validato verrà aggiunto separatamente.
+
 ## Prezzi crypto
 
 Nella pagina è disponibile il pulsante **Aggiorna Kraken**. Recupera le

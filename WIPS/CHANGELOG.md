@@ -13,6 +13,7 @@ e `Rimosso`.
 - Changelog e procedura di release/rollback documentata.
 - Verificatore locale in sola lettura per sintassi, file essenziali e dati
   iniziali.
+- Export JSON completo e non distruttivo dei dati locali WIPS.
 
 ## Baseline precedente al changelog
 

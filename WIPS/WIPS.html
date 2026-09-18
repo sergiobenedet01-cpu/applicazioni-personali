@@ -3174,6 +3174,9 @@
         <button class="np" id="nb-edit" onclick="switchTab('edit')">
           ⚙️ Portfolio
         </button>
+        <button class="np csv-btn" type="button" onclick="exportFullBackup()">
+          💾 Backup
+        </button>
         <button class="np csv-btn" onclick="exportCSV()">⬇ CSV</button>
       </div>
     </header>
@@ -6140,6 +6143,84 @@
       /* ═══════════════════════════════════════════════════════════════════
             EXPORT SYSTEM
             ═══════════════════════════════════════════════════════════════════ */
+      var BACKUP_FORMAT = "wips-local-backup";
+      var BACKUP_VERSION = 1;
+      var BUDGET_STORAGE_KEY = "wips_budget_cashflow_v3";
+
+      function readOptionalLocalJson(key) {
+        try {
+          var raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function backupFileStamp(date) {
+        function part(value) {
+          return String(value).padStart(2, "0");
+        }
+        return (
+          date.getFullYear() +
+          "-" +
+          part(date.getMonth() + 1) +
+          "-" +
+          part(date.getDate()) +
+          "_" +
+          part(date.getHours()) +
+          "-" +
+          part(date.getMinutes()) +
+          "-" +
+          part(date.getSeconds())
+        );
+      }
+
+      function exportFullBackup() {
+        try {
+          var exportedAt = new Date();
+          var addInput = g("addAmt");
+          var addAmount = addInput ? Number(addInput.value) : 0;
+          var backup = {
+            format: BACKUP_FORMAT,
+            version: BACKUP_VERSION,
+            exportedAt: exportedAt.toISOString(),
+            app: {
+              storageVersion: STORAGE_VERSION,
+              priceVersion: PRICE_VERSION,
+            },
+            portfolio: {
+              P: portfolioSnapshot(),
+              prices: deepClone(prices),
+            },
+            whatIf: {
+              addAmount: isFiniteNumber(addAmount) ? addAmount : 0,
+            },
+            local: {
+              cryptoQuoteMeta: readOptionalLocalJson(CRYPTO_QUOTE_META_KEY),
+              tradeRepublicQuotes: readOptionalLocalJson(
+                TRADE_REPUBLIC_QUOTES_KEY,
+              ),
+              budget: readOptionalLocalJson(BUDGET_STORAGE_KEY),
+            },
+          };
+          var blob = new Blob([JSON.stringify(backup, null, 2)], {
+            type: "application/json",
+          });
+          var link = document.createElement("a");
+          var url = URL.createObjectURL(blob);
+          link.href = url;
+          link.download = "wips-backup-" + backupFileStamp(exportedAt) + ".json";
+          link.click();
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 0);
+          showToast("✓ Backup JSON esportato");
+        } catch (e) {
+          console.warn("WIPS: impossibile esportare il backup", e);
+          showToast("⚠ Backup non esportato");
+        }
+      }
+
       function exportCSV() {
         var add = parseFloat(document.getElementById("addAmt").value) || 0;
         var portfolio = portfolioSnapshot();
