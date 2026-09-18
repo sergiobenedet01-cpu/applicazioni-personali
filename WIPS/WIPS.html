@@ -904,6 +904,15 @@
         margin-bottom: 24px;
         align-items: stretch;
       }
+      /* Le KPI dell'analisi condividono sempre la stessa altezza, anche
+         quando una card contiene il valore potenziale What-If. */
+      .analytics-kpis {
+        grid-auto-rows: minmax(0, 1fr);
+      }
+      .analytics-kpis .kc {
+        min-height: 148px;
+        box-sizing: border-box;
+      }
       .kc {
         background: var(--d2);
         border: 1px solid var(--rim);
@@ -986,6 +995,21 @@
         font-size: 0.63rem;
         color: var(--t3);
         margin-top: 2px;
+      }
+      .kpi-sim-total {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 2px;
+        font-family: var(--MO);
+        font-size: 0.64rem;
+        line-height: 1.3;
+        color: rgba(0, 229, 160, 0.72);
+      }
+      .kpi-sim-total strong {
+        color: var(--go);
+        font-weight: 700;
       }
       .ag2 {
         display: grid;
@@ -3954,6 +3978,15 @@
           pct = tI > 0 ? (pnl / tI) * 100 : 0;
         var addA = parseFloat(document.getElementById("addAmt").value) || 0;
         var inc = tI > 0 ? (addA / tI) * 100 : 0;
+        var potentialInvested =
+          addA > 0
+            ? '<div class="kpi-sim-total" title="Capitale investito dopo il What-If"><strong>' +
+              "+" +
+              N(addA, 2) +
+              ' €</strong><span>→ ' +
+              N(tI + addA, 2) +
+              ' € investiti potenziali</span></div>'
+            : "";
         var wPnl = calcs
           .filter(function (x) {
             return x.c.rp !== null;
@@ -3979,10 +4012,10 @@
 
         var h =
           '<div class="an"><div class="anh"><div class="ant">&#128202; Analisi</div><div class="anl"></div></div>';
-        h += '<div class="kg">';
+        h += '<div class="kg analytics-kpis">';
         h += kpi(
           "Investito",
-          '<span class="y">' + N(tI, 2) + " €</span>",
+          '<span class="y">' + N(tI, 2) + " €</span>" + potentialInvested,
           "ky",
         );
         h += kpi(
