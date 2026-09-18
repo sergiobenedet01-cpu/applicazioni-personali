@@ -52,7 +52,13 @@ attuale. L'export legge soltanto lo stato: non modifica il browser, i dati
 iniziali o GitHub.
 
 Conserva il file in un luogo privato: contiene i dati finanziari personali
-presenti nel browser. Il ripristino validato verrà aggiunto separatamente.
+presenti nel browser.
+
+Il pulsante **📥 Ripristina** apre un'anteprima del file selezionato e abilita
+il ripristino solo per backup WIPS compatibili. Portfolio, prezzi, metadata
+crypto, confronti Trade Republic e Budget sono validati prima della conferma
+finale. Un file corrotto, incompleto o di versione incompatibile non modifica
+mai i dati attuali.
 
 ## Prezzi crypto
 

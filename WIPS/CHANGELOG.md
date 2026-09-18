@@ -14,6 +14,8 @@ e `Rimosso`.
 - Verificatore locale in sola lettura per sintassi, file essenziali e dati
   iniziali.
 - Export JSON completo e non distruttivo dei dati locali WIPS.
+- Ripristino JSON con anteprima, validazione completa, conferma finale e
+  rollback del localStorage in caso di errore di scrittura.
 
 ## Baseline precedente al changelog
 

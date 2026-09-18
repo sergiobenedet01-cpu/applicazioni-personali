@@ -357,6 +357,108 @@
       .np.csv-btn:hover {
         background: var(--bl2);
       }
+      .backup-dialog {
+        width: min(560px, calc(100vw - 32px));
+        max-width: 560px;
+        padding: 0;
+        border: 1px solid var(--rim3);
+        border-radius: var(--radius-lg);
+        background: var(--d2);
+        color: var(--text);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
+      }
+      .backup-dialog::backdrop {
+        background: rgba(3, 5, 10, 0.76);
+      }
+      .backup-dialog-body {
+        display: grid;
+        gap: var(--sp-3);
+        padding: var(--sp-5);
+      }
+      .backup-dialog h2 {
+        font-family: var(--BE);
+        font-size: 1.75rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+      }
+      .backup-dialog-copy,
+      .backup-preview {
+        font-family: var(--MO);
+        font-size: 0.7rem;
+        line-height: 1.65;
+        color: var(--t2);
+      }
+      .backup-preview {
+        min-height: 90px;
+        padding: var(--sp-3);
+        border: 1px solid var(--rim);
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.025);
+        white-space: pre-line;
+      }
+      .backup-preview.ok {
+        border-color: rgba(0, 229, 160, 0.3);
+        color: #9af5d4;
+      }
+      .backup-preview.err {
+        border-color: rgba(255, 61, 90, 0.38);
+        color: #ff9aaa;
+      }
+      .backup-file-label {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+        min-height: 34px;
+        padding: 0 12px;
+        border: 1px solid rgba(77, 143, 255, 0.32);
+        border-radius: var(--radius-sm);
+        background: var(--bl2);
+        color: #a8c8ff;
+        font-family: var(--SA);
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .backup-file-label:hover {
+        background: rgba(77, 143, 255, 0.2);
+      }
+      .backup-file-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      .backup-dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--sp-2);
+        margin-top: var(--sp-1);
+      }
+      .backup-dialog-actions button {
+        min-height: 34px;
+        padding: 0 12px;
+        border: 1px solid var(--rim2);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--t2);
+        font-family: var(--SA);
+        font-size: 0.76rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .backup-dialog-actions button.primary {
+        border-color: rgba(0, 229, 160, 0.42);
+        background: var(--go2);
+        color: var(--go);
+      }
+      .backup-dialog-actions button:disabled {
+        cursor: not-allowed;
+        opacity: 0.42;
+      }
       .nsep {
         width: 1px;
         height: 18px;
@@ -3134,6 +3236,19 @@
       ╚══════════════════════════════════════╝
     -->
     <div class="toast" id="toast"></div>
+    <dialog class="backup-dialog" id="backupImportDialog" aria-labelledby="backupImportTitle">
+      <div class="backup-dialog-body">
+        <h2 id="backupImportTitle">Ripristina backup</h2>
+        <p class="backup-dialog-copy">Seleziona un backup JSON creato da WIPS. I dati attuali non verranno toccati finché il file non supera tutti i controlli e non confermi il ripristino.</p>
+        <label class="backup-file-label" for="backupImportFile">📂 Seleziona backup JSON</label>
+        <input class="backup-file-input" id="backupImportFile" type="file" accept="application/json,.json" onchange="readBackupImport(this)">
+        <div class="backup-preview" id="backupImportPreview">Nessun file selezionato.</div>
+        <div class="backup-dialog-actions">
+          <button type="button" onclick="closeBackupImport()">Annulla</button>
+          <button class="primary" id="backupImportConfirm" type="button" onclick="applyBackupImport()" disabled>Ripristina dati</button>
+        </div>
+      </div>
+    </dialog>
 
     <!-- ══════════════════════════ HEADER ══════════════════════════════ -->
     <header>
@@ -3176,6 +3291,9 @@
         </button>
         <button class="np csv-btn" type="button" onclick="exportFullBackup()">
           💾 Backup
+        </button>
+        <button class="np csv-btn" type="button" onclick="openBackupImport()">
+          📥 Ripristina
         </button>
         <button class="np csv-btn" onclick="exportCSV()">⬇ CSV</button>
       </div>
@@ -6146,6 +6264,9 @@
       var BACKUP_FORMAT = "wips-local-backup";
       var BACKUP_VERSION = 1;
       var BUDGET_STORAGE_KEY = "wips_budget_cashflow_v3";
+      var RESTORED_WHAT_IF_SESSION_KEY = "wips_restored_whatif_v1";
+      var BACKUP_IMPORT_MAX_BYTES = 2 * 1024 * 1024;
+      var pendingBackupImport = null;
 
       function readOptionalLocalJson(key) {
         try {
@@ -6218,6 +6339,222 @@
         } catch (e) {
           console.warn("WIPS: impossibile esportare il backup", e);
           showToast("⚠ Backup non esportato");
+        }
+      }
+
+      function validTimestamp(value) {
+        return typeof value === "string" && !isNaN(Date.parse(value));
+      }
+
+      function validOptionalCryptoMeta(value) {
+        if (value === null) return true;
+        if (!isPlainObject(value) || typeof value.source !== "string" || !validTimestamp(value.updatedAt) || !isPlainObject(value.quotes)) return false;
+        for (var id in value.quotes) {
+          if (!KRAKEN_CRYPTO_PAIRS[id] || !isFiniteNumber(value.quotes[id]) || value.quotes[id] <= 0) return false;
+        }
+        return true;
+      }
+
+      function validOptionalTradeRepublicQuotes(value) {
+        if (value === null) return true;
+        if (!isPlainObject(value)) return false;
+        for (var id in value) {
+          var entry = value[id];
+          if (!KRAKEN_CRYPTO_PAIRS[id] || !isPlainObject(entry) || !isFiniteNumber(entry.price) || entry.price <= 0 || !validTimestamp(entry.updatedAt)) return false;
+        }
+        return true;
+      }
+
+      function validOptionalBudgetState(value) {
+        if (value === null) return true;
+        if (!isPlainObject(value)) return false;
+        var nonNegative = ["liq", "safety", "bDom", "bSp", "cPieno"];
+        for (var i = 0; i < nonNegative.length; i++) {
+          var key = nonNegative[i];
+          if (value[key] !== undefined && !isFiniteNumber(value[key])) return false;
+        }
+        var integerFields = ["nPieni", "nDom", "nSet"];
+        for (var j = 0; j < integerFields.length; j++) {
+          var integerKey = integerFields[j];
+          if (value[integerKey] !== undefined && value[integerKey] !== null && (!isFiniteNumber(value[integerKey]) || Math.floor(value[integerKey]) !== value[integerKey])) return false;
+        }
+        if (value.domTouched !== undefined && typeof value.domTouched !== "boolean") return false;
+        if (value.settTouched !== undefined && typeof value.settTouched !== "boolean") return false;
+        if (value.custom !== undefined) {
+          if (!Array.isArray(value.custom)) return false;
+          for (var k = 0; k < value.custom.length; k++) {
+            var item = value.custom[k];
+            if (!isPlainObject(item) || typeof item.id !== "string" || !/^[a-zA-Z0-9_-]+$/.test(item.id) || typeof item.name !== "string" || item.name.length > 80 || !isFiniteNumber(item.amount) || typeof item.date !== "string" || item.date.length > 32) return false;
+          }
+        }
+        return true;
+      }
+
+      function validateBackupImport(value) {
+        if (!isPlainObject(value) || value.format !== BACKUP_FORMAT || value.version !== BACKUP_VERSION) return { ok: false, message: "Formato backup non riconosciuto." };
+        if (!validTimestamp(value.exportedAt)) return { ok: false, message: "Data di esportazione non valida." };
+        if (!isPlainObject(value.app) || value.app.storageVersion !== STORAGE_VERSION || value.app.priceVersion !== PRICE_VERSION) return { ok: false, message: "Backup creato con una versione dati non compatibile." };
+        if (!isPlainObject(value.portfolio) || !sameAssetShape(value.portfolio.P, DEFAULT_PORTFOLIO) || !validPrices(value.portfolio.prices)) return { ok: false, message: "Portfolio o prezzi del backup non sono validi." };
+        if (!isPlainObject(value.whatIf) || !isFiniteNumber(value.whatIf.addAmount)) return { ok: false, message: "Importo What-If non valido." };
+        if (!isPlainObject(value.local) || !validOptionalCryptoMeta(value.local.cryptoQuoteMeta) || !validOptionalTradeRepublicQuotes(value.local.tradeRepublicQuotes) || !validOptionalBudgetState(value.local.budget)) return { ok: false, message: "Metadati crypto, confronto Trade Republic o Budget non validi." };
+
+        var assetCount = 0;
+        PORTFOLIO_TYPES.forEach(function (type) {
+          assetCount += value.portfolio.P[type].length;
+        });
+        return {
+          ok: true,
+          backup: deepClone(value),
+          preview:
+            "✓ Backup valido\n" +
+            assetCount +
+            " asset · " +
+            Object.keys(value.portfolio.prices).length +
+            " prezzi\nEsportato: " +
+            new Date(value.exportedAt).toLocaleString("it-IT") +
+            "\nBudget: " +
+            (value.local.budget === null ? "non presente" : "incluso") +
+            " · Quotazioni crypto: " +
+            (value.local.cryptoQuoteMeta === null ? "non presenti" : "incluse"),
+        };
+      }
+
+      function setBackupImportPreview(message, state) {
+        var preview = g("backupImportPreview");
+        var confirmButton = g("backupImportConfirm");
+        if (preview) {
+          preview.className = "backup-preview" + (state ? " " + state : "");
+          preview.textContent = message;
+        }
+        if (confirmButton) confirmButton.disabled = !pendingBackupImport;
+      }
+
+      function openBackupImport() {
+        var dialog = g("backupImportDialog");
+        var input = g("backupImportFile");
+        pendingBackupImport = null;
+        if (input) input.value = "";
+        setBackupImportPreview("Nessun file selezionato.", "");
+        if (dialog && typeof dialog.showModal === "function") dialog.showModal();
+        else if (dialog) dialog.setAttribute("open", "");
+      }
+
+      function closeBackupImport() {
+        var dialog = g("backupImportDialog");
+        pendingBackupImport = null;
+        if (dialog && typeof dialog.close === "function") dialog.close();
+        else if (dialog) dialog.removeAttribute("open");
+      }
+
+      function readBackupImport(input) {
+        pendingBackupImport = null;
+        setBackupImportPreview("Lettura e verifica del backup…", "");
+        var file = input && input.files ? input.files[0] : null;
+        if (!file) {
+          setBackupImportPreview("Nessun file selezionato.", "");
+          return;
+        }
+        if (file.size > BACKUP_IMPORT_MAX_BYTES) {
+          setBackupImportPreview("Il backup supera il limite di 2 MB.", "err");
+          return;
+        }
+        var reader = new FileReader();
+        reader.onerror = function () {
+          setBackupImportPreview("Impossibile leggere il file selezionato.", "err");
+        };
+        reader.onload = function () {
+          try {
+            var result = validateBackupImport(JSON.parse(reader.result));
+            if (!result.ok) {
+              setBackupImportPreview(result.message + " I dati attuali restano invariati.", "err");
+              return;
+            }
+            pendingBackupImport = result.backup;
+            setBackupImportPreview(result.preview, "ok");
+          } catch (e) {
+            setBackupImportPreview("JSON non leggibile. I dati attuali restano invariati.", "err");
+          }
+        };
+        reader.readAsText(file, "utf-8");
+      }
+
+      function backupStoragePlan(backup) {
+        return {
+          [STORAGE_KEY]: JSON.stringify({
+            v: STORAGE_VERSION,
+            P: backup.portfolio.P,
+            prices: backup.portfolio.prices,
+            priceVersion: PRICE_VERSION,
+          }),
+          [CRYPTO_QUOTE_META_KEY]: backup.local.cryptoQuoteMeta === null ? null : JSON.stringify(backup.local.cryptoQuoteMeta),
+          [TRADE_REPUBLIC_QUOTES_KEY]: backup.local.tradeRepublicQuotes === null ? null : JSON.stringify(backup.local.tradeRepublicQuotes),
+          [BUDGET_STORAGE_KEY]: backup.local.budget === null ? null : JSON.stringify(backup.local.budget),
+        };
+      }
+
+      function writeStoragePlanSafely(plan) {
+        var previous = {};
+        var keys = Object.keys(plan);
+        for (var i = 0; i < keys.length; i++) previous[keys[i]] = localStorage.getItem(keys[i]);
+        try {
+          for (var j = 0; j < keys.length; j++) {
+            var key = keys[j];
+            if (plan[key] === null) localStorage.removeItem(key);
+            else localStorage.setItem(key, plan[key]);
+          }
+        } catch (error) {
+          try {
+            for (var k = 0; k < keys.length; k++) {
+              var restoreKey = keys[k];
+              if (previous[restoreKey] === null) localStorage.removeItem(restoreKey);
+              else localStorage.setItem(restoreKey, previous[restoreKey]);
+            }
+          } catch (rollbackError) {
+            console.error("WIPS: rollback localStorage incompleto", rollbackError);
+          }
+          throw error;
+        }
+      }
+
+      function applyBackupImport() {
+        var validation = validateBackupImport(pendingBackupImport);
+        if (!validation.ok) {
+          pendingBackupImport = null;
+          setBackupImportPreview(validation.message + " I dati attuali restano invariati.", "err");
+          return;
+        }
+        if (!window.confirm("Ripristinare portfolio, prezzi, Budget e dati locali dal backup selezionato? I dati locali attuali verranno sostituiti.")) return;
+        try {
+          writeStoragePlanSafely(backupStoragePlan(validation.backup));
+          try {
+            sessionStorage.setItem(
+              RESTORED_WHAT_IF_SESSION_KEY,
+              JSON.stringify({ addAmount: validation.backup.whatIf.addAmount }),
+            );
+          } catch (sessionError) {
+            console.warn("WIPS: importo What-If non ripristinato", sessionError);
+          }
+          showToast("✓ Backup ripristinato · riavvio WIPS…");
+          setTimeout(function () {
+            window.location.reload();
+          }, 250);
+        } catch (e) {
+          console.warn("WIPS: ripristino backup annullato", e);
+          showToast("⚠ Ripristino non completato: dati attuali conservati");
+        }
+      }
+
+      function applyRestoredWhatIf() {
+        try {
+          var raw = sessionStorage.getItem(RESTORED_WHAT_IF_SESSION_KEY);
+          if (!raw) return;
+          sessionStorage.removeItem(RESTORED_WHAT_IF_SESSION_KEY);
+          var restored = JSON.parse(raw);
+          if (!restored || !isFiniteNumber(restored.addAmount)) return;
+          syncSl(restored.addAmount);
+          syncIn(restored.addAmount);
+        } catch (e) {
+          console.warn("WIPS: importo What-If non leggibile", e);
         }
       }
 
@@ -7423,6 +7760,7 @@
       load();
       loadCryptoQuoteMeta();
       loadTradeRepublicQuotes();
+      applyRestoredWhatIf();
       var initialPortfolio = portfolioSnapshot();
       buildPE("crypto", initialPortfolio);
       buildPE("etf", initialPortfolio);

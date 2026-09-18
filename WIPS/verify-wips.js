@@ -30,6 +30,9 @@ const REQUIRED_APP_FUNCTIONS = [
   "renderAdvisor",
   "renderBudget",
   "exportFullBackup",
+  "openBackupImport",
+  "readBackupImport",
+  "applyBackupImport",
   "exportCSV",
 ];
 
