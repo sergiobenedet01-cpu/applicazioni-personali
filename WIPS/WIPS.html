@@ -897,20 +897,19 @@
         height: 1px;
         background: linear-gradient(90deg, var(--rim) 0%, transparent 100%);
       }
-      .kg {
+      .kpi-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
         gap: 8px;
         margin-bottom: 24px;
         align-items: stretch;
-      }
-      /* Le KPI dell'analisi condividono sempre la stessa altezza, anche
-         quando una card contiene il valore potenziale What-If. */
-      .analytics-kpis {
         grid-auto-rows: minmax(0, 1fr);
       }
-      .analytics-kpis .kc {
+      /* Ogni riga KPI mantiene card di uguale altezza, anche quando una
+         label o un dettaglio simulato richiede più righe di testo. */
+      .kpi-grid > .kc {
         min-height: 148px;
+        height: 100%;
         box-sizing: border-box;
       }
       .kc {
@@ -2893,7 +2892,7 @@
         gap: var(--sp-3);
         margin-bottom: var(--sp-3);
       }
-      .kg {
+      .kpi-grid {
         gap: var(--sp-2);
         margin-bottom: var(--sp-5);
       }
@@ -4012,7 +4011,7 @@
 
         var h =
           '<div class="an"><div class="anh"><div class="ant">&#128202; Analisi</div><div class="anl"></div></div>';
-        h += '<div class="kg analytics-kpis">';
+        h += '<div class="kpi-grid">';
         h += kpi(
           "Investito",
           '<span class="y">' + N(tI, 2) + " €</span>" + potentialInvested,
@@ -4177,7 +4176,7 @@
 
         var h =
           '<div class="an"><div class="anh"><div class="ant">&#127757; Portafoglio Globale</div><div class="anl"></div></div>';
-        h += '<div class="kg">';
+        h += '<div class="kpi-grid">';
         h += kpi(
           "&#128176; Totale Investito",
           '<span class="y">' + N(tI, 2) + " €</span>",
@@ -5204,7 +5203,7 @@
         });
         var pnl = tV > 0 ? tV - tI : null,
           pct = tV > 0 && tI > 0 ? (pnl / tI) * 100 : null;
-        h += '<div class="kg">';
+        h += '<div class="kpi-grid">';
         h += kpi(
           "&#128176; Capitale Investito",
           '<span class="y">' + N(tI, 2) + " €</span>",

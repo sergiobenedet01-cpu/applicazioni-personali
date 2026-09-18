@@ -123,9 +123,10 @@ window.WIPS_DATA = {
       {
         name: "NEF Ethical Global Trends",
         id: "LU2051778178",
-        cap: 6099.97,
-        qty: 465.469,
-        pm0: 13.105,
+        cap: 3238.69,
+        qty: 247.128,
+        // Capitale residuo / quote dopo il disinvestimento del 18/09/2026.
+        pm0: 13.105313032399196,
         isin: "LU2051778178",
         conto: "Banca 360 BCC FriulAdria",
       },
@@ -151,6 +152,6 @@ window.WIPS_DATA = {
     COPX: 59.91,
     FLXI: 34.93,
 
-    LU2051778178: 20.08,
+    LU2051778178: 22.830031643143653,
   },
 };
