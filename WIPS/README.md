@@ -100,6 +100,44 @@ cache.
 Non includere mai nel commit file personali, backup temporanei, credenziali o
 dati non correlati a WIPS.
 
+## Release, tag e rollback
+
+Ogni intervento WIPS deve produrre un commit piccolo e con un solo scopo. Prima
+di creare il commit, controlla esplicitamente i file coinvolti:
+
+```sh
+git status
+git diff -- WIPS/
+git diff --check
+git add WIPS/<file-modificato>
+git diff --cached
+```
+
+Quando un insieme di commit è stato verificato anche sul sito pubblicato, crea
+un tag annotato per avere un punto di ritorno chiaro:
+
+```sh
+git tag -a wips-AAAA.MM.GG -m "Release WIPS verificata"
+git push origin main --follow-tags
+```
+
+Sostituisci `AAAA.MM.GG` con la data effettiva della release. Il tag si crea
+solo dopo una verifica riuscita; non è necessario per ogni singolo commit.
+
+Se una modifica già pubblicata causa una regressione, non usare `reset --hard`
+e non riscrivere la cronologia pubblicata. Ripristina invece con un commit
+reversibile:
+
+```sh
+git log --oneline
+git revert <hash-del-commit-da-annullare>
+git push origin main
+```
+
+Per tornare a una release nota, individua prima il tag con `git tag --list` e
+verifica il diff. Un rollback deve sempre essere seguito dalla stessa checklist
+funzionale usata per la release.
+
 ## Verifiche prima della pubblicazione
 
 Controllare almeno:
