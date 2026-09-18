@@ -11,6 +11,8 @@ e `Rimosso`.
 - README operativo con istruzioni locali, aggiornamento prezzi, pubblicazione
   e controlli preliminari.
 - Changelog e procedura di release/rollback documentata.
+- Verificatore locale in sola lettura per sintassi, file essenziali e dati
+  iniziali.
 
 ## Baseline precedente al changelog
 

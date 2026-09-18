@@ -20,11 +20,23 @@ Controlla la versione con:
 node --version
 ```
 
+Prima di una pubblicazione o dopo una modifica al codice, esegui il controllo
+locale in sola lettura:
+
+```sh
+node verify-wips.js
+```
+
+Il verificatore non modifica file, non usa la rete e non accede ai dati salvati
+nel browser. Controlla file essenziali, sintassi e coerenza minima dei dati
+iniziali.
+
 ## Struttura essenziale
 
 ```text
 WIPS.html                         Interfaccia e logica dell'app
 WIPS-data.js                      Portfolio e prezzi iniziali/fallback
+verify-wips.js                    Controllo locale in sola lettura
 update-wips-crypto-prices.js      Updater locale delle quotazioni crypto
 update-wips-etf-prices.js         Updater locale manuale delle quotazioni ETF
 ```
