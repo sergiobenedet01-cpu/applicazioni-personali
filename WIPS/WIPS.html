@@ -576,6 +576,40 @@
         background: rgba(240, 192, 64, 0.22);
         box-shadow: 0 0 18px rgba(240, 192, 64, 0.16);
       }
+      .quote-actions {
+        display: grid;
+        gap: var(--sp-2);
+      }
+      .pab.quote-refresh {
+        background: linear-gradient(120deg, var(--go2), var(--go3));
+        border-color: rgba(0, 229, 160, 0.3);
+        color: var(--go);
+      }
+      .pab.quote-refresh:hover:not(:disabled) {
+        background: rgba(0, 229, 160, 0.18);
+        box-shadow: 0 0 18px rgba(0, 229, 160, 0.14);
+      }
+      .pab:disabled {
+        cursor: wait;
+        opacity: 0.62;
+      }
+      .quote-status {
+        margin-top: var(--sp-2);
+        min-height: 1.2em;
+        font-family: var(--MO);
+        font-size: 0.64rem;
+        line-height: 1.35;
+        color: var(--t3);
+      }
+      .quote-status.ok {
+        color: rgba(0, 229, 160, 0.72);
+      }
+      .quote-status.warn {
+        color: var(--em);
+      }
+      .quote-status.err {
+        color: var(--re);
+      }
 
       /* ─ SCENARIO BAR ────────────────────────────────────────────────── */
       .sb {
@@ -3056,9 +3090,15 @@
       <div class="cb" id="cb-crypto">
         <div class="pp">
           <div class="ppg" id="pe-crypto"></div>
-          <button class="pab" onclick="applyP('crypto')">
-            ✓ Applica Prezzi Crypto
-          </button>
+          <div class="quote-actions">
+            <button class="pab quote-refresh" id="cryptoQuoteBtn" type="button" onclick="refreshCryptoQuotes()">
+              ↻ Aggiorna quotazioni Crypto
+            </button>
+            <button class="pab" type="button" onclick="applyP('crypto')">
+              ✓ Applica Prezzi Crypto manuali
+            </button>
+          </div>
+          <div class="quote-status" id="cryptoQuoteStatus" role="status" aria-live="polite"></div>
         </div>
       </div>
     </div>
@@ -3168,7 +3208,7 @@
     <div id="sec-advisor" class="sec"></div>
 
     <footer>
-      <span>💾 Salvataggio automatico · Prezzi inseriti manualmente</span>
+      <span>💾 Salvataggio automatico · Crypto aggiornabili da Kraken</span>
       <span id="fts">—</span>
     </footer>
 
@@ -3477,6 +3517,219 @@
       }
 
       /* ═══════════════════════════════════════════════════════════════════
+            CRYPTO QUOTES — indicativi EUR, separati dai dati statici
+            ═══════════════════════════════════════════════════════════════════ */
+      var CRYPTO_QUOTE_META_KEY = "wips_crypto_quote_meta_v1";
+      var CRYPTO_QUOTE_TIMEOUT_MS = 10000;
+      var cryptoQuoteRefreshInFlight = false;
+      var cryptoQuoteMeta = null;
+      var KRAKEN_CRYPTO_PAIRS = {
+        bitcoin: { pair: "XBTEUR", aliases: ["XXBTZEUR", "XBTEUR", "BTCEUR"] },
+        ethereum: { pair: "ETHEUR", aliases: ["XETHZEUR", "ETHEUR"] },
+        solana: { pair: "SOLEUR", aliases: ["SOLEUR"] },
+        polkadot: { pair: "DOTEUR", aliases: ["DOTEUR"] },
+        ripple: { pair: "XRPEUR", aliases: ["XXRPZEUR", "XRPEUR"] },
+        avalanche: { pair: "AVAXEUR", aliases: ["AVAXEUR"] },
+        dogecoin: { pair: "DOGEEUR", aliases: ["XDGEUR", "DOGEEUR"] },
+        cardano: { pair: "ADAEUR", aliases: ["ADAEUR"] },
+      };
+
+      function normaliseTickerPair(pair) {
+        return String(pair || "")
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, "");
+      }
+
+      function saveCryptoQuoteMeta() {
+        try {
+          localStorage.setItem(
+            CRYPTO_QUOTE_META_KEY,
+            JSON.stringify(cryptoQuoteMeta),
+          );
+        } catch (e) {
+          console.warn("WIPS: impossibile salvare metadati quotazioni crypto", e);
+        }
+      }
+
+      function loadCryptoQuoteMeta() {
+        try {
+          var raw = localStorage.getItem(CRYPTO_QUOTE_META_KEY);
+          if (!raw) return;
+          var saved = JSON.parse(raw);
+          if (
+            saved &&
+            typeof saved.source === "string" &&
+            typeof saved.updatedAt === "string" &&
+            !isNaN(Date.parse(saved.updatedAt))
+          )
+            cryptoQuoteMeta = saved;
+        } catch (e) {
+          console.warn("WIPS: metadati quotazioni crypto non leggibili", e);
+        }
+      }
+
+      function setCryptoQuoteStatus(message, state) {
+        var status = g("cryptoQuoteStatus");
+        if (!status) return;
+        status.className = "quote-status" + (state ? " " + state : "");
+        status.textContent = message || "";
+      }
+
+      function renderCryptoQuoteStatus() {
+        if (!cryptoQuoteMeta || !cryptoQuoteMeta.updatedAt) {
+          setCryptoQuoteStatus(
+            "Kraken · quotazioni spot EUR indicative, non prezzi ufficiali Trade Republic.",
+          );
+          return;
+        }
+        var when = new Date(cryptoQuoteMeta.updatedAt);
+        setCryptoQuoteStatus(
+          "Ultimo aggiornamento: " +
+            cryptoQuoteMeta.source +
+            " · " +
+            when.toLocaleString("it-IT") +
+            " · quotazioni EUR indicative.",
+          "ok",
+        );
+      }
+
+      function tickerLastPrice(result, assetId) {
+        var config = KRAKEN_CRYPTO_PAIRS[assetId];
+        if (!config || !result) return null;
+        for (var key in result) {
+          var ticker = result[key];
+          if (
+            config.aliases.indexOf(normaliseTickerPair(key)) === -1 ||
+            !ticker ||
+            !ticker.c
+          )
+            continue;
+          var last = Number(ticker.c[0]);
+          if (isFinite(last) && last > 0) return last;
+        }
+        return null;
+      }
+
+      function fetchJsonWithTimeout(url, timeoutMs) {
+        var controller = typeof AbortController === "function" ? new AbortController() : null;
+        var timer = controller
+          ? setTimeout(function () {
+              controller.abort();
+            }, timeoutMs)
+          : null;
+        return fetch(url, {
+          method: "GET",
+          cache: "no-store",
+          signal: controller ? controller.signal : undefined,
+        }).then(function (response) {
+          if (timer) clearTimeout(timer);
+          if (!response.ok)
+            throw new Error("Servizio quotazioni non disponibile (HTTP " + response.status + ")");
+          return response.json();
+        }).catch(function (error) {
+          if (timer) clearTimeout(timer);
+          throw error;
+        });
+      }
+
+      function refreshCryptoQuotes() {
+        if (cryptoQuoteRefreshInFlight) return;
+        var cryptoAssets = P.crypto.filter(function (asset) {
+          return !!KRAKEN_CRYPTO_PAIRS[asset.id];
+        });
+        if (!cryptoAssets.length) {
+          setCryptoQuoteStatus("Nessuna criptovaluta supportata per l'aggiornamento.", "warn");
+          return;
+        }
+
+        cryptoQuoteRefreshInFlight = true;
+        var button = g("cryptoQuoteBtn");
+        if (button) {
+          button.disabled = true;
+          button.textContent = "↻ Aggiornamento quotazioni…";
+        }
+        setCryptoQuoteStatus("Recupero quotazioni spot EUR da Kraken…");
+
+        var pairs = cryptoAssets
+          .map(function (asset) {
+            return KRAKEN_CRYPTO_PAIRS[asset.id].pair;
+          })
+          .join(",");
+        var endpoint =
+          "https://api.kraken.com/0/public/Ticker?pair=" +
+          encodeURIComponent(pairs);
+
+        fetchJsonWithTimeout(endpoint, CRYPTO_QUOTE_TIMEOUT_MS)
+          .then(function (payload) {
+            if (!payload || (payload.error && payload.error.length) || !payload.result)
+              throw new Error("Risposta quotazioni non valida");
+
+            var updated = [];
+            var missing = [];
+            cryptoAssets.forEach(function (asset) {
+              var quote = tickerLastPrice(payload.result, asset.id);
+              if (quote === null) {
+                missing.push(asset.name);
+                return;
+              }
+              prices[asset.id] = quote;
+              updated.push(asset.id);
+            });
+            if (!updated.length)
+              throw new Error("Nessuna quotazione EUR valida ricevuta");
+
+            cryptoQuoteMeta = {
+              source: "Kraken",
+              updatedAt: new Date().toISOString(),
+            };
+            save();
+            saveCryptoQuoteMeta();
+            buildPE("crypto", portfolioSnapshot());
+            updCC(portfolioSnapshot());
+            renderAll();
+            renderCryptoQuoteStatus();
+
+            var footer = g("fts");
+            if (footer)
+              footer.textContent =
+                "Crypto aggiornate: Kraken · " + new Date().toLocaleTimeString("it-IT");
+            if (missing.length) {
+              setCryptoQuoteStatus(
+                "Aggiornate " +
+                  updated.length +
+                  "/" +
+                  cryptoAssets.length +
+                  " quotazioni. Valori precedenti mantenuti per: " +
+                  missing.join(", ") +
+                  ".",
+                "warn",
+              );
+              showToast("⚠ " + updated.length + " quotazioni crypto aggiornate");
+            } else showToast("✓ " + updated.length + " quotazioni crypto aggiornate");
+          })
+          .catch(function (error) {
+            var detail =
+              error && error.name === "AbortError"
+                ? "Timeout del servizio quotazioni"
+                : error && error.message
+                  ? error.message
+                  : "Errore di rete";
+            setCryptoQuoteStatus(
+              detail + ". I prezzi precedenti sono stati mantenuti.",
+              "err",
+            );
+            showToast("⚠ Quotazioni crypto non aggiornate");
+          })
+          .finally(function () {
+            cryptoQuoteRefreshInFlight = false;
+            if (button) {
+              button.disabled = false;
+              button.textContent = "↻ Aggiorna quotazioni Crypto";
+            }
+          });
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
             PRICE INPUT ENGINE
             ═══════════════════════════════════════════════════════════════════ */
       function buildPE(type, portfolio) {
@@ -3507,6 +3760,7 @@
         }
         el.innerHTML = h;
         updCC(portfolio);
+        if (type === "crypto") renderCryptoQuoteStatus();
       }
       function onPI(inp) {
         inp.classList.toggle("fi", inp.value.trim() !== "");
@@ -6764,6 +7018,7 @@
             APP INITIALIZATION
             ═════════════════════════════════════════════════════════════════════ */
       load();
+      loadCryptoQuoteMeta();
       var initialPortfolio = portfolioSnapshot();
       buildPE("crypto", initialPortfolio);
       buildPE("etf", initialPortfolio);
