@@ -1416,6 +1416,36 @@
       .backup-actions .bb { width:auto; flex:none; }
       #backupModal .reps-box { max-width: 520px; }
       .backup-preview { margin:.9rem 0; padding:.75rem; border:1px solid var(--border); border-radius:var(--r3); color:var(--muted2); font-size:.8rem; line-height:1.55; }
+      .calendar-section { margin-top: 2.4rem; }
+      .calendar-cycle-note { display:flex; align-items:center; gap:.45rem; color:var(--muted2); font-size:.75rem; margin:-.35rem 0 .8rem; }
+      .calendar-cycle-note strong { color:var(--accent); }
+      .calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(145px,1fr)); gap:.55rem; overflow-x:auto; padding-bottom:.2rem; }
+      .calendar-day { min-width:145px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r2); overflow:hidden; }
+      .calendar-day.today { border-color:var(--accent); box-shadow:0 0 0 1px rgba(229,192,64,.18); }
+      .calendar-day-head { padding:.65rem .7rem; background:var(--surface2); border-bottom:1px solid var(--border); }
+      .calendar-day-name { font:700 .69rem "Syne",sans-serif; text-transform:uppercase; letter-spacing:.06em; }
+      .calendar-day-date { color:var(--muted); font-size:.67rem; margin-top:.12rem; }
+      .calendar-cycle-start { display:inline-block; margin-top:.35rem; color:var(--accent); font:700 .55rem "JetBrains Mono",monospace; text-transform:uppercase; }
+      .calendar-slots { padding:.42rem; display:grid; gap:.38rem; }
+      .calendar-slot { width:100%; min-height:84px; padding:.55rem; text-align:left; border:1px solid var(--border); border-radius:var(--r3); background:var(--surface2); color:var(--text); cursor:pointer; transition:transform var(--t),border-color var(--t),background var(--t); }
+      .calendar-slot:hover { border-color:var(--border2); transform:translateY(-1px); }
+      .calendar-slot.fixed { cursor:default; }
+      .calendar-slot.fixed-work { border-color:rgba(91,141,250,.35); background:rgba(91,141,250,.07); }
+      .calendar-slot.fixed-away { border-color:rgba(148,120,217,.4); background:rgba(148,120,217,.08); }
+      .calendar-slot.special { border-color:rgba(229,192,64,.42); background:rgba(229,192,64,.07); }
+      .calendar-slot.light { border-color:rgba(90,200,130,.4); background:rgba(90,200,130,.07); }
+      .calendar-slot.empty { border-style:dashed; color:var(--muted); }
+      .calendar-slot-label { display:block; color:var(--muted); font:700 .57rem "JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.32rem; }
+      .calendar-slot-title { display:block; font-size:.74rem; font-weight:650; line-height:1.35; }
+      .calendar-slot-meta { display:block; color:var(--muted2); font-size:.63rem; line-height:1.35; margin-top:.28rem; }
+      .calendar-badges { display:flex; flex-wrap:wrap; gap:.22rem; margin-top:.34rem; }
+      .calendar-badge { padding:.1rem .28rem; border-radius:999px; background:var(--surface3); color:var(--muted2); font:700 .53rem "JetBrains Mono",monospace; }
+      .calendar-slot.fixed .calendar-badge { background:rgba(255,255,255,.1); }
+      .calendar-picker-list { display:grid; gap:.45rem; max-height:300px; overflow:auto; margin-top:.8rem; }
+      .calendar-pick { width:100%; padding:.65rem .7rem; border:1px solid var(--border); border-radius:var(--r3); color:var(--text); background:var(--surface2); text-align:left; cursor:pointer; font:600 .78rem "Plus Jakarta Sans",sans-serif; }
+      .calendar-pick:hover { border-color:var(--accent); }
+      .calendar-pick small { display:block; color:var(--muted); margin-top:.16rem; }
+      .calendar-picker-empty { color:var(--muted); font-size:.8rem; line-height:1.5; margin:.8rem 0; }
       .si-qty {
         font-family: "JetBrains Mono", monospace;
         font-size: 0.63rem;
@@ -1443,7 +1473,7 @@
       }
 
       /* ─── REPS MODAL ─────────────────────────────── */
-      #repsModal, #backupModal {
+      #repsModal, #backupModal, #calendarModal {
         position: fixed;
         inset: 0;
         z-index: 500;
@@ -1455,7 +1485,7 @@
         pointer-events: none;
         transition: opacity 0.22s ease;
       }
-      #repsModal.open, #backupModal.open {
+      #repsModal.open, #backupModal.open, #calendarModal.open {
         opacity: 1;
         pointer-events: all;
       }
@@ -1480,7 +1510,7 @@
         transform: translateY(12px) scale(0.97);
         transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      #repsModal.open .reps-box, #backupModal.open .reps-box {
+      #repsModal.open .reps-box, #backupModal.open .reps-box, #calendarModal.open .reps-box {
         transform: translateY(0) scale(1);
       }
       .reps-title {
@@ -1850,6 +1880,7 @@
       body.mode-mobile[data-mobile-view="home"] #mHome,
       body.mode-mobile[data-mobile-view="piano"] #s01,
       body.mode-mobile[data-mobile-view="piano"] #s03,
+      body.mode-mobile[data-mobile-view="piano"] #sCalendar,
       body.mode-mobile[data-mobile-view="ricette"] #s02,
       body.mode-mobile[data-mobile-view="spesa"] #s04,
       body.mode-mobile[data-mobile-view="altro"] #mMore {
@@ -1913,6 +1944,9 @@
         flex-shrink: 0;
       }
       body.mode-mobile .recipes-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+      body.mode-mobile .calendar-grid { grid-template-columns:1fr; overflow:visible; }
+      body.mode-mobile .calendar-day { min-width:0; }
+      body.mode-mobile .calendar-slot { min-height:72px; }
       body.mode-mobile .recipe-tools { grid-template-columns: 1fr; }
       body.mode-mobile .recipe-search, body.mode-mobile .recipe-sort, body.mode-mobile .recipe-filter { min-height: 44px; }
       body.mode-mobile .rc { padding: 0.9rem; border-radius: 12px; }
@@ -1958,7 +1992,7 @@
         bottom: calc(5.7rem + env(safe-area-inset-bottom));
         text-align: center;
       }
-      body.mode-mobile #repsModal { align-items: flex-end; padding: 0; }
+      body.mode-mobile #repsModal, body.mode-mobile #calendarModal { align-items: flex-end; padding: 0; }
       body.mode-mobile .reps-box {
         max-width: none;
         min-width: 0;
@@ -1966,7 +2000,7 @@
         padding: 1.2rem 1rem calc(1rem + env(safe-area-inset-bottom));
         transform: translateY(100%);
       }
-      body.mode-mobile #repsModal.open .reps-box { transform: translateY(0); }
+      body.mode-mobile #repsModal.open .reps-box, body.mode-mobile #calendarModal.open .reps-box { transform: translateY(0); }
       body.mode-mobile .reps-nb { width: 48px; height: 46px; font-size: 1.25rem; }
       body.mode-mobile .reps-val { width: 44px; font-size: 1.3rem; }
       body.mode-mobile .reps-btn { min-height: 48px; }
@@ -2121,6 +2155,8 @@
         .tracker-split {
           grid-template-columns: 1fr;
         }
+        .calendar-grid { grid-template-columns:repeat(2,minmax(180px,1fr)); overflow:visible; }
+        .calendar-day { min-width:0; }
       }
       @media (max-width: 600px) {
         body { overflow-x: hidden; }
@@ -2581,6 +2617,17 @@
           </div>
         </section>
 
+        <!-- ══ CALENDARIO ═══════════════════════════════ -->
+        <section id="sCalendar" class="calendar-section" aria-label="Calendario pasti">
+          <div class="sec-hdr">
+            <div class="sec-num">// CALENDARIO</div>
+            <div class="sec-title">Pasti dei prossimi <span class="hl">7 giorni</span></div>
+            <div class="sec-sub">Pranzo e cena, dal giorno corrente in avanti.</div>
+          </div>
+          <div class="calendar-cycle-note"><span>◷</span><span>Il ciclo di pianificazione inizia <strong>sabato a pranzo</strong>.</span></div>
+          <div class="calendar-grid" id="calendarGrid" aria-live="polite"></div>
+        </section>
+
         <!-- ══ 04 SPESA ══════════════════════════════════ -->
         <section id="s04">
           <div class="sec-hdr">
@@ -2672,6 +2719,18 @@
         </div>
       </div>
     </div>
+    <div id="calendarModal" role="dialog" aria-modal="true" aria-labelledby="calendarModalTitle" aria-hidden="true">
+      <div class="reps-backdrop" onclick="closeCalendarPicker()"></div>
+      <div class="reps-box">
+        <div class="reps-title" id="calendarModalTitle">Assegna al calendario</div>
+        <div class="reps-name" id="calendarPickerSlot">—</div>
+        <div class="backup-preview" id="calendarPickerHint"></div>
+        <div class="calendar-picker-list" id="calendarPickerList"></div>
+        <div class="reps-btns">
+          <button class="reps-btn cancel" type="button" onclick="closeCalendarPicker()">✕</button>
+        </div>
+      </div>
+    </div>
 
     <!-- REPS MODAL -->
     <div id="repsModal">
@@ -2744,6 +2803,7 @@
         favoriteRecipeIds: [],
         shopChecks: {},
         hidePurchased: false,
+        calendarAssignments: {},
       };
 
       function clampStateNumber(value, min, max = 21) {
@@ -2776,6 +2836,15 @@
         }
         const favoriteRecipeIds = Array.isArray(value.favoriteRecipeIds)
           ? [...new Set(value.favoriteRecipeIds.filter((id) => Number.isInteger(id) && knownIds.has(id)))] : [];
+        const mealIds = new Set(meals.map((meal) => meal.id));
+        const calendarAssignments = {};
+        if (value.calendarAssignments && typeof value.calendarAssignments === "object" && !Array.isArray(value.calendarAssignments)) {
+          Object.entries(value.calendarAssignments).forEach(([slotKey, assignment]) => {
+            if (/^\d{4}-\d{2}-\d{2}:(lunch|dinner)$/.test(slotKey) && assignment && mealIds.has(assignment.mealId)) {
+              calendarAssignments[slotKey] = { mealId: assignment.mealId };
+            }
+          });
+        }
         const maxId = meals.reduce((max, meal) => Math.max(max, meal.id), 0);
         return {
           sM: clampStateNumber(value.sM, 0), sR: clampStateNumber(value.sR, 1),
@@ -2785,6 +2854,7 @@
           recipeFilter: RECIPE_FILTERS.some((filter) => filter.id === value.recipeFilter) ? value.recipeFilter : "all",
           recipeSort: ["default", "alpha", "category", "favorites"].includes(value.recipeSort) ? value.recipeSort : "default",
           favoriteRecipeIds, shopChecks, hidePurchased: value.hidePurchased === true,
+          calendarAssignments,
         };
       }
       function stateForStorage() {
@@ -2793,7 +2863,7 @@
           meals: ST.meals, nextId: ST.nextId, activeRCat: ST.activeRCat, recipeSearch: ST.recipeSearch,
           recipeFilter: ST.recipeFilter, recipeSort: ST.recipeSort,
           favoriteRecipeIds: ST.favoriteRecipeIds, shopChecks: ST.shopChecks,
-          hidePurchased: ST.hidePurchased,
+          hidePurchased: ST.hidePurchased, calendarAssignments: ST.calendarAssignments,
         };
       }
       function saveState() {
@@ -3400,7 +3470,7 @@
 
       // Close modal on Escape
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") { closeRepsModal(); closeBackupModal(); }
+        if (e.key === "Escape") { closeRepsModal(); closeBackupModal(); closeCalendarPicker(); }
       });
       function copyRecipe(id, btn) {
         const rec = RECIPES.find((r) => r.id === id);
@@ -3436,6 +3506,9 @@
       }
       function removeMeal(id) {
         ST.meals = ST.meals.filter((m) => m.id !== id);
+        Object.entries(ST.calendarAssignments).forEach(([slotKey, assignment]) => {
+          if (assignment.mealId === id) delete ST.calendarAssignments[slotKey];
+        });
         saveState();
         renderAll();
       }
@@ -3444,6 +3517,7 @@
         if (!confirm("Svuotare tutti i pasti pianificati?")) return;
         ST.meals = [];
         ST.shopChecks = {};
+        ST.calendarAssignments = {};
         saveState();
         renderAll();
         toast("🗑 Tutti i pasti rimossi");
@@ -3453,6 +3527,7 @@
         renderTracker();
         renderShop();
         renderMobileHome();
+        renderCalendar();
       }
 
       /* ─── SIDEBAR ─────────────────────────────────── */
@@ -3596,6 +3671,140 @@
         }
         document.getElementById("repsModal").classList.add("open");
         document.body.style.overflow = "hidden";
+      }
+
+      /* ─── CALENDARIO PASTI ───────────────────────── */
+      const CALENDAR_DAY_NAMES = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+      const CALENDAR_MONTH_NAMES = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+      let calendarPickerTarget = null;
+      function calendarDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+      function calendarSlotKey(date, slot) { return `${calendarDateKey(date)}:${slot}`; }
+      function fixedCalendarRule(date, slot) {
+        const day = date.getDay();
+        if (slot === "lunch" && day >= 1 && day <= 5) return { title: "Mensa lavoro", meta: "Pasto fisso · fuori lista spesa", kind: "fixed-work", badges: ["Fuori casa"] };
+        if (slot === "dinner" && day === 3) return { title: "Cena dalla mia ragazza", meta: "Pasto fisso · fuori lista spesa", kind: "fixed-away", badges: ["Fuori casa"] };
+        if (slot === "lunch" && day === 0) return { title: "Ristorante / fuori casa", meta: "Pasto fisso · nessuna spesa automatica", kind: "fixed-away", badges: ["Fuori casa"] };
+        return null;
+      }
+      function calendarGuidance(date, slot) {
+        const day = date.getDay();
+        if (day === 6 && slot === "lunch") return { title: "Pranzo da pianificare", meta: "Priorità: ricette veloci", kind: "special", badges: ["Veloce", "Inizio ciclo"] };
+        if (day === 6 && slot === "dinner") return { title: "Cena speciale", meta: "Scegli liberamente una ricetta per l'occasione", kind: "special", badges: ["Cena speciale"] };
+        if (day === 0 && slot === "dinner") return { title: "Cena leggera vegetariana", meta: "Priorità: ricette leggere e vegetariane", kind: "light", badges: ["Leggera", "Vegetariana"] };
+        return { title: "Nessun pasto assegnato", meta: "Assegna una ricetta già nel piano", kind: "empty", badges: [] };
+      }
+      function getCalendarAssignment(date, slot) {
+        const assignment = ST.calendarAssignments[calendarSlotKey(date, slot)];
+        return assignment ? ST.meals.find((meal) => meal.id === assignment.mealId) || null : null;
+      }
+      function calendarSlotElement(date, slot) {
+        const fixed = fixedCalendarRule(date, slot);
+        const assigned = getCalendarAssignment(date, slot);
+        const info = fixed || (assigned
+          ? { title: assigned.name, meta: `${assigned.type === "single" ? "👤 Singolo" : "👥 Coppia"} · già incluso nel piano e nella spesa`, kind: "planned", badges: [] }
+          : calendarGuidance(date, slot));
+        const el = document.createElement(fixed ? "div" : "button");
+        if (!fixed) el.type = "button";
+        el.className = `calendar-slot ${info.kind || ""}${fixed ? " fixed" : ""}`;
+        if (!fixed) {
+          el.setAttribute("aria-label", `${slot === "lunch" ? "Pranzo" : "Cena"} ${CALENDAR_DAY_NAMES[date.getDay()]}: ${assigned ? `modifica ${assigned.name}` : "assegna una ricetta"}`);
+          el.addEventListener("click", () => openCalendarPicker(date, slot));
+        }
+        const badges = [...(info.badges || [])];
+        if (assigned) badges.push("Pianificato");
+        el.innerHTML = `<span class="calendar-slot-label">${slot === "lunch" ? "☀ Pranzo" : "☾ Cena"}</span><span class="calendar-slot-title">${escHtml(info.title)}</span><span class="calendar-slot-meta">${escHtml(info.meta)}</span>${badges.length ? `<span class="calendar-badges">${badges.map((badge) => `<span class="calendar-badge">${escHtml(badge)}</span>`).join("")}</span>` : ""}`;
+        return el;
+      }
+      function renderCalendar() {
+        const grid = document.getElementById("calendarGrid");
+        if (!grid) return;
+        const now = new Date();
+        const todayKey = calendarDateKey(now);
+        grid.innerHTML = "";
+        for (let offset = 0; offset < 7; offset++) {
+          const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+          const day = document.createElement("article");
+          const isToday = calendarDateKey(date) === todayKey;
+          day.className = "calendar-day" + (isToday ? " today" : "");
+          const isCycleStart = date.getDay() === 6;
+          day.innerHTML = `<div class="calendar-day-head"><div class="calendar-day-name">${isToday ? "Oggi · " : ""}${CALENDAR_DAY_NAMES[date.getDay()]}</div><div class="calendar-day-date">${date.getDate()} ${CALENDAR_MONTH_NAMES[date.getMonth()]}</div>${isCycleStart ? '<span class="calendar-cycle-start">Nuovo ciclo dal pranzo</span>' : ""}</div>`;
+          const slots = document.createElement("div");
+          slots.className = "calendar-slots";
+          slots.append(calendarSlotElement(date, "lunch"), calendarSlotElement(date, "dinner"));
+          day.appendChild(slots);
+          grid.appendChild(day);
+        }
+      }
+      function calendarMealIsRecommended(meal, date, slot) {
+        const recipe = RECIPES.find((item) => item.name === meal.name);
+        if (!recipe) return false;
+        if (date.getDay() === 6 && slot === "lunch") return recipeHas(recipe, ["veloce", "quick"]);
+        if (date.getDay() === 0 && slot === "dinner") return recipeIsVegetarian(recipe);
+        return false;
+      }
+      function openCalendarPicker(date, slot) {
+        if (fixedCalendarRule(date, slot)) return;
+        calendarPickerTarget = { date: new Date(date), slot };
+        const title = `${slot === "lunch" ? "Pranzo" : "Cena"} · ${CALENDAR_DAY_NAMES[date.getDay()]} ${date.getDate()} ${CALENDAR_MONTH_NAMES[date.getMonth()]}`;
+        const guidance = calendarGuidance(date, slot);
+        document.getElementById("calendarPickerSlot").textContent = title;
+        document.getElementById("calendarPickerHint").textContent = `${guidance.meta}. Le ricette qui sotto sono già nel tracker: assegnarle al calendario non modifica né quantità né lista spesa.`;
+        const list = document.getElementById("calendarPickerList");
+        list.innerHTML = "";
+        const assigned = getCalendarAssignment(date, slot);
+        if (assigned) {
+          const clear = document.createElement("button");
+          clear.type = "button";
+          clear.className = "calendar-pick";
+          clear.textContent = "↺ Rimuovi assegnazione dal calendario";
+          clear.addEventListener("click", clearCalendarAssignment);
+          list.appendChild(clear);
+        }
+        const meals = [...ST.meals].sort((a, b) => Number(calendarMealIsRecommended(b, date, slot)) - Number(calendarMealIsRecommended(a, date, slot)) || a.name.localeCompare(b.name, "it"));
+        if (!meals.length) {
+          list.innerHTML += '<div class="calendar-picker-empty">Aggiungi prima una ricetta al tracker: sarà poi disponibile qui senza creare una seconda lista della spesa.</div>';
+        } else {
+          meals.forEach((meal) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "calendar-pick";
+            button.innerHTML = `${escHtml(meal.name)}<small>${meal.type === "single" ? "👤 Singolo" : "👥 Coppia"}${calendarMealIsRecommended(meal, date, slot) ? " · consigliata per questa fascia" : ""}</small>`;
+            button.addEventListener("click", () => assignCalendarMeal(meal.id));
+            list.appendChild(button);
+          });
+        }
+        const modal = document.getElementById("calendarModal");
+        modal.classList.add("open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+      function assignCalendarMeal(mealId) {
+        if (!calendarPickerTarget || !ST.meals.some((meal) => meal.id === mealId)) return;
+        ST.calendarAssignments[calendarSlotKey(calendarPickerTarget.date, calendarPickerTarget.slot)] = { mealId };
+        saveState();
+        closeCalendarPicker();
+        renderCalendar();
+        toast("✓ Pasto assegnato al calendario");
+      }
+      function clearCalendarAssignment() {
+        if (!calendarPickerTarget) return;
+        delete ST.calendarAssignments[calendarSlotKey(calendarPickerTarget.date, calendarPickerTarget.slot)];
+        saveState();
+        closeCalendarPicker();
+        renderCalendar();
+        toast("↺ Assegnazione rimossa");
+      }
+      function closeCalendarPicker() {
+        const modal = document.getElementById("calendarModal");
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        calendarPickerTarget = null;
       }
 
       /* ─── STAPLES ─────────────────────────────────── */
