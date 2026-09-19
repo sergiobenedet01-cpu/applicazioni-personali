@@ -8,16 +8,25 @@
 
 (() => {
       const STAPLES = {
-        Colazione: ["Avena", "Cacao", "Uova (scorta)", "Miele"],
-        "Snack & Dolci": [
+        Colazione: [
+          "Avena",
+          "Cacao",
+          "Uova (scorta)",
+          "Miele",
+          "Marmellata",
+          "Pane per colazione",
+        ],
+        "Snack & Merende": [
           "Banane",
           "Mela",
           "Frutta varia",
           "Burro di arachidi",
+          "Barrette per merenda",
           "Dolcetti",
         ],
         Bevande: [
           "Caffè",
+          "Acqua naturale",
           "Acqua frizzante",
           "Succo di frutta 100%",
           "Energetiche",
