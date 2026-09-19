@@ -648,12 +648,17 @@
       }
       .coll-hdr {
         display: flex;
+        width: 100%;
         align-items: center;
         justify-content: space-between;
         padding: 0.95rem 1.2rem;
         cursor: pointer;
         user-select: none;
         transition: background var(--t);
+        color: inherit;
+        border: 0;
+        background: transparent;
+        text-align: left;
       }
       .coll-hdr:hover {
         background: var(--surface2);
@@ -662,6 +667,23 @@
         display: flex;
         align-items: center;
         gap: 0.55rem;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      .coll-hdr:focus-visible {
+        outline: 3px solid rgba(229, 192, 64, 0.8);
+        outline-offset: 3px;
       }
       .coll-icon {
         font-size: 0.95rem;
@@ -941,6 +963,8 @@
         transition: all var(--t);
         user-select: none;
         line-height: 1.5;
+        font: inherit;
+        text-align: left;
       }
       .chip:hover {
         border-color: var(--accent);
@@ -988,6 +1012,48 @@
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 0.6rem;
       }
+      .recipe-tools {
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) auto;
+        gap: 0.55rem;
+        margin-bottom: 0.75rem;
+      }
+      .recipe-search {
+        min-width: 0;
+        padding: 0.62rem 0.75rem;
+        color: var(--text);
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--r3);
+        font: inherit;
+      }
+      .recipe-sort, .shop-toggle {
+        padding: 0.55rem 0.65rem;
+        color: var(--muted2);
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--r3);
+        font: inherit;
+        font-size: 0.72rem;
+      }
+      .recipe-filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin: 0 0 0.75rem;
+      }
+      .recipe-filter {
+        padding: 0.32rem 0.62rem;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface2);
+        color: var(--muted2);
+        cursor: pointer;
+        font: 700 0.67rem "Syne", sans-serif;
+      }
+      .recipe-filter.active { border-color: var(--accent); color: var(--accent); background: rgba(229,192,64,.08); }
+      .recipe-result-note { color: var(--muted); font-size: .72rem; margin: -.25rem 0 .65rem; }
+      .rc-favorite { flex: 0 0 auto; }
       .rc {
         background: var(--surface2);
         border: 1px solid var(--border);
@@ -1318,6 +1384,7 @@
         transition: all var(--t);
         display: grid;
         place-items: center;
+        background: transparent;
       }
       .schk:hover {
         border-color: var(--green);
@@ -1342,6 +1409,13 @@
         text-decoration: line-through;
         color: var(--muted);
       }
+      .shop-item.done { opacity: .62; }
+      .shop-progress { color: var(--accent); font: 700 .72rem "JetBrains Mono", monospace; white-space: nowrap; }
+      .shop-hidden-note { grid-column: 1/-1; color: var(--muted); font-size: .75rem; padding: .35rem 0; }
+      .backup-actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.85rem; }
+      .backup-actions .bb { width:auto; flex:none; }
+      #backupModal .reps-box { max-width: 520px; }
+      .backup-preview { margin:.9rem 0; padding:.75rem; border:1px solid var(--border); border-radius:var(--r3); color:var(--muted2); font-size:.8rem; line-height:1.55; }
       .si-qty {
         font-family: "JetBrains Mono", monospace;
         font-size: 0.63rem;
@@ -1369,7 +1443,7 @@
       }
 
       /* ─── REPS MODAL ─────────────────────────────── */
-      #repsModal {
+      #repsModal, #backupModal {
         position: fixed;
         inset: 0;
         z-index: 500;
@@ -1381,7 +1455,7 @@
         pointer-events: none;
         transition: opacity 0.22s ease;
       }
-      #repsModal.open {
+      #repsModal.open, #backupModal.open {
         opacity: 1;
         pointer-events: all;
       }
@@ -1406,7 +1480,7 @@
         transform: translateY(12px) scale(0.97);
         transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      #repsModal.open .reps-box {
+      #repsModal.open .reps-box, #backupModal.open .reps-box {
         transform: translateY(0) scale(1);
       }
       .reps-title {
@@ -1839,6 +1913,8 @@
         flex-shrink: 0;
       }
       body.mode-mobile .recipes-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+      body.mode-mobile .recipe-tools { grid-template-columns: 1fr; }
+      body.mode-mobile .recipe-search, body.mode-mobile .recipe-sort, body.mode-mobile .recipe-filter { min-height: 44px; }
       body.mode-mobile .rc { padding: 0.9rem; border-radius: 12px; }
       body.mode-mobile .rc-name { font-size: 0.93rem; line-height: 1.35; }
       body.mode-mobile .rc-actions { gap: 0.45rem; margin-top: 0.75rem; }
@@ -2008,6 +2084,8 @@
         cursor: pointer;
       }
       @media (max-width: 380px) {
+        header .hdr-right .mode-switch[title="Esporta backup"],
+        header .hdr-right .mode-switch[title="Importa backup"] { display: none; }
         .mode-gate-cards { gap: 0.5rem; }
         .mode-card { min-height: 138px; padding: 0.85rem; }
         body.mode-mobile main { padding-right: 0.75rem; padding-left: 0.75rem; }
@@ -2045,6 +2123,14 @@
         }
       }
       @media (max-width: 600px) {
+        body { overflow-x: hidden; }
+        header { gap: 0.3rem; padding: 0 0.65rem; }
+        header nav { display: none; }
+        .hdr-right { margin-left: auto; gap: 0.25rem; }
+        .claude-badge-sm { display: none; }
+        .mode-switch { padding: 0.35rem 0.42rem; font-size: 0.64rem; }
+        .layout, main, .sidebar, .coll, .coll-content, .ing-panel, .ing-tabs { min-width: 0; width: 100%; }
+        .recipe-tools { grid-template-columns: 1fr; }
         main {
           padding: 1rem;
           gap: 2rem;
@@ -2120,6 +2206,8 @@
         <button class="nav-btn" onclick="goTo('s04', this)">Spesa</button>
       </nav>
       <div class="hdr-right">
+        <button class="mode-switch" type="button" onclick="downloadBackup()" title="Esporta backup">⇩ Backup</button>
+        <button class="mode-switch" type="button" onclick="document.getElementById('backupImportInput').click()" title="Importa backup">⇧ Ripristina</button>
         <button class="mode-switch" type="button" onclick="showModePicker()" title="Cambia modalità">
           ⇄ Modalità
         </button>
@@ -2331,15 +2419,15 @@
 
           <!-- A: MODULARE -->
           <div class="coll" id="cA">
-            <div class="coll-hdr" onclick="toggleC('cA')">
-              <div class="coll-left">
+            <button type="button" class="coll-hdr" onclick="toggleC('cA')" aria-controls="cABody" aria-expanded="false">
+              <span class="coll-left">
                 <span class="coll-icon">🧩</span>
                 <span class="coll-title">Cucina Modulare</span>
                 <span class="coll-badge">Assembla il tuo piatto</span>
-              </div>
+              </span>
               <span class="coll-arrow">▼</span>
-            </div>
-            <div class="coll-body">
+            </button>
+            <div class="coll-body" id="cABody">
               <div class="coll-content">
                 <div class="builder-layout">
                   <div>
@@ -2395,16 +2483,28 @@
 
           <!-- B: RICETTE PRONTE -->
           <div class="coll" id="cB">
-            <div class="coll-hdr" onclick="toggleC('cB')">
-              <div class="coll-left">
+            <button type="button" class="coll-hdr" onclick="toggleC('cB')" aria-controls="cBBody" aria-expanded="false">
+              <span class="coll-left">
                 <span class="coll-icon">📖</span>
                 <span class="coll-title">Ricette Complete</span>
                 <span class="coll-badge" id="recBadge">— ricette</span>
-              </div>
+              </span>
               <span class="coll-arrow">▼</span>
-            </div>
-            <div class="coll-body">
+            </button>
+            <div class="coll-body" id="cBBody">
               <div class="coll-content">
+                <div class="recipe-tools">
+                  <label class="sr-only" for="recipeSearch">Cerca ricette</label>
+                  <input id="recipeSearch" class="recipe-search" type="search" placeholder="🔍 Cerca nome, ingrediente, tag o categoria" autocomplete="off" />
+                  <select id="recipeSort" class="recipe-sort" aria-label="Ordina ricette">
+                    <option value="default">Ordine catalogo</option>
+                    <option value="alpha">Alfabetico</option>
+                    <option value="category">Categoria</option>
+                    <option value="favorites">Preferite prima</option>
+                  </select>
+                </div>
+                <div class="recipe-filter-row" id="recipeFilters" aria-label="Filtri ricette"></div>
+                <div id="recipeResultNote" class="recipe-result-note" aria-live="polite"></div>
                 <div class="rcat-tabs" id="rcatTabs"></div>
                 <div class="recipes-grid" id="recipesGrid"></div>
               </div>
@@ -2449,6 +2549,7 @@
               </div>
             </div>
           </div>
+          <div class="hint-box" id="distinctProgress" aria-live="polite" style="margin-top:0.75rem"></div>
           <div
             style="
               margin-top: 0.75rem;
@@ -2497,10 +2598,9 @@
                 gap: 0.5rem;
               "
             >
-              <span
-                >Generata automaticamente · hover su ogni voce per copiare
-                📋</span
-              >
+              <span>Generata automaticamente · tocca 📋 per copiare</span>
+              <span class="shop-progress" id="shopProgress" aria-live="polite">0 / 0 acquistati</span>
+              <button class="shop-toggle" id="shopToggle" type="button" onclick="togglePurchasedVisibility()" aria-pressed="false">Nascondi acquistati</button>
               <button
                 class="bb bc"
                 style="
@@ -2541,6 +2641,8 @@
             <div class="mobile-more-card">
               <button class="mobile-more-btn" type="button" onclick="openMobileBuilder()"><span>🧩 Cucina modulare</span><span>›</span></button>
               <button class="mobile-more-btn" type="button" onclick="showModePicker()"><span>⇄ Cambia modalità</span><span>›</span></button>
+              <button class="mobile-more-btn" type="button" onclick="downloadBackup()"><span>⇩ Esporta backup</span><span>›</span></button>
+              <button class="mobile-more-btn" type="button" onclick="document.getElementById('backupImportInput').click()"><span>⇧ Importa backup</span><span>›</span></button>
             </div>
             <div class="mobile-more-card">
               <div class="mobile-home-label">Ingredienti ricorrenti</div>
@@ -2557,7 +2659,19 @@
       <button class="mobile-nav-btn" type="button" data-mobile-nav="spesa" onclick="setMobileView('spesa')"><span>🛒</span>Spesa</button>
       <button class="mobile-nav-btn" type="button" data-mobile-nav="altro" onclick="setMobileView('altro')"><span>•••</span>Altro</button>
     </nav>
-    <div id="toast"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <input id="backupImportInput" type="file" accept="application/json,.json" hidden />
+    <div id="backupModal" role="dialog" aria-modal="true" aria-labelledby="backupModalTitle" aria-hidden="true">
+      <div class="reps-backdrop" onclick="closeBackupModal()"></div>
+      <div class="reps-box">
+        <div class="reps-title" id="backupModalTitle">Importa backup</div>
+        <div class="backup-preview" id="backupPreview"></div>
+        <div class="reps-btns">
+          <button class="reps-btn confirm-s" type="button" onclick="confirmBackupImport()">Sostituisci i dati</button>
+          <button class="reps-btn confirm-d" type="button" onclick="closeBackupModal()">Annulla</button>
+        </div>
+      </div>
+    </div>
 
     <!-- REPS MODAL -->
     <div id="repsModal">
@@ -2603,7 +2717,11 @@
         window.FORKFOLIO_DATA;
 
       const MODE_STORAGE_KEY = "forkfolio-ui-mode";
+      const STATE_STORAGE_KEY = "forkfolio-state-v1";
+      const BACKUP_SCHEMA = "forkfolio-backup";
+      const BACKUP_VERSION = 1;
       let currentMode = null;
+      let pendingBackup = null;
 
 
 
@@ -2620,12 +2738,92 @@
         nextId: 1,
         selIng: [],
         activeRCat: "all",
+        recipeSearch: "",
+        recipeFilter: "all",
+        recipeSort: "default",
+        favoriteRecipeIds: [],
+        shopChecks: {},
+        hidePurchased: false,
       };
+
+      function clampStateNumber(value, min, max = 21) {
+        const number = Number.parseInt(value, 10);
+        return Number.isFinite(number) ? Math.max(min, Math.min(max, number)) : min;
+      }
+      function validMeal(value) {
+        if (!value || typeof value !== "object" || !Number.isInteger(value.id)) return null;
+        if (typeof value.name !== "string" || !["single", "double"].includes(value.type)) return null;
+        if (!value.ing || typeof value.ing !== "object" || Array.isArray(value.ing)) return null;
+        const ing = {};
+        for (const [group, items] of Object.entries(value.ing)) {
+          if (!Array.isArray(items) || !items.every((item) => typeof item === "string")) return null;
+          ing[group] = [...items];
+        }
+        return { id: value.id, name: value.name.slice(0, 240), type: value.type, ing, reps: clampStateNumber(value.reps, 1, 7) };
+      }
+      function normalizeState(value) {
+        if (!value || typeof value !== "object" || !Array.isArray(value.meals)) return null;
+        const meals = value.meals.map(validMeal);
+        if (meals.some((meal) => !meal)) return null;
+        const uniqueIds = new Set(meals.map((meal) => meal.id));
+        if (uniqueIds.size !== meals.length) return null;
+        const knownIds = new Set(RECIPES.map((recipe) => recipe.id));
+        const shopChecks = {};
+        if (value.shopChecks && typeof value.shopChecks === "object" && !Array.isArray(value.shopChecks)) {
+          Object.entries(value.shopChecks).forEach(([key, checked]) => {
+            if (typeof key === "string" && checked === true) shopChecks[key] = true;
+          });
+        }
+        const favoriteRecipeIds = Array.isArray(value.favoriteRecipeIds)
+          ? [...new Set(value.favoriteRecipeIds.filter((id) => Number.isInteger(id) && knownIds.has(id)))] : [];
+        const maxId = meals.reduce((max, meal) => Math.max(max, meal.id), 0);
+        return {
+          sM: clampStateNumber(value.sM, 0), sR: clampStateNumber(value.sR, 1),
+          dM: clampStateNumber(value.dM, 0), dR: clampStateNumber(value.dR, 1),
+          meals, nextId: Math.max(maxId + 1, clampStateNumber(value.nextId, 1, Number.MAX_SAFE_INTEGER)),
+          selIng: [], activeRCat: REC_CATS.includes(value.activeRCat) ? value.activeRCat : "all", recipeSearch: typeof value.recipeSearch === "string" ? value.recipeSearch.slice(0, 120) : "",
+          recipeFilter: RECIPE_FILTERS.some((filter) => filter.id === value.recipeFilter) ? value.recipeFilter : "all",
+          recipeSort: ["default", "alpha", "category", "favorites"].includes(value.recipeSort) ? value.recipeSort : "default",
+          favoriteRecipeIds, shopChecks, hidePurchased: value.hidePurchased === true,
+        };
+      }
+      function stateForStorage() {
+        return {
+          version: BACKUP_VERSION, sM: ST.sM, sR: ST.sR, dM: ST.dM, dR: ST.dR,
+          meals: ST.meals, nextId: ST.nextId, activeRCat: ST.activeRCat, recipeSearch: ST.recipeSearch,
+          recipeFilter: ST.recipeFilter, recipeSort: ST.recipeSort,
+          favoriteRecipeIds: ST.favoriteRecipeIds, shopChecks: ST.shopChecks,
+          hidePurchased: ST.hidePurchased,
+        };
+      }
+      function saveState() {
+        try { localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(stateForStorage())); } catch {}
+      }
+      function restoreState() {
+        try {
+          const raw = localStorage.getItem(STATE_STORAGE_KEY);
+          if (!raw) return false;
+          const restored = normalizeState(JSON.parse(raw));
+          if (!restored) return false;
+          Object.assign(ST, restored);
+          return true;
+        } catch { return false; }
+      }
 
       /* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
       function init() {
+        restoreState();
+        document.getElementById("sM").value = ST.sM;
+        document.getElementById("sR").value = ST.sR;
+        document.getElementById("dM").value = ST.dM;
+        document.getElementById("dR").value = ST.dR;
+        document.getElementById("recipeSearch").value = ST.recipeSearch;
+        document.getElementById("recipeSort").value = ST.recipeSort;
+        document.getElementById("recipeSearch").addEventListener("input", (event) => { ST.recipeSearch = event.target.value; saveState(); renderRecipes(); });
+        document.getElementById("recipeSort").addEventListener("change", (event) => { ST.recipeSort = event.target.value; saveState(); renderRecipes(); });
+        document.getElementById("backupImportInput").addEventListener("change", handleBackupFile);
         buildParticles();
         renderIngPanel();
         renderRecCatTabs();
@@ -2633,6 +2831,7 @@
         renderStaples();
         renderMobileStaples();
         renderAll();
+        hints();
         observeSections();
         prepareModePicker();
       }
@@ -2815,6 +3014,7 @@
         document.getElementById("dM").value = ST.dM;
         document.getElementById("dR").value = ST.dR;
         hints();
+        saveState();
         renderAll();
         toast(
           requestedSingles < singlePlanned || requestedDoubles < doublePlanned
@@ -2859,7 +3059,8 @@
             const cc = document.createElement("div");
             cc.className = "chips";
             items.forEach((item) => {
-              const c = document.createElement("div");
+              const c = document.createElement("button");
+              c.type = "button";
               c.className = "chip";
               c.textContent = item;
               c.onclick = () => toggleIng(item, c);
@@ -2917,7 +3118,8 @@
         const chipsWrap = document.createElement("div");
         chipsWrap.className = "chips";
         matches.forEach((item) => {
-          const c = document.createElement("div");
+          const c = document.createElement("button");
+          c.type = "button";
           c.className = "chip" + (ST.selIng.includes(item) ? " sel" : "");
           c.textContent = item;
           c.onclick = () => {
@@ -2963,7 +3165,8 @@
         }
         z.classList.add("has");
         ST.selIng.forEach((ing) => {
-          const c = document.createElement("div");
+          const c = document.createElement("button");
+          c.type = "button";
           c.className = "chip sel";
           c.textContent = ing;
           c.onclick = () => {
@@ -3004,6 +3207,22 @@
 
       /* ─── RECIPES ─────────────────────────────────── */
       const recipeCategory = (recipe) => recipe.cat || "Senza categoria";
+      const MEAT_WORDS = ["manzo", "maiale", "pancetta", "speck", "bresaola", "prosciutto", "carpaccio", "tartare"];
+      const POULTRY_WORDS = ["pollo", "tacchino"];
+      const FISH_WORDS = ["pesce", "salmone", "tonno", "acciugh", "gamber", "orata", "branzino", "merluzzo", "sgombro", "trota", "vongol", "calamari"];
+      const recipeHaystack = (recipe) => [recipe.name, recipe.cat, ...(recipe.tags || []), ...Object.values(recipe.ing || {}).flat()].join(" ").toLocaleLowerCase("it");
+      const recipeHas = (recipe, words) => words.some((word) => recipeHaystack(recipe).includes(word));
+      const recipeIsVegetarian = (recipe) => !recipeHas(recipe, [...MEAT_WORDS, ...POULTRY_WORDS, ...FISH_WORDS]);
+      const RECIPE_FILTERS = [
+        { id: "all", label: "Tutte", test: () => true },
+        { id: "meat", label: "🥩 Carne", test: (recipe) => recipeHas(recipe, MEAT_WORDS) },
+        { id: "poultry", label: "🐔 Pollo & avicoli", test: (recipe) => recipeHas(recipe, POULTRY_WORDS) },
+        { id: "fish", label: "🐟 Pesce", test: (recipe) => recipeHas(recipe, FISH_WORDS) },
+        { id: "vegetarian", label: "🌿 Vegetariano", test: recipeIsVegetarian },
+        { id: "grains", label: "🍝 Pasta, riso & cereali", test: (recipe) => recipeHas(recipe, ["pasta", "spaghetti", "penne", "trofie", "rigatoni", "fusilli", "tagliatelle", "orecchiette", "riso", "cous cous", "quinoa", "farro", "orzo", "bulgur"]) },
+        { id: "quick", label: "⚡ Veloce", test: (recipe) => recipeHas(recipe, ["veloce", "quick"]) },
+        { id: "favorites", label: "★ Preferite", test: (recipe) => ST.favoriteRecipeIds.includes(recipe.id) },
+      ];
       const REC_CATS = [
         "all",
         ...new Set(RECIPES.map((recipe) => recipeCategory(recipe))),
@@ -3013,7 +3232,7 @@
         el.innerHTML = "";
         REC_CATS.forEach((cat) => {
           const b = document.createElement("button");
-          b.className = "rcb" + (cat === "all" ? " active" : "");
+          b.className = "rcb" + (cat === ST.activeRCat ? " active" : "");
           b.textContent = cat === "all" ? "✦ Tutte" : cat;
           b.onclick = () => {
             ST.activeRCat = cat;
@@ -3021,33 +3240,74 @@
               .querySelectorAll(".rcb")
               .forEach((x) => x.classList.remove("active"));
             b.classList.add("active");
+            saveState();
             renderRecipes();
           };
           el.appendChild(b);
         });
         document.getElementById("recBadge").textContent =
           RECIPES.length + " ricette";
+        renderRecipeFilters();
+      }
+      function renderRecipeFilters() {
+        const wrap = document.getElementById("recipeFilters");
+        wrap.innerHTML = "";
+        RECIPE_FILTERS.forEach((filter) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "recipe-filter" + (ST.recipeFilter === filter.id ? " active" : "");
+          button.textContent = filter.label;
+          button.setAttribute("aria-pressed", String(ST.recipeFilter === filter.id));
+          button.addEventListener("click", () => {
+            ST.recipeFilter = filter.id;
+            saveState();
+            renderRecipeFilters();
+            renderRecipes();
+          });
+          wrap.appendChild(button);
+        });
+      }
+      function toggleFavoriteRecipe(id) {
+        const index = ST.favoriteRecipeIds.indexOf(id);
+        if (index === -1) ST.favoriteRecipeIds.push(id);
+        else ST.favoriteRecipeIds.splice(index, 1);
+        saveState();
+        renderRecipeFilters();
+        renderRecipes();
       }
       function renderRecipes() {
         const grid = document.getElementById("recipesGrid");
         grid.innerHTML = "";
-        const list =
+        const query = ST.recipeSearch.trim().toLocaleLowerCase("it");
+        const activeFilter = RECIPE_FILTERS.find((filter) => filter.id === ST.recipeFilter) || RECIPE_FILTERS[0];
+        let list =
           ST.activeRCat === "all"
             ? RECIPES
             : RECIPES.filter((r) => recipeCategory(r) === ST.activeRCat);
+        list = list.filter((recipe) => !query || recipeHaystack(recipe).includes(query)).filter(activeFilter.test);
+        if (ST.recipeSort === "alpha") list = [...list].sort((a, b) => a.name.localeCompare(b.name, "it"));
+        if (ST.recipeSort === "category") list = [...list].sort((a, b) => recipeCategory(a).localeCompare(recipeCategory(b), "it") || a.name.localeCompare(b.name, "it"));
+        if (ST.recipeSort === "favorites") list = [...list].sort((a, b) => Number(ST.favoriteRecipeIds.includes(b.id)) - Number(ST.favoriteRecipeIds.includes(a.id)));
+        document.getElementById("recipeResultNote").textContent = `${list.length} ricett${list.length === 1 ? "a" : "e"} trovate${query ? ` per “${ST.recipeSearch}”` : ""}`;
+        if (!list.length) {
+          grid.innerHTML = '<div class="t-empty">Nessuna ricetta corrisponde alla ricerca o ai filtri scelti.</div>';
+          return;
+        }
         list.forEach((r) => {
           const card = document.createElement("div");
           card.className = "rc";
           card.id = "rc" + r.id;
           const tags = Array.isArray(r.tags) ? r.tags : [];
           card.innerHTML = `
-      <div class="rc-name">${r.name}</div>
-      <div class="rc-tags">${tags.map((t) => `<span class="rc-tag">${t}</span>`).join("")}</div>
+      <div class="rc-name">${escHtml(r.name)}</div>
+      <div class="rc-tags">${tags.map((t) => `<span class="rc-tag">${escHtml(t)}</span>`).join("")}</div>
       <div class="rc-actions">
         <button class="rcb2 rcs" onclick="addRec(${r.id},'single')">👤 Singolo</button>
         <button class="rcb2 rcd" onclick="addRec(${r.id},'double')">👥 Coppia</button>
         <button class="rcb2 rcp" onclick="copyRecipe(${r.id},this)" title="Copia ricetta">📋</button>
+        <button class="rcb2 rcp rc-favorite" type="button" title="${ST.favoriteRecipeIds.includes(r.id) ? "Rimuovi dalle preferite" : "Aggiungi alle preferite"}" aria-pressed="${ST.favoriteRecipeIds.includes(r.id)}">${ST.favoriteRecipeIds.includes(r.id) ? "★" : "☆"}</button>
       </div>`;
+          card.querySelector(".rc-favorite").addEventListener("click", () => toggleFavoriteRecipe(r.id));
           grid.appendChild(card);
         });
       }
@@ -3140,7 +3400,7 @@
 
       // Close modal on Escape
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeRepsModal();
+        if (e.key === "Escape") { closeRepsModal(); closeBackupModal(); }
       });
       function copyRecipe(id, btn) {
         const rec = RECIPES.find((r) => r.id === id);
@@ -3166,6 +3426,7 @@
       function addMeal(name, type, ing, reps) {
         reps = Math.max(1, parseInt(reps) || 1);
         ST.meals.push({ id: ST.nextId++, name, type, ing, reps });
+        saveState();
         renderAll();
         const label = type === "single" ? "👤" : "👥";
         const repsLabel = reps > 1 ? ` ×${reps}` : "";
@@ -3175,12 +3436,15 @@
       }
       function removeMeal(id) {
         ST.meals = ST.meals.filter((m) => m.id !== id);
+        saveState();
         renderAll();
       }
       function clearAll() {
         if (!ST.meals.length) return;
         if (!confirm("Svuotare tutti i pasti pianificati?")) return;
         ST.meals = [];
+        ST.shopChecks = {};
+        saveState();
         renderAll();
         toast("🗑 Tutti i pasti rimossi");
       }
@@ -3249,6 +3513,12 @@
         const dTotal = doubles.reduce((s, m) => s + (m.reps || 1), 0);
         document.getElementById("tSc").textContent = `${sTotal} / ${ST.sM}`;
         document.getElementById("tDc").textContent = `${dTotal} / ${ST.dM}`;
+        const distinct = (type) => new Set(ST.meals.filter((meal) => meal.type === type).map((meal) => meal.name)).size;
+        const status = [];
+        if (ST.sM > 0) status.push(`Singoli: ${distinct("single")} / ${ST.sR} ricette distinte`);
+        if (ST.dM > 0) status.push(`Coppia: ${distinct("double")} / ${ST.dR} ricette distinte`);
+        const unmet = (ST.sM > 0 && distinct("single") < ST.sR) || (ST.dM > 0 && distinct("double") < ST.dR);
+        document.getElementById("distinctProgress").innerHTML = `${unmet ? "💡 " : "✓ "}${status.join(" · ") || "Imposta i pasti per monitorare le ricette distinte."}${unmet ? " — puoi aggiungere ricette diverse quando vuoi; le ripetizioni restano consentite." : ""}`;
         const makeMealRow = (m, i) => {
           const div = document.createElement("div");
           div.className = "t-meal";
@@ -3316,6 +3586,7 @@
               return;
             }
             meal.reps = newReps;
+            saveState();
             closeRepsModal();
             btns.querySelector(".update-reps")?.remove();
             renderAll();
@@ -3387,10 +3658,13 @@
       function renderShop() {
         const wrap = document.getElementById("shopGrid");
         if (!ST.meals.length) {
+          document.getElementById("shopProgress").textContent = "0 / 0 acquistati";
+          document.getElementById("shopToggle").disabled = true;
           wrap.innerHTML =
             '<div style="font-size:0.81rem;color:var(--muted);font-style:italic;grid-column:1/-1;padding:0.4rem 0;">Aggiungi pasti nel tracker per generare la lista.</div>';
           return;
         }
+        document.getElementById("shopToggle").disabled = false;
 
         // Aggregate ingredients: key = normalized name, value = {displayName, qty}
         const counts = {};
@@ -3415,19 +3689,28 @@
           arr.sort((a, b) => a.name.localeCompare(b.name, "it")),
         );
 
+        const allItems = Object.values(catMap).flat();
+        const checked = allItems.filter((item) => ST.shopChecks[item.name.toLocaleLowerCase("it").trim()]).length;
+        document.getElementById("shopProgress").textContent = `${checked} / ${allItems.length} acquistati`;
+        const toggle = document.getElementById("shopToggle");
+        toggle.textContent = ST.hidePurchased ? "Mostra acquistati" : "Nascondi acquistati";
+        toggle.setAttribute("aria-pressed", String(ST.hidePurchased));
         const ordered = Object.keys(SHOP_CATS).filter((c) => catMap[c]);
         wrap.innerHTML = ordered
           .map((cat) => {
-            const items = catMap[cat];
+            const items = catMap[cat].filter((item) => !ST.hidePurchased || !ST.shopChecks[item.name.toLocaleLowerCase("it").trim()]);
+            if (!items.length) return "";
             return `<div class="shop-cat">
       <div class="shop-cat-hdr">${cat}</div>
       <div class="shop-items">${items
         .map((item) => {
           const sid = "si" + Math.random().toString(36).slice(2, 8);
           const safeN = item.name.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-          return `<div class="shop-item" id="${sid}">
-          <div class="schk" onclick="toggleChk(this)"></div>
-          <span class="si-name">${item.name}</span>
+          const checkKey = item.name.toLocaleLowerCase("it").trim();
+          const isChecked = ST.shopChecks[checkKey] === true;
+          return `<div class="shop-item${isChecked ? " done" : ""}" id="${sid}">
+          <button type="button" class="schk${isChecked ? " on" : ""}" data-shop-key="${escHtml(checkKey)}" aria-label="Segna ${escHtml(item.name)} come acquistato" aria-pressed="${isChecked}"></button>
+          <span class="si-name">${escHtml(item.name)}</span>
           ${item.qty > 1 ? `<span class="si-qty">×${item.qty}</span>` : ""}
           <button class="si-copy" onclick="copyItem('${safeN}',this)">📋</button>
         </div>`;
@@ -3435,7 +3718,88 @@
         .join("")}</div>
     </div>`;
           })
-          .join("");
+          .join("") || '<div class="shop-hidden-note">Tutti gli elementi sono acquistati. Usa “Mostra acquistati” per rivederli.</div>';
+        wrap.querySelectorAll(".schk").forEach((checkbox) => {
+          checkbox.addEventListener("click", () => toggleChk(checkbox));
+        });
+      }
+
+      /* ─── BACKUP & RESTORE ─────────────────────────── */
+      function downloadBackup() {
+        const backup = {
+          schema: BACKUP_SCHEMA,
+          version: BACKUP_VERSION,
+          exportedAt: new Date().toISOString(),
+          uiMode: readSavedMode(),
+          state: stateForStorage(),
+        };
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `forkfolio-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+        toast("⇩ Backup esportato");
+      }
+      function handleBackupFile(event) {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+          toast("⚠️ Il backup è troppo grande");
+          return;
+        }
+        const reader = new FileReader();
+        reader.onerror = () => toast("⚠️ Impossibile leggere il file");
+        reader.onload = () => {
+          try {
+            const backup = JSON.parse(reader.result);
+            if (!backup || backup.schema !== BACKUP_SCHEMA || backup.version !== BACKUP_VERSION) throw new Error("schema");
+            const state = normalizeState(backup.state);
+            if (!state) throw new Error("state");
+            pendingBackup = { state, uiMode: backup.uiMode === "mobile" || backup.uiMode === "desktop" ? backup.uiMode : null };
+            const total = state.meals.reduce((sum, meal) => sum + meal.reps, 0);
+            document.getElementById("backupPreview").textContent = `Backup valido: ${state.meals.length} ricette pianificate (${total} pasti), ${Object.keys(state.shopChecks).length} prodotti acquistati e ${state.favoriteRecipeIds.length} preferite. L'import sostituirà il piano, le impostazioni, la spesa e le preferenze locali solo dopo la conferma.`;
+            const modal = document.getElementById("backupModal");
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          } catch {
+            pendingBackup = null;
+            toast("⚠️ Backup non valido o incompatibile: nessun dato è stato modificato");
+          }
+        };
+        reader.readAsText(file);
+      }
+      function closeBackupModal() {
+        const modal = document.getElementById("backupModal");
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        pendingBackup = null;
+      }
+      function confirmBackupImport() {
+        if (!pendingBackup) return;
+        Object.assign(ST, pendingBackup.state);
+        if (pendingBackup.uiMode) {
+          try { localStorage.setItem(MODE_STORAGE_KEY, pendingBackup.uiMode); } catch {}
+        }
+        saveState();
+        document.getElementById("sM").value = ST.sM;
+        document.getElementById("sR").value = ST.sR;
+        document.getElementById("dM").value = ST.dM;
+        document.getElementById("dR").value = ST.dR;
+        document.getElementById("recipeSearch").value = ST.recipeSearch;
+        document.getElementById("recipeSort").value = ST.recipeSort;
+        closeBackupModal();
+        hints();
+        renderRecCatTabs();
+        renderRecipes();
+        renderAll();
+        toast("✓ Backup ripristinato");
       }
 
       /* ─── UTILS ───────────────────────────────────── */
@@ -3448,11 +3812,22 @@
           .replace(/'/g, "&#39;");
       }
       function toggleC(id) {
-        document.getElementById(id).classList.toggle("open");
+        const section = document.getElementById(id);
+        const open = section.classList.toggle("open");
+        section.querySelector(".coll-hdr")?.setAttribute("aria-expanded", String(open));
       }
       function toggleChk(el) {
-        el.classList.toggle("on");
-        el.closest(".shop-item").classList.toggle("done");
+        const key = el.dataset.shopKey;
+        if (!key) return;
+        if (ST.shopChecks[key]) delete ST.shopChecks[key];
+        else ST.shopChecks[key] = true;
+        saveState();
+        renderShop();
+      }
+      function togglePurchasedVisibility() {
+        ST.hidePurchased = !ST.hidePurchased;
+        saveState();
+        renderShop();
       }
       function copyItem(name, btn) {
         copyText(name)
@@ -3468,10 +3843,9 @@
           .catch(() => toast("⚠️ Copia non riuscita"));
       }
       function clearShopChecks() {
-        document.querySelectorAll(".shop-item.done").forEach((el) => {
-          el.classList.remove("done");
-          el.querySelector(".schk")?.classList.remove("on");
-        });
+        ST.shopChecks = {};
+        saveState();
+        renderShop();
         toast("↺ Spunte azzerate");
       }
       function goTo(id, btn) {
