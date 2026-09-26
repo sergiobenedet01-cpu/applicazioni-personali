@@ -1446,15 +1446,6 @@
       .calendar-pick:hover { border-color:var(--accent); }
       .calendar-pick small { display:block; color:var(--muted); margin-top:.16rem; }
       .calendar-picker-empty { color:var(--muted); font-size:.8rem; line-height:1.5; margin:.8rem 0; }
-      .google-calendar-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:1rem; }
-      .google-calendar-actions { display:flex; flex-wrap:wrap; gap:.55rem; align-items:center; }
-      .google-calendar-actions .bb { flex:none; width:auto; }
-      .google-calendar-note { margin:.7rem 0 0; color:var(--muted); font-size:.75rem; line-height:1.5; }
-      .google-embed-config { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.5rem; margin-top:.85rem; }
-      .google-embed-input { min-width:0; padding:.62rem .72rem; border:1px solid var(--border); border-radius:var(--r3); background:var(--surface2); color:var(--text); font:inherit; font-size:.75rem; }
-      .google-embed-wrap { margin-top:1rem; overflow:hidden; border:1px solid var(--border); border-radius:var(--r2); background:var(--surface2); }
-      .google-embed-wrap iframe { display:block; width:100%; height:560px; border:0; background:#fff; }
-      .google-embed-status { margin-top:.65rem; color:var(--muted2); font-size:.72rem; }
       .si-qty {
         font-family: "JetBrains Mono", monospace;
         font-size: 0.63rem;
@@ -1890,7 +1881,6 @@
       body.mode-mobile[data-mobile-view="piano"] #s01,
       body.mode-mobile[data-mobile-view="piano"] #s03,
       body.mode-mobile[data-mobile-view="piano"] #sCalendar,
-      body.mode-mobile[data-mobile-view="piano"] #sGoogleCalendar,
       body.mode-mobile[data-mobile-view="ricette"] #s02,
       body.mode-mobile[data-mobile-view="spesa"] #s04,
       body.mode-mobile[data-mobile-view="altro"] #mMore {
@@ -1957,8 +1947,6 @@
       body.mode-mobile .calendar-grid { grid-template-columns:1fr; overflow:visible; }
       body.mode-mobile .calendar-day { min-width:0; }
       body.mode-mobile .calendar-slot { min-height:72px; }
-      body.mode-mobile .google-embed-config { grid-template-columns:1fr; }
-      body.mode-mobile .google-calendar-actions .bb { min-height:44px; }
       body.mode-mobile .recipe-tools { grid-template-columns: 1fr; }
       body.mode-mobile .recipe-search, body.mode-mobile .recipe-sort, body.mode-mobile .recipe-filter { min-height: 44px; }
       body.mode-mobile .rc { padding: 0.9rem; border-radius: 12px; }
@@ -2179,7 +2167,6 @@
         .mode-switch { padding: 0.35rem 0.42rem; font-size: 0.64rem; }
         .layout, main, .sidebar, .coll, .coll-content, .ing-panel, .ing-tabs { min-width: 0; width: 100%; }
         .recipe-tools { grid-template-columns: 1fr; }
-        .google-embed-config { grid-template-columns:1fr; }
         main {
           padding: 1rem;
           gap: 2rem;
@@ -2641,32 +2628,6 @@
           <div class="calendar-grid" id="calendarGrid" aria-live="polite"></div>
         </section>
 
-        <!-- ══ GOOGLE CALENDAR ═════════════════════════ -->
-        <section id="sGoogleCalendar" aria-label="Google Calendar">
-          <div class="sec-hdr">
-            <div class="sec-num">// GOOGLE CALENDAR</div>
-            <div class="sec-title">Esporta o visualizza il tuo <span class="hl">calendario</span></div>
-            <div class="sec-sub">Nessun account, token o accesso a Google è richiesto da ForkFolio.</div>
-          </div>
-          <div class="google-calendar-panel">
-            <div class="google-calendar-actions">
-              <button class="bb bs" type="button" onclick="downloadCalendarIcs()">⇩ Esporta piano .ics</button>
-              <button class="bb bc" type="button" onclick="toggleGoogleEmbedConfig()">▣ Configura embed</button>
-              <button class="bb bc" id="clearGoogleEmbed" type="button" onclick="clearGoogleCalendarEmbed()" hidden>✕ Rimuovi embed</button>
-            </div>
-            <p class="google-calendar-note">L’export contiene solo i pasti pianificati e le regole fisse dei prossimi 7 giorni. Gli slot vuoti non vengono esportati.</p>
-            <div id="googleEmbedConfig" hidden>
-              <div class="google-embed-config">
-                <label class="sr-only" for="googleEmbedUrl">URL di embed Google Calendar</label>
-                <input id="googleEmbedUrl" class="google-embed-input" type="url" placeholder="https://calendar.google.com/calendar/embed?..." autocomplete="off" />
-                <button class="bb bc" type="button" onclick="saveGoogleCalendarEmbed()">Salva embed</button>
-              </div>
-              <div class="google-embed-status" id="googleEmbedStatus">Incolla solo un URL di embed di Google Calendar che hai scelto di condividere. L’URL resta nel browser e non entra nei backup o nel repository.</div>
-            </div>
-            <div id="googleEmbedMount"></div>
-          </div>
-        </section>
-
         <!-- ══ 04 SPESA ══════════════════════════════════ -->
         <section id="s04">
           <div class="sec-hdr">
@@ -2816,7 +2777,6 @@
 
       const MODE_STORAGE_KEY = "forkfolio-ui-mode";
       const STATE_STORAGE_KEY = "forkfolio-state-v1";
-      const GOOGLE_EMBED_STORAGE_KEY = "forkfolio-google-calendar-embed";
       const BACKUP_SCHEMA = "forkfolio-backup";
       const BACKUP_VERSION = 1;
       let currentMode = null;
@@ -2941,7 +2901,6 @@
         renderStaples();
         renderMobileStaples();
         renderAll();
-        renderGoogleCalendar();
         hints();
         observeSections();
         prepareModePicker();
@@ -3846,132 +3805,6 @@
         modal.setAttribute("aria-hidden", "true");
         document.body.style.overflow = "";
         calendarPickerTarget = null;
-      }
-
-      /* ─── GOOGLE CALENDAR ────────────────────────── */
-      function icsEscape(value) {
-        return String(value ?? "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
-      }
-      function icsDateTime(date, hour, minute = 0) {
-        return `${calendarDateKey(date).replace(/-/g, "")}T${String(hour).padStart(2, "0")}${String(minute).padStart(2, "0")}00`;
-      }
-      function icsTimestamp() {
-        return new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-      }
-      function calendarExportEvent(date, slot) {
-        const fixed = fixedCalendarRule(date, slot);
-        const assigned = getCalendarAssignment(date, slot);
-        if (!fixed && !assigned) return null;
-        const isLunch = slot === "lunch";
-        const title = fixed ? fixed.title : assigned.name;
-        const type = fixed ? "Regola fissa" : "Pasto pianificato";
-        const note = fixed
-          ? `${fixed.meta}. Non genera ingredienti o lista spesa.`
-          : `${assigned.type === "single" ? "Pasto singolo" : "Pasto di coppia"}. Già incluso nel piano e nella lista spesa di ForkFolio.`;
-        return {
-          uid: `${calendarSlotKey(date, slot)}@forkfolio.local`,
-          title: `ForkFolio · ${title}`,
-          description: `${isLunch ? "Pranzo" : "Cena"} · ${type}\n${note}`,
-          category: fixed ? "ForkFolio,Regola fissa" : "ForkFolio,Pasto pianificato",
-          start: icsDateTime(date, isLunch ? 13 : 20),
-          end: icsDateTime(date, isLunch ? 14 : 21),
-        };
-      }
-      function calendarIcsEvents() {
-        const now = new Date();
-        const events = [];
-        for (let offset = 0; offset < 7; offset++) {
-          const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
-          ["lunch", "dinner"].forEach((slot) => {
-            const event = calendarExportEvent(date, slot);
-            if (event) events.push(event);
-          });
-        }
-        return events;
-      }
-      function downloadCalendarIcs() {
-        const events = calendarIcsEvents();
-        if (!events.length) {
-          toast("Nessun pranzo o cena da esportare nei prossimi 7 giorni");
-          return;
-        }
-        const stamp = icsTimestamp();
-        const lines = [
-          "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ForkFolio//Piano pasti//IT",
-          "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:ForkFolio - Piano pasti", "X-WR-TIMEZONE:Europe/Rome",
-        ];
-        events.forEach((event) => lines.push(
-          "BEGIN:VEVENT", `UID:${event.uid}`, `DTSTAMP:${stamp}`,
-          `DTSTART;TZID=Europe/Rome:${event.start}`, `DTEND;TZID=Europe/Rome:${event.end}`,
-          `SUMMARY:${icsEscape(event.title)}`, `DESCRIPTION:${icsEscape(event.description)}`,
-          `CATEGORIES:${icsEscape(event.category)}`, "END:VEVENT",
-        ));
-        lines.push("END:VCALENDAR");
-        const blob = new Blob([lines.join("\r\n") + "\r\n"], { type: "text/calendar;charset=utf-8" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `forkfolio-pasti-${calendarDateKey(new Date())}.ics`;
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(link.href), 0);
-        toast(`⇩ Esportati ${events.length} eventi .ics`);
-      }
-      function readGoogleCalendarEmbed() {
-        try { return localStorage.getItem(GOOGLE_EMBED_STORAGE_KEY) || ""; } catch { return ""; }
-      }
-      function validGoogleCalendarEmbed(value) {
-        try {
-          const url = new URL(value);
-          return url.protocol === "https:" && url.hostname === "calendar.google.com" && url.pathname.startsWith("/calendar/embed") ? url.toString() : null;
-        } catch { return null; }
-      }
-      function renderGoogleCalendar() {
-        const mount = document.getElementById("googleEmbedMount");
-        const clear = document.getElementById("clearGoogleEmbed");
-        if (!mount || !clear) return;
-        mount.innerHTML = "";
-        const saved = validGoogleCalendarEmbed(readGoogleCalendarEmbed());
-        clear.hidden = !saved;
-        if (!saved) return;
-        const wrap = document.createElement("div");
-        wrap.className = "google-embed-wrap";
-        const frame = document.createElement("iframe");
-        frame.src = saved;
-        frame.title = "Google Calendar condiviso";
-        frame.loading = "lazy";
-        frame.referrerPolicy = "no-referrer";
-        wrap.appendChild(frame);
-        mount.appendChild(wrap);
-      }
-      function toggleGoogleEmbedConfig() {
-        const config = document.getElementById("googleEmbedConfig");
-        const input = document.getElementById("googleEmbedUrl");
-        if (!config || !input) return;
-        config.hidden = !config.hidden;
-        if (!config.hidden) {
-          input.value = readGoogleCalendarEmbed();
-          input.focus();
-        }
-      }
-      function saveGoogleCalendarEmbed() {
-        const input = document.getElementById("googleEmbedUrl");
-        const url = validGoogleCalendarEmbed(input?.value.trim());
-        if (!url) {
-          toast("Usa solo un URL https://calendar.google.com/calendar/embed scelto da te");
-          return;
-        }
-        try { localStorage.setItem(GOOGLE_EMBED_STORAGE_KEY, url); } catch {
-          toast("Impossibile salvare l'embed in questo browser");
-          return;
-        }
-        document.getElementById("googleEmbedConfig").hidden = true;
-        renderGoogleCalendar();
-        toast("✓ Embed Google Calendar salvato solo in questo browser");
-      }
-      function clearGoogleCalendarEmbed() {
-        try { localStorage.removeItem(GOOGLE_EMBED_STORAGE_KEY); } catch {}
-        document.getElementById("googleEmbedConfig").hidden = true;
-        renderGoogleCalendar();
-        toast("Embed Google Calendar rimosso");
       }
 
       /* ─── STAPLES ─────────────────────────────────── */
