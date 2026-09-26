@@ -8,33 +8,38 @@
 
 (() => {
       const STAPLES = {
-        Colazione: [
-          "Avena",
-          "Cacao",
-          "Uova (scorta)",
-          "Miele",
-          "Marmellata",
-          "Pane per colazione",
-        ],
-        "Snack & Merende": [
-          "Banane",
-          "Mela",
-          "Frutta varia",
-          "Burro di arachidi",
-          "Barrette per merenda",
-          "Dolcetti",
-        ],
+        Casa: [],
         Bevande: [
-          "Caffè",
           "Acqua naturale",
           "Acqua frizzante",
+          "Caffè",
           "Succo di frutta 100%",
           "Energetiche",
           "Sciroppo alla menta",
         ],
-        "Dispensa Base": ["Olio EVO (scorta)", "Sale", "Pepe"],
-        Latticini: ["Latte", "Yogurt bianco", "Yogurt da bere"],
-        "Pane & Carboidrati": ["Grissini"],
+        "Cura Personale": [],
+        "Prodotti in scatola": [],
+        Salse: ["Olio EVO (scorta)", "Burro di arachidi"],
+        Spezie: ["Sale", "Pepe"],
+        Carboidrati: ["Avena", "Gallette di mais"],
+        "Frigo e Latticini": ["Uova (scorta)", "Latte", "Yogurt bianco", "Yogurt da bere"],
+        Colazione: [
+          "Cacao",
+          "Miele",
+          "Marmellata",
+        ],
+        "Frutta & Verdura": [
+          "Banane",
+          "Mela",
+          "Frutta varia",
+        ],
+        Panificio: ["Pane per colazione", "Grissini"],
+        Freezer: [],
+        Carni: [],
+        Altro: [
+          "Barrette per merenda",
+          "Dolcetti",
+        ],
       };
 
       const INGREDIENTS = {

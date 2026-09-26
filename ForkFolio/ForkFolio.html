@@ -2988,6 +2988,7 @@
       function renderMobileStaples() {
         const container = document.getElementById("mobileStaples");
         container.innerHTML = Object.entries(STAPLES)
+          .filter(([, items]) => items.length)
           .map(
             ([category, items]) =>
               `<div class="mobile-staple-group"><div class="mobile-staple-title">${escHtml(category)}</div><div class="mobile-staple-items">${items
@@ -3811,7 +3812,7 @@
       function renderStaples() {
         const grid = document.getElementById("staplesGrid");
         grid.innerHTML = "";
-        Object.entries(STAPLES).forEach(([category, items]) => {
+        Object.entries(STAPLES).filter(([, items]) => items.length).forEach(([category, items]) => {
           const group = document.createElement("div");
           group.className = "staples-group";
           const itemsHtml = items
