@@ -1,0 +1,13 @@
+# Sistema operativo e strumenti locali
+.DS_Store
+*.log
+
+# Dipendenze e risultati locali, se introdotti in futuro
+node_modules/
+coverage/
+dist/
+
+# Non inserire credenziali o configurazioni private nel repository
+.env
+.env.*
+!.env.example

@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Pianifica Food, bevande, menu e acquisti per il tuo evento.">
+  <title>Grill & Glass — Food & Drinks</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='.9em' font-size='56'%3E🔥%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🔥</div>
+        <div><strong>Grill &amp; Glass</strong><small>Food &amp; Drinks, con criterio</small></div>
+      </div>
+      <nav class="nav-tabs" aria-label="Sezioni del planner">
+        <button class="nav-tab active" type="button" data-view="event">Evento</button>
+        <button class="nav-tab" type="button" data-view="plan">Piano</button>
+        <button class="nav-tab" type="button" data-view="food">Food</button>
+        <button class="nav-tab" type="button" data-view="catalog">Catalogo</button>
+        <button class="nav-tab" type="button" data-view="drinks">Bar</button>
+        <button class="nav-tab" type="button" data-view="shopping">Spesa</button>
+      </nav>
+      <div class="actions">
+        <button class="btn" type="button" id="exportBtn">↓ Lista Word</button>
+        <button class="btn" type="button" id="printBtn">🖨 Stampa</button>
+        <button class="btn danger" type="button" id="resetAllBtn">Reset evento</button>
+      </div>
+    </header>
+
+    <div class="page" id="event">
+      <section class="hero">
+        <span class="eyebrow">Pianificazione modulare</span>
+        <h1>Un evento, tutto sotto controllo.</h1>
+        <p>Invitati, profili, menu Food, bevande e lista della spesa usano una sola fonte di dati.</p>
+      </section>
+      <section class="overview" aria-label="Riepilogo evento">
+        <div class="metric"><span>Invitati</span><b id="ovGuests">—</b></div>
+        <div class="metric"><span>Budget Food</span><b id="ovCost">—</b></div>
+        <div class="metric"><span>Bevande stimate</span><b id="ovDrinks">—</b></div>
+        <div class="metric"><span>Bottiglie cocktail</span><b id="ovBottles">—</b></div>
+      </section>
+
+      <section class="section event-brief-section">
+        <div class="section-head"><div><div class="section-title"><i>📌</i>Scheda evento</div><p>Il contesto resta locale e accompagna stampa, budget e libreria eventi.</p></div></div>
+        <article class="panel"><div class="event-brief" id="eventBrief"></div></article>
+      </section>
+
+      <section class="section" id="guests">
+        <div class="section-head">
+          <div>
+            <div class="section-title"><i>👥</i>Invitati</div>
+            <p>Ogni persona ha un profilo Food e uno Bevande; quantità e budget partono da qui.</p>
+          </div>
+        </div>
+        <div class="two-col">
+          <article class="panel">
+            <div class="subhead">Partecipazione evento</div>
+            <fieldset class="mode-switch">
+              <legend>Organizzazione partecipanti</legend>
+              <label><input type="radio" name="participantMode" value="single">Un solo totale</label>
+              <label><input type="radio" name="participantMode" value="separate">Food e Bar separati</label>
+            </fieldset>
+            <div class="audience-controls" id="audienceControls"></div>
+            <div class="profile-summary" id="profileSummary" aria-live="polite"></div>
+            <p class="hint">I profili sono stime configurabili: non sono raccomandazioni di consumo.</p>
+            <p class="guest-warning" id="guestWarning" hidden></p>
+          </article>
+          <article class="panel">
+            <div class="subhead">Lista partecipanti <span class="hint" id="estimateLabel"></span></div>
+            <div class="participant-head"><span>#</span><span>Nome</span><span>RSVP</span><span>Food</span><span>Bevande</span><span>Gruppo</span></div>
+            <div class="participant-list" id="participantList"></div>
+          </article>
+        </div>
+        <div class="totals">
+          <div class="total"><b id="guestEstimated">—</b><span>Quote Food</span></div>
+          <div class="total"><b id="guestDrinkers">—</b><span>Bevande stimate</span></div>
+          <div class="total"><b id="guestConfigured">—</b><span>Ricette Food</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <details class="panel profile-settings" open>
+          <summary><span><span class="section-title compact"><i>⚙️</i>Profili configurabili</span><small>Modifica quantità, composizione e categorie escluse.</small></span><span class="summary-chevron">⌄</span></summary>
+          <p class="hint">Le modifiche restano su questo dispositivo e aggiornano subito riepiloghi, menu e bevande.</p>
+          <div id="profileEditor"></div>
+        </details>
+      </section>
+    </div>
+
+    <section class="section page" id="plan" hidden>
+      <div class="page-kicker">Event control</div>
+      <div class="section-head"><div><div class="section-title"><i>✨</i>Piano evento</div><p>Controlli rapidi, avanzi e una libreria locale di eventi e template.</p></div></div>
+      <div class="plan-grid">
+        <article class="panel"><div class="subhead"><span>Controllo di completezza</span><span class="hint" id="planCheckMeta"></span></div><div id="planChecks" class="check-list"></div></article>
+        <article class="panel"><div class="subhead"><span>Budget</span><span class="hint">Stima modificabile</span></div><div id="budgetSummary" class="budget-summary"></div></article>
+      </div>
+      <article class="panel leftovers-panel">
+        <div class="subhead"><span>♻️ Piano avanzi e sprechi</span><span class="hint">Promemoria locali: verifica sempre sicurezza e conservazione.</span></div>
+        <p class="hint">Indica un’azione soltanto per ciò che vuoi pianificare dopo l’evento; l’app non suggerisce tempi di conservazione.</p>
+        <div id="leftoversList" class="leftovers-list"></div>
+      </article>
+      <article class="panel library-panel">
+        <div class="subhead"><span>🗂 Libreria locale</span><div class="inline"><button class="btn" id="duplicateEventBtn" type="button">＋ Duplica evento</button><button class="btn" id="saveTemplateBtn" type="button">☆ Salva come template</button></div></div>
+        <p class="hint">Ogni evento resta in IndexedDB su questo dispositivo. I template eliminano spunte di spesa e piano avanzi.</p>
+        <div id="eventLibrary" class="event-library"></div>
+      </article>
+    </section>
+
+    <section class="section page" id="food" hidden>
+      <div class="page-kicker">Food operations</div>
+      <div class="section-head">
+        <div>
+          <div class="section-title"><i>🍽️</i>Food</div>
+          <p>Scegli il tipo di evento, componi un menu modulare e conserva la tua lista base.</p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" id="selectAllBtn">✓ Tutto acquistato</button>
+          <button class="btn" type="button" id="deselectAllBtn">○ Deseleziona</button>
+          <button class="btn" type="button" id="resetQtyBtn">↺ Reset quantità</button>
+          <button class="btn warm" type="button" id="addProductBtn">＋ Prodotto</button>
+        </div>
+      </div>
+
+      <div class="panel event-type-panel">
+        <label for="eventType"><b>Tipo di evento</b><select id="eventType"></select></label>
+        <p id="eventTypeDescription" class="hint"></p>
+        <div class="food-plan-summary" id="foodPlanSummary" aria-live="polite"></div>
+      </div>
+      <div class="menu-categories" id="foodCategoryControls"></div>
+      <div id="foodRecipeAccordions"></div>
+
+      <div class="panel toolbar">
+        <label class="filter" for="productCategory">Lista base<select id="productCategory"></select></label>
+        <label class="search" for="productSearch">Cerca prodotto<input id="productSearch" type="search" placeholder="es. costine, pane…"></label>
+        <span class="hint" id="productVisible"></span>
+      </div>
+      <div class="panel">
+        <div class="subhead"><span>Spesa completata</span><span class="hint" id="purchaseProgress"></span></div>
+        <div class="progress-wrap"><div class="progress" id="purchaseBar"></div></div>
+      </div>
+      <div id="productList"></div>
+      <article class="panel shopping" id="summary">
+        <div class="subhead"><span>🛒 Lista della spesa</span><span class="hint" id="shoppingMeta"></span></div>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Categoria</th><th>Prodotto o ricetta</th><th>Origine</th><th>Quantità</th><th>Prezzo</th><th>Stato</th></tr></thead>
+            <tbody id="shoppingBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="section page" id="shopping" hidden>
+      <div class="page-kicker">Shopping run</div>
+      <div class="section-head"><div><div class="section-title"><i>🛒</i>Spesa sul campo</div><p>Solo ciò che manca, ordinato per categoria e pensato per il telefono.</p></div><div class="actions"><button class="btn" type="button" id="fieldCheckAllBtn">✓ Segna tutto</button><button class="btn" type="button" id="fieldPrintBtn">🖨 Stampa</button></div></div>
+      <div class="panel field-summary" id="fieldShoppingSummary"></div>
+      <div id="fieldShoppingList" class="field-shopping-list"></div>
+    </section>
+
+    <section class="section page" id="catalog" hidden>
+      <div class="page-kicker">Food catalogue</div>
+      <div class="section-head">
+        <div>
+          <div class="section-title"><i>📚</i>Tutte le ricette</div>
+          <p>Esplora proposte per tutti i tipi di evento; la selezione entra nel menu attivo.</p>
+        </div>
+      </div>
+      <div class="panel toolbar">
+        <label class="filter" for="catalogCategory">Categoria<select id="catalogCategory"></select></label>
+        <label class="search" for="catalogSearch">Cerca ricetta<input id="catalogSearch" type="search" placeholder="es. focaccia, pesce, vegano…"></label>
+        <span class="hint" id="catalogVisible"></span>
+      </div>
+      <div class="recipe-grid" id="catalogGrid"></div>
+    </section>
+
+    <section class="section page" id="drinks" hidden>
+      <div class="page-kicker">Bar operations</div>
+      <div class="section-head">
+        <div>
+          <div class="section-title"><i>🍹</i>Bevande</div>
+          <p>Il totale deriva dai profili; qui decidi soltanto come distribuirlo.</p>
+        </div>
+      </div>
+      <article class="panel mix-panel">
+        <div class="subhead"><span>Mix bevande</span><span class="hint" id="mixTotal">—</span></div>
+        <p class="hint">Modificare una quota ribilancia le altre. Il mix fa sempre 100% e non cambia il totale stimato.</p>
+        <div id="drinkMix"></div>
+        <div class="inline"><button class="btn" type="button" id="suggestedMixBtn">↺ Usa il suggerimento dei profili</button><span class="hint" id="mixSuggestion"></span></div>
+      </article>
+      <div class="panel toolbar">
+        <label class="search" for="drinkSearch">Cerca cocktail<input id="drinkSearch" type="search" placeholder="es. spritz, gin…"></label>
+        <label class="filter" for="drinkCategory">Categoria<select id="drinkCategory"></select></label>
+        <span class="hint" id="drinkSelected"></span>
+      </div>
+      <div class="drink-grid" id="drinkGrid"></div>
+      <div class="panel" style="margin-top:14px">
+        <div class="subhead"><span>Ripartizione cocktail</span><span class="hint" id="mixerMeta"></span></div>
+        <div class="mixer" id="mixerList"></div>
+      </div>
+      <div class="drink-results">
+        <article class="panel">
+          <div class="subhead">Distribuzione bevande</div>
+          <div class="bars" id="drinkBars"></div>
+          <div class="subhead" style="margin-top:18px">Profili partecipanti</div>
+          <div class="bars" id="profileBars"></div>
+        </article>
+        <article class="panel">
+          <div class="subhead">Ingredienti cocktail e bottiglie</div>
+          <p class="hint">Modifica la capacità della bottiglia: il calcolo aggiorna subito il risultato.</p>
+          <div id="ingredientList"></div>
+          <div class="bottle-grid" id="bottleGrid" style="margin-top:12px"></div>
+        </article>
+      </div>
+    </section>
+
+    <p class="footer">Salvataggio automatico locale · nessun account, server o installazione richiesta.</p>
+  </main>
+
+  <div class="dialog" id="productDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <form class="modal" id="productForm">
+      <div class="subhead"><h2 id="dialogTitle">Aggiungi prodotto</h2><button class="icon-btn" type="button" id="dialogClose" aria-label="Chiudi">×</button></div>
+      <div class="fields">
+        <div class="field full"><label for="newName">Nome prodotto</label><input id="newName" required></div>
+        <div class="field"><label for="newCategory">Categoria</label><input id="newCategory" placeholder="Varie"></div>
+        <div class="field"><label for="newUnit">Unità</label><input id="newUnit" placeholder="unità"></div>
+        <div class="field"><label for="newPerPerson">Quantità per persona</label><input id="newPerPerson" type="number" min="0" step="0.1" value="0"></div>
+        <div class="field"><label for="newBase">Quantità base</label><input id="newBase" type="number" min="0" step="0.1" value="1"></div>
+        <div class="field"><label for="newPrice">Prezzo unitario €</label><input id="newPrice" type="number" min="0" step="0.01" value="0"></div>
+        <div class="field"><label for="newEquiv">Unità equivalente</label><input id="newEquiv" placeholder="es. kg"></div>
+        <div class="field full"><label for="newFactor">Fattore equivalenza (opzionale)</label><input id="newFactor" type="number" min="0" step="0.01" value="1"></div>
+      </div>
+      <div class="modal-foot"><button class="btn" type="button" id="dialogCancel">Annulla</button><button class="btn primary" type="submit">Aggiungi</button></div>
+    </form>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/formatters.js?v=5"></script>
+  <script src="data/defaults.js?v=5"></script>
+  <script src="data/food-drinks.js?v=5"></script>
+  <script src="js/storage.js?v=5"></script>
+  <script src="js/state.js?v=5"></script>
+  <script src="js/calculations.js?v=5"></script>
+  <script src="js/render/ui.js?v=5"></script>
+  <script src="js/app.js?v=5"></script>
+</body>
+</html>
