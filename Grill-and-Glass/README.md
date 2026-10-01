@@ -1,4 +1,4 @@
-# Grill & Glass — Food & Drinks
+# Feast Mode — Party Planner
 
 Planner statico per organizzare un evento: invitati, profili Food e Bevande, menu modulare, cocktail, budget e lista della spesa. Funziona senza account, build, backend o dipendenze esterne.
 

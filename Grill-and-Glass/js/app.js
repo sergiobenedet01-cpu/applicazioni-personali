@@ -18,8 +18,8 @@ function exportWord() {
     '<li>' + esc(item[0]) + ': ' + (item[1] / 1000).toFixed(2) + ' L · ' + Math.ceil(item[1] / bottle(item[0])) + ' bottiglie</li>'
   )).join('');
   const eventType = currentEventType();
-  const html = '<!doctype html><html><head><meta charset="utf-8"><title>Lista Food & Drinks</title></head><body>' +
-    '<h1>Grill & Glass — Food & Drinks</h1><p>' + esc(eventType.label) + ' · ' + guests() + ' invitati · generata il ' + new Date().toLocaleString('it-IT') + '</p>' +
+  const html = '<!doctype html><html><head><meta charset="utf-8"><title>Feast Mode — Lista operativa</title></head><body>' +
+    '<h1>Feast Mode — Party Planner</h1><p>' + esc(eventType.label) + ' · ' + guests() + ' invitati · generata il ' + new Date().toLocaleString('it-IT') + '</p>' +
     '<h2>Lista Food</h2><table border="1" cellspacing="0" cellpadding="6"><tr><th>Categoria</th><th>Prodotto o ricetta</th><th>Quantità</th><th>Stato</th></tr>' + rows + '</table>' +
     '<h2>Ingredienti cocktail</h2><ul>' + (cocktailIngredients || '<li>Nessun cocktail configurato</li>') + '</ul></body></html>';
   const anchor = document.createElement('a');
@@ -116,7 +116,7 @@ function completeFieldShopping() {
 }
 
 function printOperationalSheets() {
-  const eventName = state.event.title || 'Evento Food & Drinks';
+  const eventName = state.event.title || 'Feast Mode — Evento';
   const missing = allShoppingRows().filter(row => !row.acquired);
   const menu = selectedFoodRecipes(true);
   const leftoverRows = Object.entries(state.leftovers).filter(([, value]) => value.action !== 'none' || value.note);

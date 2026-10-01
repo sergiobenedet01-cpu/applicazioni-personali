@@ -329,8 +329,8 @@ function downloadFile(name, content, type) {
 }
 
 function exportJson() {
-  const payload = { app: 'Grill & Glass', schema: EVENT_SCHEMA, exportedAt: new Date().toISOString(), state: stateSnapshot() };
-  downloadFile('grill-glass-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(payload, null, 2), 'application/json');
+  const payload = { app: 'Feast Mode', schema: EVENT_SCHEMA, exportedAt: new Date().toISOString(), state: stateSnapshot() };
+  downloadFile('feast-mode-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(payload, null, 2), 'application/json');
   toast('↓ Backup JSON esportato');
 }
 
