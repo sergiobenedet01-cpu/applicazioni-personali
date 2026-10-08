@@ -6,6 +6,11 @@ e `Rimosso`.
 
 ## Non pubblicato
 
+### Rimosso
+
+- Posizione completamente disinvestita nel fondo NEF Ethical Global Trends di
+  Banca 360 BCC, con relativo prezzo, pannello, tab e riepiloghi visivi.
+
 ### Aggiunto
 
 - README operativo con istruzioni locali, aggiornamento prezzi, pubblicazione

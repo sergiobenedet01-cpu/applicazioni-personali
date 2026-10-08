@@ -99,7 +99,11 @@ function validateData(data) {
   let assetCount = 0;
   for (const type of PORTFOLIO_TYPES) {
     const assets = data.DEFAULT_PORTFOLIO[type];
-    if (!Array.isArray(assets) || assets.length === 0) {
+    if (!Array.isArray(assets)) {
+      fail(`DEFAULT_PORTFOLIO.${type} deve essere un array`);
+      continue;
+    }
+    if (assets.length === 0 && type !== "fondi") {
       fail(`DEFAULT_PORTFOLIO.${type} deve contenere almeno un asset`);
       continue;
     }

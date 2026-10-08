@@ -3272,9 +3272,6 @@
         <button class="np" id="nb-etf" onclick="switchTab('etf')">
           📈 ETF
         </button>
-        <button class="np" id="nb-fondi" onclick="switchTab('fondi')">
-          🏦 Fondi BCC
-        </button>
         <button class="np" id="nb-all" onclick="switchTab('all')">
           ⬛ Tutto
         </button>
@@ -3358,29 +3355,6 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════ PREZZI FONDI BCC ════════════════════ -->
-    <div class="cw">
-      <button class="ct" id="ct-fondi" onclick="toggleC('fondi')">
-        <div class="ct-l">
-          <div class="ct-ic">🏦</div>
-          <span class="ct-lbl">Prezzi Fondi BCC</span>
-          <span class="ct-meta" id="cm-fondi">0 / 1 prezzi inseriti</span>
-        </div>
-        <div class="ct-r">
-          <span class="ct-badge" id="cf-fondi"></span>
-          <span class="ct-arrow">▼</span>
-        </div>
-      </button>
-      <div class="cb" id="cb-fondi">
-        <div class="pp">
-          <div class="ppg" id="pe-fondi"></div>
-          <button class="pab" onclick="applyP('fondi')">
-            ✓ Applica Prezzi Fondi BCC
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- ══════════════════════════ SCENARIO BAR ════════════════════════ -->
     <div class="sb">
       <div class="sc-b">
@@ -3433,7 +3407,6 @@
     <!-- ══════════════════════════ SECTIONS ════════════════════════════ -->
     <div id="sec-crypto" class="sec on"></div>
     <div id="sec-etf" class="sec"></div>
-    <div id="sec-fondi" class="sec"></div>
     <div id="sec-all" class="sec"></div>
     <div id="sec-edit" class="sec"></div>
     <div id="sec-budget" class="sec"></div>
@@ -3481,7 +3454,6 @@
       var TAB_IDS = [
         "crypto",
         "etf",
-        "fondi",
         "all",
         "edit",
         "budget",
@@ -4145,6 +4117,7 @@
       function buildPE(type, portfolio) {
         portfolio = portfolio || P;
         var el = document.getElementById("pe-" + type);
+        if (!el) return;
         var h = "";
         for (var i = 0; i < portfolio[type].length; i++) {
           var a = portfolio[type][i];
@@ -4251,9 +4224,10 @@
           var filled = 0;
           for (var i = 0; i < portfolio[tp].length; i++)
             if (prices[portfolio[tp][i].id]) filled++;
-          g("cm-" + tp).textContent =
-            filled + " / " + total + " prezzi inseriti";
+          var meta = g("cm-" + tp);
           var cf = g("cf-" + tp);
+          if (!meta || !cf) return;
+          meta.textContent = filled + " / " + total + " prezzi inseriti";
           if (filled > 0) {
             cf.style.display = "inline";
             cf.textContent = filled + "/" + total;
@@ -4809,6 +4783,7 @@
       /* ══ GLOBAL ANALYTICS ════════════════════════════════════════════════ */
       function globalAnalytics(add, portfolio) {
         portfolio = portfolio || P;
+        var hasFondi = portfolio.fondi.length > 0;
         var all = [];
         portfolio.crypto.forEach(function (a) {
           all.push({ a: a, t: "crypto" });
@@ -4878,7 +4853,7 @@
           "&#128176; Totale Investito",
           '<span class="y">' + N(tI, 2) + " €</span>",
           "ky",
-          "crypto + ETF + fondi",
+          hasFondi ? "crypto + ETF + fondi" : "crypto + ETF",
         );
         h += kpi(
           "&#128184; Valore Attuale",
@@ -4936,18 +4911,19 @@
             : "—",
           ePnl >= 0 ? "kg" : "kr",
         );
-        h += kpi(
-          "&#127968; Fondi BCC P&amp;L",
-          fPnl !== 0
-            ? '<span class="' +
-                (fPnl >= 0 ? "g" : "r") +
-                '">' +
-                (fPnl >= 0 ? "+" : "") +
-                Math.round(fPnl).toLocaleString("it-IT") +
-                " €</span>"
-            : '<span class="mu">Inserisci NAV</span>',
-          fPnl >= 0 ? "kg" : "kr",
-        );
+        if (hasFondi)
+          h += kpi(
+            "&#127968; Fondi BCC P&amp;L",
+            fPnl !== 0
+              ? '<span class="' +
+                  (fPnl >= 0 ? "g" : "r") +
+                  '">' +
+                  (fPnl >= 0 ? "+" : "") +
+                  Math.round(fPnl).toLocaleString("it-IT") +
+                  " €</span>"
+              : '<span class="mu">Inserisci NAV</span>',
+            fPnl >= 0 ? "kg" : "kr",
+          );
         h += kpi(
           "&#9650; Positivi",
           '<span class="g">' + pos + "</span>",
@@ -4980,12 +4956,13 @@
           "% &nbsp;" +
           N(eI, 0) +
           " €</div>";
-        h +=
-          '<div class="dli"><div class="dd" style="background:var(--go)"></div>🏦 Fondi BCC ' +
-          fPct.toFixed(1) +
-          "% &nbsp;" +
-          N(fI, 0) +
-          " €</div>";
+        if (hasFondi)
+          h +=
+            '<div class="dli"><div class="dd" style="background:var(--go)"></div>🏦 Fondi BCC ' +
+            fPct.toFixed(1) +
+            "% &nbsp;" +
+            N(fI, 0) +
+            " €</div>";
         h += "</div></div></div>";
         /* health */
         h +=
@@ -5022,10 +4999,11 @@
           '<div class="hr"><span class="hl">Esposizione ETF</span><span class="hv b">' +
           ePct.toFixed(1) +
           "%</span></div>";
-        h +=
-          '<div class="hr"><span class="hl">Esposizione Fondi BCC</span><span class="hv g">' +
-          fPct.toFixed(1) +
-          "%</span></div>";
+        if (hasFondi)
+          h +=
+            '<div class="hr"><span class="hl">Esposizione Fondi BCC</span><span class="hv g">' +
+            fPct.toFixed(1) +
+            "%</span></div>";
         h += "</div>";
         /* top movers */
         var cryptoEtfCalcs = calcs.filter(function (x) {
@@ -5888,6 +5866,7 @@
       function renderFondi(add, portfolio) {
         portfolio = portfolio || P;
         var el = document.getElementById("sec-fondi");
+        if (!el || !portfolio.fondi.length) return;
         var h =
           '<div class="an"><div class="anh"><div class="ant">&#127968; Fondi Banca 360 BCC</div><div class="anl"></div></div>';
         /* KPI cards */
@@ -6067,8 +6046,9 @@
           rows("crypto", add, portfolio) +
           '<tr class="sep-tr"><td colspan="10">&#128200; ETF — per capitale investito</td></tr>' +
           rows("etf", add, portfolio) +
-          '<tr class="sep-tr"><td colspan="10">&#127968; FONDI BCC — quote</td></tr>' +
-          rows("fondi", add, portfolio) +
+          (portfolio.fondi.length
+            ? '<tr class="sep-tr"><td colspan="10">&#127968; FONDI BCC — quote</td></tr>' + rows("fondi", add, portfolio)
+            : "") +
           "</tbody></table></div></div>";
         setTimeout(function () {
           drawDonut(portfolio);
@@ -6078,7 +6058,7 @@
         var add = parseFloat(g("addAmt").value) || 0;
         var portfolio = portfolioSnapshot();
         renderTables(add, portfolio);
-        renderFondi(add, portfolio);
+        if (portfolio.fondi.length) renderFondi(add, portfolio);
         renderAllSection(add, portfolio);
         if (g("sec-advisor") && g("sec-advisor").classList.contains("on"))
           renderAdvisor(portfolioSnapshot(portfolio));
@@ -6180,6 +6160,7 @@
         });
         h += "</div>";
         /* Fondi BCC section — full width below */
+        if (P.fondi.length) {
         h += '<div class="eb" style="margin-top:14px;">';
         h +=
           '<h4>🏦 Fondi BCC <small style="font-size:.7rem;color:var(--t3);font-family:var(--MO);font-weight:400;">— Banca 360 BCC FriulAdria</small></h4>';
@@ -6207,10 +6188,11 @@
           h += "</div>";
         });
         h += "</div>";
+        }
         h +=
           '<button class="esb" onclick="saveEdit()">&#128190; Salva Modifiche</button>';
         h +=
-          '<p class="enote">Il P.M. Acquisto è opzionale. Il calcolo usa sempre Capitale ÷ Quantità. Per i fondi il Capitale è il costo storico totale.</p>';
+          '<p class="enote">Il P.M. Acquisto è opzionale. Il calcolo usa sempre Capitale ÷ Quantità.</p>';
         root.innerHTML = h;
       }
       function addA(type) {
