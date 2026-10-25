@@ -118,13 +118,6 @@ window.WIPS_DATA = {
         pm0: 55.38,
       },
       {
-        name: "FTSE India",
-        id: "FLXI",
-        cap: 125.561072,
-        qty: 3.57215,
-        pm0: 35.15,
-      },
-      {
         name: "Core Stoxx Europe 600",
         id: "core-stoxx-europe-600",
         cap: 100.99,
@@ -168,7 +161,6 @@ window.WIPS_DATA = {
     CIBR: 59.11,
     "CEA1.DE": 243.75,
     COPX: 50.74,
-    FLXI: 35.16,
     "core-stoxx-europe-600": 313.45,
     "msci-japan": 105.3,
     "ftse-developed-asia-pacific": 46.88,
