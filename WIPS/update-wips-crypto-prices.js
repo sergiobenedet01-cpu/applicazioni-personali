@@ -2,7 +2,7 @@
 "use strict";
 
 /*
- * Aggiorna soltanto le otto quotazioni crypto di DEFAULT_PRICES in
+ * Aggiorna soltanto le quotazioni crypto di DEFAULT_PRICES in
  * WIPS-data.js. Non modifica portafoglio, quantità, P.M., né esegue git.
  * Richiede Node.js 18+ (fetch nativo).
  *
@@ -25,6 +25,7 @@ const PAIRS = {
   polkadot: { pair: "DOTEUR", aliases: ["DOTEUR"] },
   ripple: { pair: "XRPEUR", aliases: ["XXRPZEUR", "XRPEUR"] },
   avalanche: { pair: "AVAXEUR", aliases: ["AVAXEUR"] },
+  chainlink: { pair: "LINKEUR", aliases: ["LINKEUR"] },
   dogecoin: { pair: "DOGEEUR", aliases: ["XDGEUR", "DOGEEUR"] },
   cardano: { pair: "ADAEUR", aliases: ["ADAEUR"] },
 };
