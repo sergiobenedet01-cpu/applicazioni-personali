@@ -59,11 +59,6 @@ const ETF_XETRA = {
     isin: "IE0003Z9E2Y3",
     listing: "Xetra · 4COP · EUR",
   },
-  FLXI: {
-    name: "FTSE India",
-    isin: "IE00BHZRQZ17",
-    listing: "Xetra · FLXI · EUR",
-  },
 };
 
 function findObjectBlock(source, marker) {

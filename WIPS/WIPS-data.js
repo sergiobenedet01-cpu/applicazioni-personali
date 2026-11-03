@@ -138,13 +138,6 @@ window.WIPS_DATA = {
         qty: 4.25849,
         pm0: 47.2,
       },
-      {
-        name: "FTSE India",
-        id: "FLXI",
-        cap: 9.44,
-        qty: 0.263539,
-        pm0: 35.82,
-      },
     ],
 
     fondi: [],
@@ -171,7 +164,6 @@ window.WIPS_DATA = {
     "core-stoxx-europe-600": 318.1,
     "msci-japan": 103.55,
     "ftse-developed-asia-pacific": 47.33,
-    FLXI: 36.17,
 
   },
 };
