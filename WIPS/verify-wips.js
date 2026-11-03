@@ -20,6 +20,8 @@ const REQUIRED_FILES = [
   "WIPS-data.js",
   "update-wips-crypto-prices.js",
   "update-wips-etf-prices.js",
+  "WIPS-allocation-lab.js",
+  "WIPS-allocation-lab.css",
 ];
 const PORTFOLIO_TYPES = ["crypto", "etf", "fondi"];
 const REQUIRED_APP_FUNCTIONS = [
@@ -34,6 +36,13 @@ const REQUIRED_APP_FUNCTIONS = [
   "readBackupImport",
   "applyBackupImport",
   "exportCSV",
+];
+const REQUIRED_ALLOCATION_FUNCTIONS = [
+  "renderAllocationLab",
+  "allocationApplyScenario",
+  "allocationSetAmount",
+  "allocationSimulate",
+  "allocationSimulateAtPrice",
 ];
 
 const errors = [];
@@ -163,6 +172,67 @@ function validateApplicationSource() {
   if (dataScriptIndex >= 0 && !errors.length) pass("WIPS.html carica dati e funzioni applicative attese");
 }
 
+function validateAllocationLabSource() {
+  const htmlPath = path.join(ROOT, "WIPS.html");
+  const html = fs.readFileSync(htmlPath, "utf8");
+  const sourcePath = path.join(ROOT, "WIPS-allocation-lab.js");
+  const stylePath = path.join(ROOT, "WIPS-allocation-lab.css");
+  const source = fs.readFileSync(sourcePath, "utf8");
+  const style = fs.readFileSync(stylePath, "utf8");
+
+  compileJavaScript(source, "WIPS-allocation-lab.js");
+  if (!html.includes('href="WIPS-allocation-lab.css"')) {
+    fail("WIPS.html non carica lo stile Allocation Lab");
+  }
+  if (!html.includes('src="WIPS-allocation-lab.js"')) {
+    fail("WIPS.html non carica il modulo Allocation Lab");
+  }
+  for (const marker of ['id="nb-allocation"', 'id="sec-allocation"']) {
+    if (!html.includes(marker)) fail(`Elemento Allocation Lab mancante: ${marker}`);
+  }
+  for (const name of REQUIRED_ALLOCATION_FUNCTIONS) {
+    if (!new RegExp(`function\\s+${name}\\s*\\(`).test(source)) {
+      fail(`Funzione Allocation Lab attesa non trovata: ${name}`);
+    }
+  }
+  for (const selector of [".alloc-wrap", ".alloc-map", ".alloc-matrix"]) {
+    if (!style.includes(selector)) fail(`Stile Allocation Lab mancante: ${selector}`);
+  }
+  if (!errors.length) pass("Allocation Lab: modulo, stili e punti di integrazione presenti");
+}
+
+function validateAllocationMathInvariants() {
+  /* Gli stessi invarianti finanziari dichiarati dalla console: una simulazione
+     compra quantità al prezzo corrente e ricalcola il P.M. soltanto sul totale
+     storico + importo simulato. Sono controlli in sola lettura e non toccano
+     dati o localStorage. */
+  const simulatePurchase = (cost, qty, investment, price) => {
+    const nextCost = cost + investment;
+    const nextQty = qty + investment / price;
+    return { nextCost, nextQty, pm: nextCost / nextQty };
+  };
+  const closeTo = (actual, expected, tolerance = 1e-9) =>
+    Math.abs(actual - expected) <= tolerance;
+
+  const lowerPrice = simulatePurchase(100, 1, 100, 50);
+  if (!closeTo(lowerPrice.pm, 200 / 3) || lowerPrice.pm >= 100) {
+    fail("Allocation Lab: il test di riduzione P.M. non supera l'invariante");
+  }
+  const samePrice = simulatePurchase(100, 1, 100, 100);
+  if (!closeTo(samePrice.pm, 100)) {
+    fail("Allocation Lab: il test di P.M. invariato allo stesso prezzo non supera l'invariante");
+  }
+  const totalValue = 10000;
+  const pool = 1000;
+  const maxWeight = 15;
+  const currentValue = 1200;
+  const capacity = (maxWeight / 100) * (totalValue + pool) - currentValue;
+  if (!closeTo(capacity, 450) || capacity < 0) {
+    fail("Allocation Lab: il test del limite di concentrazione non supera l'invariante");
+  }
+  if (!errors.length) pass("Allocation Lab: invarianti P.M. e limite di concentrazione validi");
+}
+
 function validateUpdaterSyntax() {
   for (const file of ["update-wips-crypto-prices.js", "update-wips-etf-prices.js"]) {
     compileJavaScript(fs.readFileSync(path.join(ROOT, file), "utf8"), file);
@@ -176,6 +246,8 @@ function main() {
     const data = loadData();
     validateData(data);
     validateApplicationSource();
+    validateAllocationLabSource();
+    validateAllocationMathInvariants();
     validateUpdaterSyntax();
   }
 

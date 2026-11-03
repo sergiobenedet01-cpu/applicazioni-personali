@@ -13,6 +13,16 @@ e `Rimosso`.
 
 ### Aggiunto
 
+- Allocation Lab: area separata e simulativa per distribuire una liquidità
+  scelta dall'utente senza modificare portfolio, prezzi o funzioni esistenti.
+- Mappa di allocazione con score trasparente, importi manuali, semaforo di
+  concentrazione, mix Crypto/ETF post-piano e scenari Prudente, Bilanciato e
+  Dinamico.
+- Matrice opportunità × rischio, obiettivo di capitale storico per posizione e
+  piano a 3/4/6 tranche con impatto teorico sul P.M.
+- Modulo e foglio di stile Allocation Lab separati dal file principale;
+  verificatore locale esteso con controlli di integrazione e invarianti di P.M.
+  e concentrazione.
 - README operativo con istruzioni locali, aggiornamento prezzi, pubblicazione
   e controlli preliminari.
 - Changelog e procedura di release/rollback documentata.

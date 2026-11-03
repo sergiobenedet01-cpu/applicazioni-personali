@@ -36,6 +36,8 @@ iniziali.
 ```text
 WIPS.html                         Interfaccia e logica dell'app
 WIPS-data.js                      Portfolio e prezzi iniziali/fallback
+WIPS-allocation-lab.js            Console simulativa separata per l'allocazione
+WIPS-allocation-lab.css           Stili della console Allocation Lab
 verify-wips.js                    Controllo locale in sola lettura
 update-wips-crypto-prices.js      Updater locale delle quotazioni crypto
 update-wips-etf-prices.js         Updater locale manuale delle quotazioni ETF
@@ -43,6 +45,27 @@ update-wips-etf-prices.js         Updater locale manuale delle quotazioni ETF
 
 `WIPS-data.js` contiene solo i valori iniziali. Le modifiche effettuate nella
 pagina vivono nel `localStorage` del browser e hanno precedenza al reload.
+
+## Allocation Lab
+
+Il tab **🧭 Allocazione** è una console di supporto decisionale visuale. Permette
+di simulare come distribuire una liquidità scelta dall'utente, confrontando:
+
+- distanza dal P.M. e impatto stimato sul nuovo P.M.;
+- peso attuale e peso dopo il piano;
+- limite di concentrazione per singola posizione;
+- mix Crypto/ETF post-piano, matrice opportunità × rischio e piano a tranche;
+- obiettivo di capitale storico per una posizione.
+
+Il modulo è intenzionalmente separato dal What-If principale: non modifica
+posizioni, prezzi, Budget, Advisor, CSV, backup, Kraken o dati in
+`WIPS-data.js`. Salva solo la bozza del piano e le preferenze nel proprio
+`localStorage` (`wips_allocation_lab_v1`).
+
+Gli score e i livelli a tranche sono regole trasparenti di simulazione, non
+previsioni di mercato, segnali di acquisto né consulenza finanziaria. Ogni
+importo resta modificabile e i numeri visualizzati possono essere copiati con
+un click, come nelle tabelle del portfolio.
 
 ## Backup locale completo
 
@@ -101,10 +124,9 @@ credenziali, token o cookie.
 ## Dati locali e prudenza
 
 - `localStorage` è separato per portfolio/prezzi, metadata crypto, confronto
-  Trade Republic e Budget.
+  Trade Republic, Budget e Allocation Lab.
 - Cancellare i dati del sito dal browser può rimuovere le personalizzazioni
-  locali. Prima di farlo, attendere l'introduzione del backup JSON prevista
-  dalla roadmap oppure annotare/esportare manualmente i dati importanti.
+  locali. Prima di farlo, usa **💾 Backup** per esportare un JSON completo.
 - Non modificare direttamente `WIPS-data.js` mentre la pagina è aperta se
   desideri confrontare i fallback: il browser può già avere dati locali più
   recenti.
