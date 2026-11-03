@@ -38,6 +38,8 @@ WIPS.html                         Interfaccia e logica dell'app
 WIPS-data.js                      Portfolio e prezzi iniziali/fallback
 WIPS-allocation-lab.js            Console simulativa separata per l'allocazione
 WIPS-allocation-lab.css           Stili della console Allocation Lab
+WIPS-mobile.js                    Renderer della modalità Mobile (stesso stato e calcoli)
+WIPS-mobile.css                   Stili touch della modalità Mobile
 verify-wips.js                    Controllo locale in sola lettura
 update-wips-crypto-prices.js      Updater locale delle quotazioni crypto
 update-wips-etf-prices.js         Updater locale manuale delle quotazioni ETF
@@ -45,6 +47,22 @@ update-wips-etf-prices.js         Updater locale manuale delle quotazioni ETF
 
 `WIPS-data.js` contiene solo i valori iniziali. Le modifiche effettuate nella
 pagina vivono nel `localStorage` del browser e hanno precedenza al reload.
+
+## Modalità Desktop e Mobile
+
+Nel selettore visibile nell'header puoi scegliere **Desktop** o **Mobile**.
+La preferenza viene memorizzata soltanto nel browser corrente con la chiave
+`wips_layout_mode_v1`: non modifica portfolio, prezzi, backup o file sorgente.
+Al primo utilizzo WIPS propone Mobile sotto i 760 px; dopo una scelta esplicita
+rispetta sempre quella scelta anche dopo il reload.
+
+La modalità Mobile usa le stesse posizioni, quotazioni, `calc()`, What-If,
+copy dei valori e persistenza della vista Desktop. Sostituisce solo la
+presentazione: header di sintesi, card espandibili per gli asset, pannelli
+Portfolio / What-If / Analisi / Strumenti e controlli touch da almeno 44 px.
+Budget, Advisor, Allocation Lab, editor, backup e CSV restano tutti
+raggiungibili dal pannello **Strumenti** e si aprono nella vista Desktop
+completa, evitando di nascondere funzioni o creare una seconda logica.
 
 ## Allocation Lab
 
@@ -196,9 +214,10 @@ Controllare almeno:
 2. Portfolio, What-If, Advisor e Budget;
 3. salvataggio e reload della pagina;
 4. esportazione CSV;
-5. aggiornamento crypto o relativo fallback;
-6. `git diff --check` e revisione del diff;
-7. `git status` per escludere modifiche non correlate.
+5. passaggio Desktop ↔ Mobile, reload e What-If in entrambe le viste;
+6. aggiornamento crypto o relativo fallback;
+7. `git diff --check` e revisione del diff;
+8. `git status` per escludere modifiche non correlate.
 
 Uno script di verifica locale dedicato verrà aggiunto nella Fase 3 della
 roadmap.

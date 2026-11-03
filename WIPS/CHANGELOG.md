@@ -13,6 +13,14 @@ e `Rimosso`.
 
 ### Aggiunto
 
+- Selettore persistente Desktop / Mobile: al primo accesso sceglie la vista
+  adatta alla viewport, poi conserva sempre la preferenza esplicita.
+- Vista Mobile dedicata: sintesi portfolio, card asset espandibili, What-If
+  touch, analisi compatta, stato quotazioni e accesso diretto a tutti gli
+  strumenti completi senza duplicare dati, formule o persistenza.
+- Controllo locale esteso per verificare file, selettore, renderer e stili
+  della modalità Mobile.
+
 - Allocation Lab: area separata e simulativa per distribuire una liquidità
   scelta dall'utente senza modificare portfolio, prezzi o funzioni esistenti.
 - Mappa di allocazione con score trasparente, importi manuali, semaforo di

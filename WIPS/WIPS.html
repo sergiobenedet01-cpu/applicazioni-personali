@@ -3226,6 +3226,7 @@
       /* ═══════════════════════════════════════════════════════════════════ */
     </style>
     <link rel="stylesheet" href="WIPS-allocation-lab.css" />
+    <link rel="stylesheet" href="WIPS-mobile.css" />
   </head>
   <body class="tab-crypto">
     <!--
@@ -3266,6 +3267,14 @@
           </div>
         </div>
       </div>
+      <div class="layout-mode" role="group" aria-label="Modalità interfaccia">
+        <button id="mode-desktop" type="button" aria-pressed="true" onclick="setWipsLayoutMode('desktop')">
+          Desktop
+        </button>
+        <button id="mode-mobile" type="button" aria-pressed="false" onclick="setWipsLayoutMode('mobile')">
+          Mobile
+        </button>
+      </div>
       <div class="hnav">
         <button class="np on" id="nb-crypto" onclick="switchTab('crypto')">
           🪙 Crypto
@@ -3300,6 +3309,7 @@
       </div>
     </header>
     <div class="tab-strip"></div>
+    <main id="mobile-shell" class="mobile-shell" aria-live="polite"></main>
 
     <!-- ══════════════════════════ PREZZI CRYPTO ═══════════════════════ -->
     <div class="cw">
@@ -3696,7 +3706,10 @@
             UI NAVIGATION
             ═══════════════════════════════════════════════════════════════════ */
       function switchTab(t) {
-        document.body.className = "tab-" + t;
+        var layoutClass = document.body.classList.contains("mode-mobile")
+          ? " mode-mobile"
+          : " mode-desktop";
+        document.body.className = "tab-" + t + layoutClass;
         TAB_IDS.forEach(function (id) {
           var nb = g("nb-" + id);
           if (nb) nb.classList.toggle("on", id === t);
@@ -3708,6 +3721,11 @@
         if (t === "advisor") renderAdvisor();
         if (t === "allocation" && typeof renderAllocationLab === "function")
           renderAllocationLab();
+        if (
+          document.body.classList.contains("mode-mobile") &&
+          typeof renderMobileExperience === "function"
+        )
+          renderMobileExperience();
       }
 
       /* ══ COLLAPSE ═══════════════════════════════════════════════════════ */
@@ -3926,9 +3944,12 @@
 
       function setCryptoQuoteStatus(message, state) {
         var status = g("cryptoQuoteStatus");
-        if (!status) return;
-        status.className = "quote-status" + (state ? " " + state : "");
-        status.textContent = message || "";
+        if (status) {
+          status.className = "quote-status" + (state ? " " + state : "");
+          status.textContent = message || "";
+        }
+        if (typeof updateMobileDataStatus === "function")
+          updateMobileDataStatus(message, state);
       }
 
       function renderCryptoQuoteSummary() {
@@ -6077,6 +6098,11 @@
           typeof renderAllocationLab === "function"
         )
           renderAllocationLab(portfolioSnapshot(portfolio));
+        if (
+          document.body.classList.contains("mode-mobile") &&
+          typeof renderMobileExperience === "function"
+        )
+          renderMobileExperience(portfolioSnapshot(portfolio));
       }
       function renderEditor() {
         renderEdit();
@@ -7768,5 +7794,6 @@
       /* ═════════════════════════════════════════════════════════════════════ */
     </script>
     <script src="WIPS-allocation-lab.js"></script>
+    <script src="WIPS-mobile.js"></script>
   </body>
 </html>

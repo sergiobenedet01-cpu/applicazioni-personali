@@ -22,6 +22,8 @@ const REQUIRED_FILES = [
   "update-wips-etf-prices.js",
   "WIPS-allocation-lab.js",
   "WIPS-allocation-lab.css",
+  "WIPS-mobile.js",
+  "WIPS-mobile.css",
 ];
 const PORTFOLIO_TYPES = ["crypto", "etf", "fondi"];
 const REQUIRED_APP_FUNCTIONS = [
@@ -233,6 +235,43 @@ function validateAllocationMathInvariants() {
   if (!errors.length) pass("Allocation Lab: invarianti P.M. e limite di concentrazione validi");
 }
 
+function validateMobileModeSource() {
+  const htmlPath = path.join(ROOT, "WIPS.html");
+  const html = fs.readFileSync(htmlPath, "utf8");
+  const sourcePath = path.join(ROOT, "WIPS-mobile.js");
+  const stylePath = path.join(ROOT, "WIPS-mobile.css");
+  const source = fs.readFileSync(sourcePath, "utf8");
+  const style = fs.readFileSync(stylePath, "utf8");
+
+  compileJavaScript(source, "WIPS-mobile.js");
+  for (const marker of [
+    'href="WIPS-mobile.css"',
+    'src="WIPS-mobile.js"',
+    'id="mobile-shell"',
+    'id="mode-desktop"',
+    'id="mode-mobile"',
+  ]) {
+    if (!html.includes(marker)) fail(`Integrazione modalità Mobile mancante: ${marker}`);
+  }
+  for (const marker of [
+    "window.setWipsLayoutMode = function",
+    "function renderMobileExperience",
+    "window.renderMobileExperience = renderMobileExperience",
+    "window.mobileSetGlobalWhatIf = function",
+    "window.mobileOpenDesktopTab = function",
+    "calc(asset, add)",
+  ]) {
+    if (!source.includes(marker)) fail(`Funzione/integrazione Mobile mancante: ${marker}`);
+  }
+  for (const selector of [".mobile-shell", "body.mode-mobile", ".m-asset-card"]) {
+    if (!style.includes(selector)) fail(`Stile Mobile mancante: ${selector}`);
+  }
+  if (!html.includes("updateMobileDataStatus(message, state)")) {
+    fail("Lo stato quotazioni non viene inoltrato alla modalità Mobile");
+  }
+  if (!errors.length) pass("Modalità Mobile: selettore, renderer e stili presenti");
+}
+
 function validateUpdaterSyntax() {
   for (const file of ["update-wips-crypto-prices.js", "update-wips-etf-prices.js"]) {
     compileJavaScript(fs.readFileSync(path.join(ROOT, file), "utf8"), file);
@@ -248,6 +287,7 @@ function main() {
     validateApplicationSource();
     validateAllocationLabSource();
     validateAllocationMathInvariants();
+    validateMobileModeSource();
     validateUpdaterSyntax();
   }
 
