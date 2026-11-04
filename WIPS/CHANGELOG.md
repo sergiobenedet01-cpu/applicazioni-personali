@@ -10,6 +10,7 @@ e `Rimosso`.
 
 - Posizione completamente disinvestita nel fondo NEF Ethical Global Trends di
   Banca 360 BCC, con relativo prezzo, pannello, tab e riepiloghi visivi.
+- Advisor: pagina, navigazione, renderer, stato e stili dedicati.
 
 ### Aggiunto
 
@@ -39,6 +40,10 @@ e `Rimosso`.
 - Export JSON completo e non distruttivo dei dati locali WIPS.
 - Ripristino JSON con anteprima, validazione completa, conferma finale e
   rollback del localStorage in caso di errore di scrittura.
+- Allocazione riorganizzata come punto unico per ranking Globale, Crypto ed
+  ETF, con filtri persistenti e mappa della liquidità raggruppata per categoria.
+- Fondo ambientale CSS leggero e discreto, disattivato per preferenza di moto
+  ridotto e attenuato su viewport piccole.
 
 ## Baseline precedente al changelog
 
@@ -46,5 +51,5 @@ Le modifiche storiche precedenti a questo file sono disponibili nella cronologia
 Git. Non vengono ricostruite retroattivamente qui per evitare di attribuire
 date, versioni o dettagli non verificati.
 
-Tra le funzionalità già presenti rientrano Portfolio, What-If, Advisor, Budget,
+Tra le funzionalità già presenti rientrano Portfolio, What-If, Budget,
 esportazione CSV, aggiornamento crypto e updater ETF locale manuale.

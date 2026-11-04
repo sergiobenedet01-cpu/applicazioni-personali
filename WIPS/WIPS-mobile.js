@@ -221,14 +221,6 @@
     var total = totals(rows);
     var pnl = total.value - total.invested;
     var pct = total.invested > 0 ? (pnl / total.invested) * 100 : 0;
-    var ranked = rows.filter(function (row) { return row.c.rp !== null; }).slice().sort(function (a, b) { return b.c.rp - a.c.rp; });
-    var best = ranked.slice(0, 3);
-    var worst = ranked.slice(-3).reverse();
-    function ranking(title, list, className) {
-      return '<div class="m-surface"><div class="m-section-label">' + title + "</div><div class=\"m-list-card\" style=\"margin-top:10px;\">" + (list.length ? list.map(function (row) {
-        return '<div class="m-row"><span>' + esc(row.a.name) + '</span><strong class="' + className + '">' + (row.c.rp >= 0 ? "+" : "") + num(row.c.rp, 3) + "%</strong></div>";
-      }).join("") : '<div class="m-empty">Nessun dato disponibile.</div>') + "</div></div>";
-    }
     return (
       '<section class="m-panel" aria-label="Analisi mobile">' +
       '<h1 class="m-panel-title">Analisi</h1>' +
@@ -237,7 +229,7 @@
       '<div class="m-kpi"><span class="m-label">Valore</span><strong class="m-kpi-value">' + money(total.value) + "</strong></div>" +
       '<div class="m-kpi"><span class="m-label">P&L</span><strong class="m-kpi-value ' + pnlClass(pnl) + '">' + signedMoney(pnl) + "</strong></div>" +
       '<div class="m-kpi"><span class="m-label">P&L %</span><strong class="m-kpi-value ' + pnlClass(pct) + '">' + (pct >= 0 ? "+" : "") + num(pct, 3) + "%</strong></div>" +
-      "</div>" + ranking("Migliori rendimenti", best, "m-pnl-positive") + ranking("Rendimenti più deboli", worst, "m-pnl-negative") +
+      '</div><div class="m-surface"><div class="m-section-label">Priorità e piano liquidità</div><div class="m-whatif-current">Ranking Global, Crypto ed ETF e piano di distribuzione sono riuniti in Allocazione.</div><button class="m-secondary-btn" type="button" style="margin-top:12px" onclick="mobileOpenDesktopTab(\'allocation\')">Apri Allocazione</button></div>' +
       "</section>"
     );
   }
@@ -257,7 +249,6 @@
       '<div id="mobile-data-status" class="m-data-status ' + esc(lastDataStatus.state || "") + '">' + esc(quoteStatusText()) + "</div>" +
       '<div class="m-surface"><div class="m-section-label">Copertura prezzi</div><div class="m-whatif-current"><strong>' + coverage + "</strong> posizioni con quotazione disponibile · Kraken: " + esc(cryptoTime) + "</div></div>" +
       toolCard("Aggiorna crypto", "Quotazioni spot EUR da Kraken: flusso invariato rispetto al desktop.", "mobileRefreshCrypto()", "↻ Kraken", true) +
-      toolCard("Advisor", "Valutazione completa, punteggi e indicazioni di portafoglio.", "mobileOpenDesktopTab('advisor')", "Apri") +
       toolCard("Budget", "Liquidità, spese e capitale investibile prima dello stipendio.", "mobileOpenDesktopTab('budget')", "Apri") +
       toolCard("Allocazione", "Laboratorio visuale di distribuzione della liquidità.", "mobileOpenDesktopTab('allocation')", "Apri") +
       toolCard("Portfolio / prezzi", "Modifica posizioni e inserisci i prezzi manuali ETF.", "mobileOpenDesktopTab('edit')", "Apri") +

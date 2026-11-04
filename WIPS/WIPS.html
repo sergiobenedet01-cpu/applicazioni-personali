@@ -66,11 +66,6 @@
         --acc2: var(--go2);
         --acc3: var(--go3);
       }
-      body.tab-advisor {
-        --acc: #38d9ff;
-        --acc2: rgba(56, 217, 255, 0.12);
-        --acc3: rgba(56, 217, 255, 0.045);
-      }
 
       * {
         margin: 0;
@@ -98,6 +93,22 @@
             transparent 60%
           );
       }
+      /* Fondo ambientale volutamente quasi impercettibile: non riceve input,
+         usa solo transform/opacity e si ferma se il sistema riduce il moto. */
+      body::before {
+        content: "";
+        position: fixed;
+        z-index: 0;
+        pointer-events: none;
+        inset: -18%;
+        opacity: 0.2;
+        background:
+          radial-gradient(circle at 18% 24%, rgba(77, 143, 255, 0.15), transparent 16%),
+          radial-gradient(circle at 78% 70%, rgba(155, 114, 255, 0.11), transparent 18%),
+          radial-gradient(circle at 52% 12%, rgba(0, 229, 160, 0.06), transparent 14%);
+        animation: ambientDrift 30s ease-in-out infinite alternate;
+        will-change: transform;
+      }
       ::-webkit-scrollbar {
         width: 4px;
         height: 4px;
@@ -119,6 +130,16 @@
         to {
           opacity: 1;
           transform: none;
+        }
+      }
+      @keyframes ambientDrift {
+        from { transform: translate3d(-1%, -1%, 0) scale(1); }
+        to { transform: translate3d(1.5%, 1%, 0) scale(1.025); }
+      }
+      @media (prefers-reduced-motion: reduce), (max-width: 700px) {
+        body::before {
+          animation: none;
+          opacity: 0.07;
         }
       }
       @keyframes pulse-dot {
@@ -346,9 +367,6 @@
       body.tab-fondi .np.on {
         box-shadow: 0 0 18px rgba(0, 229, 160, 0.22);
       }
-      body.tab-advisor .np.on {
-        box-shadow: 0 0 18px rgba(56, 217, 255, 0.24);
-      }
       .np.csv-btn {
         color: var(--bl);
         border-color: rgba(77, 143, 255, 0.22);
@@ -483,9 +501,6 @@
       }
       body.tab-fondi .tab-strip {
         background: linear-gradient(90deg, var(--go) 0%, transparent 40%);
-      }
-      body.tab-advisor .tab-strip {
-        background: linear-gradient(90deg, #38d9ff 0%, transparent 40%);
       }
 
       /* ─ COLLAPSE ────────────────────────────────────────────────────── */
@@ -1498,308 +1513,6 @@
         flex-shrink: 0;
       }
 
-      /* ─ AI PORTFOLIO ADVISOR ───────────────────────────────────────── */
-      body.tab-advisor header::after {
-        background: linear-gradient(90deg, transparent, #38d9ff, transparent);
-      }
-      body.tab-advisor .sb,
-      body.tab-advisor .cw {
-        display: none;
-      }
-      #sec-advisor {
-        max-width: 1260px;
-        margin: 0 auto;
-      }
-      .adv-wrap {
-        display: grid;
-        gap: 18px;
-      }
-      .adv-hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
-        gap: 16px;
-        align-items: stretch;
-      }
-      .adv-panel,
-      .adv-card {
-        background: var(--d2);
-        border: 1px solid var(--rim);
-        border-radius: 8px;
-        padding: 18px;
-      }
-      .adv-panel.primary {
-        background: linear-gradient(
-          145deg,
-          rgba(56, 217, 255, 0.1),
-          rgba(155, 114, 255, 0.045) 46%,
-          var(--d2)
-        );
-        border-color: rgba(56, 217, 255, 0.22);
-      }
-      .adv-eyebrow {
-        font-family: var(--MO);
-        font-size: 0.64rem;
-        color: #38d9ff;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-      }
-      .adv-title {
-        font-family: var(--BE);
-        font-size: 2rem;
-        letter-spacing: 0.04em;
-        line-height: 1;
-        color: var(--text);
-      }
-      .adv-copy {
-        color: var(--t2);
-        font-size: 0.86rem;
-        line-height: 1.7;
-        margin-top: 10px;
-        max-width: 820px;
-      }
-      .adv-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
-        margin-top: 14px;
-      }
-      .adv-badge {
-        border: 1px solid rgba(56, 217, 255, 0.22);
-        background: rgba(56, 217, 255, 0.06);
-        color: #9beeff;
-        border-radius: 999px;
-        padding: 5px 9px;
-        font-family: var(--MO);
-        font-size: 0.64rem;
-      }
-      .adv-scorebox {
-        display: grid;
-        place-items: center;
-        gap: 10px;
-        text-align: center;
-      }
-      .adv-score-ring {
-        --score: 0;
-        width: 148px;
-        height: 148px;
-        border-radius: 50%;
-        background:
-          radial-gradient(circle at center, var(--d2) 0 57%, transparent 58%),
-          conic-gradient(#38d9ff calc(var(--score) * 1%), var(--d4) 0);
-        display: grid;
-        place-items: center;
-        border: 1px solid rgba(56, 217, 255, 0.24);
-      }
-      .adv-score-ring strong {
-        font-family: var(--BE);
-        font-size: 2.45rem;
-        letter-spacing: 0.03em;
-        color: #38d9ff;
-        line-height: 1;
-      }
-      .adv-score-ring span {
-        display: block;
-        font-family: var(--MO);
-        font-size: 0.62rem;
-        color: var(--t3);
-      }
-      .adv-score-label {
-        font-family: var(--SA);
-        font-weight: 700;
-        color: var(--text);
-      }
-      .adv-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-      }
-      .adv-grid.three {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-      .adv-card h3 {
-        font-family: var(--SA);
-        font-size: 0.86rem;
-        color: var(--text);
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .adv-list {
-        display: grid;
-        gap: 9px;
-      }
-      .adv-item {
-        display: grid;
-        grid-template-columns: 9px 1fr;
-        gap: 9px;
-        color: var(--t2);
-        font-size: 0.78rem;
-        line-height: 1.55;
-      }
-      .adv-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        margin-top: 7px;
-        background: var(--acc);
-      }
-      .adv-dot.good {
-        background: var(--go);
-      }
-      .adv-dot.warn {
-        background: var(--em);
-      }
-      .adv-dot.risk {
-        background: var(--re);
-      }
-      .adv-metrics {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 8px;
-      }
-      .adv-metric {
-        background: var(--d3);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 8px;
-        padding: 12px;
-        min-height: 82px;
-      }
-      .adv-metric span {
-        display: block;
-        font-family: var(--MO);
-        font-size: 0.62rem;
-        color: var(--t3);
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        margin-bottom: 7px;
-      }
-      .adv-metric strong {
-        font-family: var(--BE);
-        font-size: 1.35rem;
-        letter-spacing: 0.03em;
-      }
-      .adv-bars {
-        display: grid;
-        gap: 10px;
-      }
-      .adv-bar-row {
-        display: grid;
-        grid-template-columns: 118px 1fr 54px;
-        gap: 10px;
-        align-items: center;
-      }
-      .adv-bar-name {
-        color: var(--t2);
-        font-size: 0.74rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .adv-track {
-        height: 7px;
-        border-radius: 99px;
-        background: var(--d4);
-        overflow: hidden;
-      }
-      .adv-fill {
-        height: 100%;
-        border-radius: 99px;
-        background: var(--acc);
-      }
-      .adv-bar-val {
-        font-family: var(--MO);
-        font-size: 0.68rem;
-        color: var(--t2);
-        text-align: right;
-      }
-      .adv-opps {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
-        gap: 12px;
-      }
-      .adv-opp {
-        background: var(--d3);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        border-radius: 8px;
-        padding: 14px;
-        display: grid;
-        gap: 9px;
-      }
-      .adv-opp-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        align-items: flex-start;
-      }
-      .adv-opp-title {
-        font-family: var(--SA);
-        font-size: 0.84rem;
-        font-weight: 700;
-        color: var(--text);
-      }
-      .adv-pill {
-        font-family: var(--MO);
-        font-size: 0.58rem;
-        padding: 3px 7px;
-        border-radius: 999px;
-        border: 1px solid var(--rim2);
-        color: var(--t2);
-        white-space: nowrap;
-      }
-      .adv-pill.low {
-        color: var(--go);
-        border-color: rgba(0, 229, 160, 0.25);
-        background: rgba(0, 229, 160, 0.06);
-      }
-      .adv-pill.med {
-        color: var(--em);
-        border-color: rgba(240, 192, 64, 0.25);
-        background: rgba(240, 192, 64, 0.06);
-      }
-      .adv-pill.high {
-        color: var(--re);
-        border-color: rgba(255, 61, 90, 0.25);
-        background: rgba(255, 61, 90, 0.06);
-      }
-      .adv-opp p {
-        color: var(--t2);
-        font-size: 0.75rem;
-        line-height: 1.55;
-      }
-      .adv-opp-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-      .adv-action {
-        display: grid;
-        grid-template-columns: 24px 1fr;
-        gap: 10px;
-        padding: 10px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      }
-      .adv-action:last-child {
-        border-bottom: none;
-      }
-      .adv-check {
-        width: 18px;
-        height: 18px;
-        border-radius: 4px;
-        border: 1px solid var(--rim2);
-        margin-top: 2px;
-      }
-      .adv-action strong {
-        color: var(--text);
-        font-size: 0.8rem;
-      }
-      .adv-action p {
-        color: var(--t3);
-        font-size: 0.72rem;
-        line-height: 1.55;
-        margin-top: 3px;
-      }
 
       /* ─ EDIT ────────────────────────────────────────────────────────── */
       .ew {
@@ -1966,17 +1679,8 @@
       @media (max-width: 700px) {
         .ag2,
         .gg,
-        .ew,
-        .adv-hero,
-        .adv-grid,
-        .adv-grid.three {
+        .ew {
           grid-template-columns: 1fr;
-        }
-        .adv-metrics {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-        .adv-bar-row {
-          grid-template-columns: 92px 1fr 48px;
         }
         .arow {
           grid-template-columns: 24px minmax(94px, 1fr) minmax(90px, 1.3fr) 36px 54px 62px;
@@ -3144,9 +2848,7 @@
       }
       .card,
       .eb,
-      .ac,
-      .adv-panel,
-      .adv-card {
+      .ac {
         border-radius: var(--radius-lg);
         padding: var(--sp-4);
       }
@@ -3175,8 +2877,6 @@
       .bmetric,
       .ascore-val,
       .arow-metric,
-      .adv-metric strong,
-      .adv-bar-val,
       .bdg-kpi-value,
       .bdg-line-amount,
       .bdg-bamt,
@@ -3288,9 +2988,6 @@
         <div class="nsep"></div>
         <button class="np" id="nb-budget" onclick="switchTab('budget')">
           💰 Budget
-        </button>
-        <button class="np" id="nb-advisor" onclick="switchTab('advisor')">
-          🧠 Advisor
         </button>
         <button class="np" id="nb-allocation" onclick="switchTab('allocation')">
           🧭 Allocazione
@@ -3424,7 +3121,6 @@
     <div id="sec-all" class="sec"></div>
     <div id="sec-edit" class="sec"></div>
     <div id="sec-budget" class="sec"></div>
-    <div id="sec-advisor" class="sec"></div>
     <div id="sec-allocation" class="sec"></div>
 
     <footer>
@@ -3472,7 +3168,6 @@
         "all",
         "edit",
         "budget",
-        "advisor",
         "allocation",
       ];
 
@@ -3718,7 +3413,6 @@
         });
         if (t === "edit") renderEditor();
         if (t === "budget") renderBudget();
-        if (t === "advisor") renderAdvisor();
         if (t === "allocation" && typeof renderAllocationLab === "function")
           renderAllocationLab();
         if (
@@ -4661,1239 +4355,172 @@
         var calcs = list.map(function (a) {
           return { a: a, t: type, c: calc(a, add) };
         });
-        var tI = 0,
-          tV = 0,
-          pos = 0,
-          neg = 0,
-          noP = 0;
-        calcs.forEach(function (x) {
-          tI += x.c.cost;
-          if (x.c.va !== null) {
-            tV += x.c.va;
-            if (x.c.rp >= 0) pos++;
-            else neg++;
-          } else noP++;
+        var invested = 0;
+        var value = 0;
+        var positive = 0;
+        var negative = 0;
+        var withoutPrice = 0;
+        calcs.forEach(function (row) {
+          invested += row.c.cost;
+          if (row.c.va === null) {
+            withoutPrice++;
+            return;
+          }
+          value += row.c.va;
+          if (row.c.rp >= 0) positive++;
+          else negative++;
         });
-        var pnl = tV - tI,
-          pct = tI > 0 ? (pnl / tI) * 100 : 0;
-        var addA = parseFloat(document.getElementById("addAmt").value) || 0;
-        var inc = tI > 0 ? (addA / tI) * 100 : 0;
+        var pnl = value - invested;
+        var pnlPct = invested > 0 ? (pnl / invested) * 100 : 0;
+        var addAmount = parseFloat(document.getElementById("addAmt").value) || 0;
+        var dcaIncidence = invested > 0 ? (addAmount / invested) * 100 : 0;
         var potentialInvested =
-          addA > 0
-            ? '<div class="kpi-sim-total" title="Capitale investito dopo il What-If"><strong>' +
-              "+" +
-              N(addA, 2) +
+          addAmount > 0
+            ? '<div class="kpi-sim-total" title="Capitale investito dopo il What-If"><strong>+' +
+              N(addAmount, 2) +
               ' €</strong><span>→ ' +
-              N(tI + addA, 2) +
+              N(invested + addAmount, 2) +
               ' € investiti potenziali</span></div>'
             : "";
-        var wPnl = calcs
-          .filter(function (x) {
-            return x.c.rp !== null;
-          })
-          .sort(sortByPnlPctDesc);
-        var wD = calcs
-          .filter(function (x) {
-            return x.c.dpp !== null;
-          })
-          .sort(sortByDcaPctDesc);
-        var sc2 = calcs
-          .map(function (x) {
-            return { a: x.a, t: type, c: x.c, sc: asc(x.c) };
-          })
-          .sort(function (a, b) {
-            return b.sc - a.sc;
-          });
-        var mxS = 0;
-        sc2.forEach(function (x) {
-          if (x.sc > mxS) mxS = x.sc;
-        });
-        if (!mxS) mxS = 1;
 
         var h =
           '<div class="an"><div class="anh"><div class="ant">&#128202; Analisi</div><div class="anl"></div></div>';
         h += '<div class="kpi-grid">';
         h += kpi(
           "Investito",
-          '<span class="y">' + N(tI, 2) + " €</span>" + potentialInvested,
+          '<span class="y">' + N(invested, 2) + " €</span>" + potentialInvested,
           "ky",
         );
         h += kpi(
           "Valore Attuale",
-          tV > 0 ? '<span class="y">' + N(tV, 2) + " €</span>" : "—",
+          value > 0 ? '<span class="y">' + N(value, 2) + " €</span>" : "—",
           "ky",
         );
         h += kpi(
           "P&amp;L €",
-          pnl !== 0
-            ? '<span class="' +
-                (pnl >= 0 ? "g" : "r") +
-                '">' +
-                (pnl >= 0 ? "+" : "") +
-                Math.abs(pnl).toLocaleString("it-IT", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }) +
-                " €</span>"
+          value > 0
+            ? '<span class="' + (pnl >= 0 ? "g" : "r") + '">' +
+              (pnl >= 0 ? "+" : "") + N(Math.abs(pnl), 2) + " €</span>"
             : "—",
           pnl >= 0 ? "kg" : "kr",
         );
         h += kpi(
           "P&amp;L %",
-          tV > 0
-            ? '<span class="' +
-                (pct >= 0 ? "g" : "r") +
-                '">' +
-                (pct >= 0 ? "+" : "") +
-                pct.toFixed(2) +
-                "%</span>"
+          value > 0
+            ? '<span class="' + (pnlPct >= 0 ? "g" : "r") + '">' +
+              (pnlPct >= 0 ? "+" : "") + formatDisplayNumber(pnlPct, 3) + "%</span>"
             : "—",
-          pct >= 0 ? "kg" : "kr",
+          pnlPct >= 0 ? "kg" : "kr",
         );
-        h += kpi(
-          "&#9650; Positivi",
-          '<span class="g">' + pos + "</span>",
-          "kg",
-          "asset in guadagno",
-        );
-        h += kpi(
-          "&#9660; Negativi",
-          '<span class="r">' + neg + "</span>",
-          "kr",
-          "asset in perdita",
-        );
-        h += kpi("Senza Prezzo", String(noP), "", "inserisci sopra");
+        h += kpi("&#9650; Positivi", '<span class="g">' + positive + "</span>", "kg", "asset in guadagno");
+        h += kpi("&#9660; Negativi", '<span class="r">' + negative + "</span>", "kr", "asset in perdita");
+        h += kpi("Senza Prezzo", String(withoutPrice), "", "inserisci sopra");
         h += kpi(
           "DCA Incidenza",
-          '<span class="b">' +
-            (addA > 0 ? "+" : "") +
-            inc.toFixed(2) +
-            "%</span>",
+          '<span class="b">' + (addAmount > 0 ? "+" : "") +
+            formatDisplayNumber(dcaIncidence, 3) + "%</span>",
           "kb",
           "sul capitale totale",
         );
-        h += "</div>";
-        h += '<div class="ag2">';
-        h += barCard(
-          "&#128200; P&amp;L per Asset",
-          wPnl,
-          function (c) {
-            return c.re;
-          },
-          function (c) {
-            return c.rp;
-          },
-          function (c) {
-            return c.re >= 0 ? "var(--go)" : "var(--re)";
-          },
-        );
-        h += barCard(
-          "&#9660; Efficacia DCA",
-          wD,
-          function (c) {
-            return c.dp;
-          },
-          function (c) {
-            return c.dpp;
-          },
-          function (c) {
-            return c.dp < 0 ? "var(--go)" : "var(--em)";
-          },
-        );
-        h += "</div>";
-        h += allocCard(
-          "&#127919; Ranking Convenienza — Prossimi " + N(addA, 2) + " €",
-          sc2,
-          mxS,
-          addA,
-        );
-        return h + "</div>";
+        return h + "</div></div>";
       }
 
-      /* ══ GLOBAL ANALYTICS ════════════════════════════════════════════════ */
       function globalAnalytics(add, portfolio) {
         portfolio = portfolio || P;
-        var hasFondi = portfolio.fondi.length > 0;
         var all = [];
-        portfolio.crypto.forEach(function (a) {
-          all.push({ a: a, t: "crypto" });
+        PORTFOLIO_TYPES.forEach(function (type) {
+          (portfolio[type] || []).forEach(function (asset) {
+            all.push({ a: asset, t: type, c: calc(asset, add) });
+          });
         });
-        portfolio.etf.forEach(function (a) {
-          all.push({ a: a, t: "etf" });
+        var totals = {
+          invested: 0,
+          value: 0,
+          cryptoInvested: 0,
+          cryptoValue: 0,
+          etfInvested: 0,
+          etfValue: 0,
+          fondiInvested: 0,
+          fondiValue: 0,
+          positive: 0,
+          negative: 0,
+        };
+        all.forEach(function (row) {
+          totals.invested += row.c.cost;
+          if (row.t === "crypto") totals.cryptoInvested += row.c.cost;
+          else if (row.t === "etf") totals.etfInvested += row.c.cost;
+          else totals.fondiInvested += row.c.cost;
+          if (row.c.va === null) return;
+          totals.value += row.c.va;
+          if (row.t === "crypto") totals.cryptoValue += row.c.va;
+          else if (row.t === "etf") totals.etfValue += row.c.va;
+          else totals.fondiValue += row.c.va;
+          if (row.c.rp >= 0) totals.positive++;
+          else totals.negative++;
         });
-        portfolio.fondi.forEach(function (a) {
-          all.push({ a: a, t: "fondi" });
-        });
-        var calcs = all.map(function (x) {
-          return { a: x.a, t: x.t, c: calc(x.a, add) };
-        });
-        var tI = 0,
-          tV = 0,
-          cI = 0,
-          cV = 0,
-          eI = 0,
-          eV = 0,
-          fI = 0,
-          fV = 0,
-          pos = 0,
-          neg = 0,
-          noP = 0;
-        calcs.forEach(function (x) {
-          tI += x.c.cost;
-          if (x.t === "crypto") cI += x.c.cost;
-          else if (x.t === "etf") eI += x.c.cost;
-          else fI += x.c.cost;
-          if (x.c.va !== null) {
-            tV += x.c.va;
-            if (x.t === "crypto") cV += x.c.va;
-            else if (x.t === "etf") eV += x.c.va;
-            else fV += x.c.va;
-            if (x.c.rp >= 0) pos++;
-            else neg++;
-          } else noP++;
-        });
-        var pnl = tV - tI,
-          pct = tI > 0 ? (pnl / tI) * 100 : 0,
-          cPnl = cV - cI,
-          ePnl = eV - eI,
-          fPnl = fV - fI;
-        var addA = parseFloat(document.getElementById("addAmt").value) || 0;
-        var avgR = 0,
-          rc = 0;
-        calcs.forEach(function (x) {
-          if (x.c.rp !== null) {
-            avgR += x.c.rp;
-            rc++;
-          }
-        });
-        if (rc > 0) avgR /= rc;
-        var worstRec = null;
-        calcs.forEach(function (x) {
-          if (x.c.rc !== null && (worstRec === null || x.c.rc > worstRec))
-            worstRec = x.c.rc;
-        });
-        var cPct = tI > 0 ? (cI / tI) * 100 : 0,
-          ePct = tI > 0 ? (eI / tI) * 100 : 0,
-          fPct = tI > 0 ? (fI / tI) * 100 : 0;
-
+        var pnl = totals.value - totals.invested;
+        var pnlPct =
+          totals.invested > 0 ? (pnl / totals.invested) * 100 : 0;
+        var cryptoPnl = totals.cryptoValue - totals.cryptoInvested;
+        var etfPnl = totals.etfValue - totals.etfInvested;
+        var fondiPnl = totals.fondiValue - totals.fondiInvested;
+        var hasFondi = (portfolio.fondi || []).length > 0;
         var h =
           '<div class="an"><div class="anh"><div class="ant">&#127757; Portafoglio Globale</div><div class="anl"></div></div>';
         h += '<div class="kpi-grid">';
         h += kpi(
           "&#128176; Totale Investito",
-          '<span class="y">' + N(tI, 2) + " €</span>",
+          '<span class="y">' + N(totals.invested, 2) + " €</span>",
           "ky",
           hasFondi ? "crypto + ETF + fondi" : "crypto + ETF",
         );
         h += kpi(
           "&#128184; Valore Attuale",
-          tV > 0 ? '<span class="y">' + N(tV, 2) + " €</span>" : "—",
+          totals.value > 0 ? '<span class="y">' + N(totals.value, 2) + " €</span>" : "—",
           "ky",
         );
         h += kpi(
           "P&amp;L Totale",
-          pnl !== 0
-            ? '<span class="' +
-                (pnl >= 0 ? "g" : "r") +
-                '">' +
-                (pnl >= 0 ? "+" : "") +
-                Math.abs(pnl).toLocaleString("it-IT", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }) +
-                " €</span>"
+          totals.value > 0
+            ? '<span class="' + (pnl >= 0 ? "g" : "r") + '">' +
+              (pnl >= 0 ? "+" : "") + N(Math.abs(pnl), 2) + " €</span>"
             : "—",
           pnl >= 0 ? "kg" : "kr",
         );
         h += kpi(
           "P&amp;L %",
-          tV > 0
-            ? '<span class="' +
-                (pct >= 0 ? "g" : "r") +
-                '">' +
-                (pct >= 0 ? "+" : "") +
-                pct.toFixed(2) +
-                "%</span>"
+          totals.value > 0
+            ? '<span class="' + (pnlPct >= 0 ? "g" : "r") + '">' +
+              (pnlPct >= 0 ? "+" : "") + formatDisplayNumber(pnlPct, 3) + "%</span>"
             : "—",
-          pct >= 0 ? "kg" : "kr",
+          pnlPct >= 0 ? "kg" : "kr",
         );
         h += kpi(
           "&#129689; Crypto P&amp;L",
-          cPnl !== 0
-            ? '<span class="' +
-                (cPnl >= 0 ? "g" : "r") +
-                '">' +
-                (cPnl >= 0 ? "+" : "") +
-                Math.round(cPnl).toLocaleString("it-IT") +
-                " €</span>"
-            : "—",
-          cPnl >= 0 ? "kg" : "kr",
+          '<span class="' + (cryptoPnl >= 0 ? "g" : "r") + '">' +
+            (cryptoPnl >= 0 ? "+" : "") + N(Math.abs(cryptoPnl), 2) + " €</span>",
+          cryptoPnl >= 0 ? "kg" : "kr",
         );
         h += kpi(
           "&#128200; ETF P&amp;L",
-          ePnl !== 0
-            ? '<span class="' +
-                (ePnl >= 0 ? "g" : "r") +
-                '">' +
-                (ePnl >= 0 ? "+" : "") +
-                Math.round(ePnl).toLocaleString("it-IT") +
-                " €</span>"
-            : "—",
-          ePnl >= 0 ? "kg" : "kr",
+          '<span class="' + (etfPnl >= 0 ? "g" : "r") + '">' +
+            (etfPnl >= 0 ? "+" : "") + N(Math.abs(etfPnl), 2) + " €</span>",
+          etfPnl >= 0 ? "kg" : "kr",
         );
         if (hasFondi)
           h += kpi(
             "&#127968; Fondi BCC P&amp;L",
-            fPnl !== 0
-              ? '<span class="' +
-                  (fPnl >= 0 ? "g" : "r") +
-                  '">' +
-                  (fPnl >= 0 ? "+" : "") +
-                  Math.round(fPnl).toLocaleString("it-IT") +
-                  " €</span>"
-              : '<span class="mu">Inserisci NAV</span>',
-            fPnl >= 0 ? "kg" : "kr",
+            '<span class="' + (fondiPnl >= 0 ? "g" : "r") + '">' +
+              (fondiPnl >= 0 ? "+" : "") + N(Math.abs(fondiPnl), 2) + " €</span>",
+            fondiPnl >= 0 ? "kg" : "kr",
           );
-        h += kpi(
-          "&#9650; Positivi",
-          '<span class="g">' + pos + "</span>",
-          "kg",
-          "asset totali",
-        );
-        h += kpi(
-          "&#9660; Negativi",
-          '<span class="r">' + neg + "</span>",
-          "kr",
-          "asset totali",
-        );
-        h += "</div>";
-
-        h += '<div class="gg" style="align-items:stretch;">';
-        /* donut */
-        h +=
-          '<div class="card"><div class="card-hdr"><h4>&#127880; Allocazione Capitale</h4></div>';
-        h +=
-          '<div class="dw"><canvas id="donut" width="90" height="90"></canvas><div class="dl">';
-        h +=
-          '<div class="dli"><div class="dd" style="background:var(--pu)"></div>🪙 Crypto ' +
-          cPct.toFixed(1) +
-          "% &nbsp;" +
-          N(cI, 0) +
-          " €</div>";
-        h +=
-          '<div class="dli"><div class="dd" style="background:var(--bl)"></div>📈 ETF ' +
-          ePct.toFixed(1) +
-          "% &nbsp;" +
-          N(eI, 0) +
-          " €</div>";
-        if (hasFondi)
-          h +=
-            '<div class="dli"><div class="dd" style="background:var(--go)"></div>🏦 Fondi BCC ' +
-            fPct.toFixed(1) +
-            "% &nbsp;" +
-            N(fI, 0) +
-            " €</div>";
-        h += "</div></div></div>";
-        /* health */
-        h +=
-          '<div class="card"><div class="card-hdr"><h4>&#10084;&#65039; Portfolio Health</h4></div>';
-        h +=
-          '<div class="hr"><span class="hl">Diversificazione</span><span class="hv b">' +
-          (portfolio.crypto.length +
-            portfolio.etf.length +
-            portfolio.fondi.length) +
-          " asset</span></div>";
-        h +=
-          '<div class="hr"><span class="hl">Prezzi caricati</span><span class="hv ' +
-          (noP === 0 ? "g" : "y") +
-          '">' +
-          (all.length - noP) +
-          "/" +
-          all.length +
-          "</span></div>";
-        h +=
-          '<div class="hr"><span class="hl">Rendimento medio</span><span class="hv ' +
-          (rc > 0 ? (avgR >= 0 ? "g" : "r") : "mu") +
-          '">' +
-          (rc > 0 ? (avgR >= 0 ? "+" : "") + avgR.toFixed(1) + "%" : "—") +
-          "</span></div>";
-        h +=
-          '<div class="hr"><span class="hl">Max recovery</span><span class="hv r">' +
-          (worstRec !== null ? "+" + worstRec.toFixed(1) + "%" : "—") +
-          "</span></div>";
-        h +=
-          '<div class="hr"><span class="hl">Esposizione Crypto</span><span class="hv" style="color:var(--pu)">' +
-          cPct.toFixed(1) +
-          "%</span></div>";
-        h +=
-          '<div class="hr"><span class="hl">Esposizione ETF</span><span class="hv b">' +
-          ePct.toFixed(1) +
-          "%</span></div>";
-        if (hasFondi)
-          h +=
-            '<div class="hr"><span class="hl">Esposizione Fondi BCC</span><span class="hv g">' +
-            fPct.toFixed(1) +
-            "%</span></div>";
-        h += "</div>";
-        /* top movers */
-        var cryptoEtfCalcs = calcs.filter(function (x) {
-          return x.t !== "fondi";
-        });
-        var movered = cryptoEtfCalcs
-          .filter(function (x) {
-            return x.c.re !== null;
-          })
-          .sort(function (a, b) {
-            return b.c.re - a.c.re;
-          });
-        h +=
-          '<div class="card"><div class="card-hdr"><h4>&#9889; Top Movers</h4></div>';
-        movered.slice(0, 6).forEach(function (x) {
-          var cl = x.c.re >= 0 ? "g" : "r";
-          h +=
-            '<div class="hr"><span class="hl">' +
-            (x.t === "crypto" ? "🪙" : "📈") +
-            " " +
-            x.a.name +
-            '</span><span class="hv ' +
-            cl +
-            '">' +
-            (x.c.re >= 0 ? "+" : "") +
-            Math.round(x.c.re).toLocaleString("it-IT") +
-            " €</span></div>";
-        });
-        h += "</div>";
-        h += "</div>"; /* gg */
-
-        /* ── Grafici per tutti gli asset con prezzi disponibili ── */
-        var allC = calcs.filter(function (x) {
-          return x.t !== "fondi";
-        });
-        var wPnl2 = calcs
-          .filter(function (x) {
-            return x.c.rp !== null;
-          })
-          .sort(sortByPnlPctDesc);
-
-        h +=
-          '<div class="anh" style="margin-top:4px;"><div class="ant" style="font-size:1.1rem;">&#128197; Analisi per Asset</div><div class="anl"></div></div>';
-        h += '<div class="ag2">';
-        h += barCard(
-          "&#128200; P&amp;L per Asset",
-          wPnl2,
-          function (c) {
-            return c.re;
-          },
-          function (c) {
-            return c.rp;
-          },
-          function (c) {
-            return c.re >= 0 ? "var(--go)" : "var(--re)";
-          },
-        );
-        var wDCAb = allC
-          .filter(function (x) {
-            return x.c.dpp !== null;
-          })
-          .sort(sortByDcaPctDesc);
-        h += barCard(
-          "&#9660; Efficacia DCA",
-          wDCAb,
-          function (c) {
-            return c.dp;
-          },
-          function (c) {
-            return c.dpp;
-          },
-          function (c) {
-            return c.dp < 0 ? "var(--go)" : "var(--em)";
-          },
-        );
-        h += "</div>";
-
-        /* global ranking — exclude fondi (no DCA logic for funds) */
-        var gSc = allC
-          .map(function (x) {
-            return { a: x.a, t: x.t, c: x.c, sc: asc(x.c) };
-          })
-          .sort(function (a, b) {
-            return b.sc - a.sc;
-          });
-        var gMx = 0;
-        gSc.forEach(function (x) {
-          if (x.sc > gMx) gMx = x.sc;
-        });
-        if (!gMx) gMx = 1;
-        h += allocCard(
-          "&#127919; Ranking Globale — Dove Allocare i Prossimi " +
-            N(addA, 2) +
-            " €",
-          gSc,
-          gMx,
-          addA,
-        );
-        return h + "</div>";
-      }
-
-      /* ═══════════════════════════════════════════════════════════════════
-            AI PORTFOLIO ADVISOR - read-only strategic layer
-            ═══════════════════════════════════════════════════════════════════ */
-      function advEsc(value) {
-        return String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
-      }
-
-      function advMoney(value) {
-        if (value === null || value === undefined || isNaN(value)) return "—";
-        return (
-          value.toLocaleString("it-IT", {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          }) + " €"
-        );
-      }
-
-      function advAdd(map, key, value) {
-        if (!key) return;
-        map[key] = (map[key] || 0) + value;
-      }
-
-      function advAssetProfile(asset, type) {
-        var n = (asset.name + " " + asset.id).toLowerCase();
-        var sector = "Multi-asset";
-        var region = "Globale";
-        if (type === "crypto") {
-          sector = "Crypto asset";
-          region = "Digitale globale";
-        } else if (n.indexOf("s&p") >= 0 || n.indexOf("qdve") >= 0) {
-          sector = "Tecnologia";
-          region = "USA";
-        } else if (n.indexOf("cyber") >= 0 || n.indexOf("cibr") >= 0) {
-          sector = "Cybersecurity";
-          region = "USA";
-        } else if (n.indexOf("ai") >= 0 || n.indexOf("big data") >= 0) {
-          sector = "AI e dati";
-          region = "Globale sviluppato";
-        } else if (n.indexOf("quantum") >= 0 || n.indexOf("qntm") >= 0) {
-          sector = "Quantum computing";
-          region = "Globale sviluppato";
-        } else if (n.indexOf("automation") >= 0 || n.indexOf("rbot") >= 0) {
-          sector = "Robotica e automazione";
-          region = "Globale sviluppato";
-        } else if (n.indexOf("uran") >= 0 || n.indexOf("wnuc") >= 0) {
-          sector = "Uranio ed energia";
-          region = "Globale";
-        } else if (n.indexOf("copper") >= 0 || n.indexOf("copx") >= 0) {
-          sector = "Rame e materiali";
-          region = "Globale";
-        } else if (n.indexOf("asia") >= 0 || n.indexOf("em") >= 0) {
-          sector = "Mercati emergenti";
-          region = "Asia emergente";
-        } else if (type === "fondi") {
-          sector = "Trend globali ESG";
-          region = "Globale sviluppato";
-        }
-        return { sector: sector, region: region };
-      }
-
-      function advBudgetSnapshot() {
-        if (typeof window.bdgGetSnapshot === "function") {
-          try {
-            return window.bdgGetSnapshot();
-          } catch (e) {
-            console.warn("WIPS advisor: budget snapshot non disponibile", e);
-          }
-        }
-        try {
-          var raw = localStorage.getItem("wips_budget_cashflow_v3");
-          if (raw) return JSON.parse(raw);
-        } catch (e2) {
-          console.warn("WIPS advisor: impossibile leggere budget salvato", e2);
-        }
-        return null;
-      }
-
-      function buildAdvisorSnapshot(add, portfolio) {
-        portfolio = portfolio || P;
-        var all = [];
-        PORTFOLIO_TYPES.forEach(function (type) {
-          portfolio[type].forEach(function (asset) {
-            all.push({ a: asset, t: type });
-          });
-        });
-        var rows = all.map(function (x) {
-          var c = calc(x.a, add);
-          var value = c.va !== null ? c.va : c.cost;
-          var profile = advAssetProfile(x.a, x.t);
-          return {
-            a: x.a,
-            t: x.t,
-            c: c,
-            value: value,
-            sector: profile.sector,
-            region: profile.region,
-          };
-        });
-        var totals = {
-          invested: 0,
-          value: 0,
-          pricedValue: 0,
-          pricedInvested: 0,
-          priced: 0,
-          noPrice: 0,
-          positive: 0,
-          negative: 0,
-        };
-        var byType = { crypto: 0, etf: 0, fondi: 0 };
-        var bySector = {};
-        var byRegion = {};
-        rows.forEach(function (x) {
-          totals.invested += x.c.cost;
-          totals.value += x.value;
-          byType[x.t] += x.value;
-          advAdd(bySector, x.sector, x.value);
-          advAdd(byRegion, x.region, x.value);
-          if (x.c.va !== null) {
-            totals.priced++;
-            totals.pricedValue += x.c.va;
-            totals.pricedInvested += x.c.cost;
-            if (x.c.re >= 0) totals.positive++;
-            else totals.negative++;
-          } else totals.noPrice++;
-        });
-        rows.forEach(function (x) {
-          x.weight = totals.value > 0 ? (x.value / totals.value) * 100 : 0;
-        });
-        rows.sort(function (a, b) {
-          return b.value - a.value;
-        });
-        var budget = advBudgetSnapshot();
-        return {
-          add: add,
-          rows: rows,
-          totals: totals,
-          byType: byType,
-          bySector: bySector,
-          byRegion: byRegion,
-          budget: budget,
-          pnl: totals.pricedValue - totals.pricedInvested,
-          pnlPct:
-            totals.pricedInvested > 0
-              ? ((totals.pricedValue - totals.pricedInvested) /
-                  totals.pricedInvested) *
-                100
-              : null,
-        };
-      }
-
-      function advShare(map, key, total) {
-        return total > 0 ? ((map[key] || 0) / total) * 100 : 0;
-      }
-
-      function advTopEntry(map) {
-        var best = { key: "—", value: 0 };
-        Object.keys(map).forEach(function (key) {
-          if (map[key] > best.value) best = { key: key, value: map[key] };
-        });
-        return best;
-      }
-
-      function analyzeAdvisor(s) {
-        var total = s.totals.value;
-        var assetCount = s.rows.length;
-        var typeCount = PORTFOLIO_TYPES.filter(function (type) {
-          return s.byType[type] > 0;
-        }).length;
-        var maxAsset = s.rows[0] ? s.rows[0].weight : 0;
-        var topType = advTopEntry(s.byType);
-        var topSector = advTopEntry(s.bySector);
-        var topRegion = advTopEntry(s.byRegion);
-        var cryptoPct = advShare(s.byType, "crypto", total);
-        var etfPct = advShare(s.byType, "etf", total);
-        var fondiPct = advShare(s.byType, "fondi", total);
-        var priceCoverage =
-          assetCount > 0 ? (s.totals.priced / assetCount) * 100 : 0;
-        var liq =
-          s.budget && s.budget.liq !== undefined ? Number(s.budget.liq) : 0;
-        var investible =
-          s.budget && s.budget.investible !== undefined
-            ? Number(s.budget.investible)
-            : null;
-        var cashBase = total + Math.max(0, liq);
-        var cashPct = cashBase > 0 ? (Math.max(0, liq) / cashBase) * 100 : 0;
-        var diversificationScore =
-          Math.min(100, assetCount * 6) * 0.55 + typeCount * 15;
-        var concentrationScore = Math.max(
-          0,
-          100 - Math.max(0, maxAsset - 10) * 4,
-        );
-        var assetBalanceScore = 100;
-        if (cryptoPct > 35) assetBalanceScore -= (cryptoPct - 35) * 1.7;
-        if (etfPct < 30) assetBalanceScore -= (30 - etfPct) * 1.2;
-        if (fondiPct > 30) assetBalanceScore -= (fondiPct - 30) * 1.1;
-        assetBalanceScore = Math.max(20, Math.min(100, assetBalanceScore));
-        var geographyScore = Math.max(
-          35,
-          100 - Math.max(0, (topRegion.value / total) * 100 - 45) * 1.4,
-        );
-        var sectorScore = Math.max(
-          35,
-          100 - Math.max(0, (topSector.value / total) * 100 - 40) * 1.5,
-        );
-        var liquidityScore =
-          investible === null
-            ? 72
-            : investible < 0
-              ? 35
-              : cashPct > 35
-                ? 72
-                : cashPct < 3 && total > 0
-                  ? 62
-                  : 90;
-        var dataScore = priceCoverage;
-        var health = Math.round(
-          diversificationScore * 0.18 +
-            concentrationScore * 0.18 +
-            assetBalanceScore * 0.17 +
-            geographyScore * 0.12 +
-            sectorScore * 0.12 +
-            liquidityScore * 0.13 +
-            dataScore * 0.1,
-        );
-        health = Math.max(0, Math.min(100, health));
-        var state =
-          health >= 82
-            ? "Portafoglio solido e ben leggibile"
-            : health >= 68
-              ? "Portafoglio interessante, con alcuni sbilanciamenti"
-              : health >= 52
-                ? "Portafoglio da ribilanciare con metodo"
-                : "Portafoglio concentrato e da semplificare";
-
-        var strengths = [];
-        var risks = [];
-        var steps = [];
-        var comments = [];
-
-        if (assetCount >= 14)
-          strengths.push(
-            "Buona granularita: il capitale e distribuito su " +
-              assetCount +
-              " posizioni.",
-          );
-        else
-          risks.push(
-            "Numero di posizioni ancora limitato: la diversificazione puo migliorare.",
-          );
-        if (etfPct >= 45)
-          strengths.push(
-            "La componente ETF/fondi sostiene una base piu strutturale del portafoglio.",
-          );
-        if (cryptoPct > 30)
-          risks.push(
-            "Peso crypto elevato: volatilita e drawdown possono dominare il risultato complessivo.",
-          );
-        else if (cryptoPct >= 8)
-          strengths.push(
-            "Crypto presenti ma non isolate dal resto del portafoglio.",
-          );
-        if (maxAsset > 18)
-          risks.push(
-            "La posizione principale pesa " +
-              maxAsset.toFixed(1) +
-              "%: attenzione al rischio singolo asset.",
-          );
-        else
-          strengths.push(
-            "Nessuna posizione singola domina in modo eccessivo il portafoglio.",
-          );
-        if (priceCoverage < 100)
-          risks.push(
-            "Mancano prezzi su " +
-              s.totals.noPrice +
-              " asset: lo score resta parziale.",
-          );
-        else
-          strengths.push(
-            "Copertura prezzi completa: analisi, P&L e pesi sono coerenti.",
-          );
-        if (topSector.value / total > 0.4)
-          risks.push(
-            "Concentrazione settoriale su " +
-              topSector.key +
-              " oltre il 40% del portafoglio.",
-          );
-        if (topRegion.value / total > 0.5)
-          risks.push(
-            "Esposizione geografica prevalente su " + topRegion.key + ".",
-          );
-        if (investible !== null && investible > 0) {
-          strengths.push(
-            "Il budget segnala capitale investibile positivo: possibile accumulo graduale.",
-          );
-          steps.push({
-            title: "Allocare gradualmente il capitale investibile",
-            text: "Usa ingressi progressivi e privilegia le aree sottopesate rispetto a quelle gia dominanti.",
-          });
-        } else if (investible !== null && investible < 0) {
-          risks.push(
-            "Budget in tensione: le uscite previste superano la liquidita disponibile.",
-          );
-          steps.push({
-            title: "Sospendere nuovi acquisti finche il budget torna positivo",
-            text: "Prima proteggi liquidita e margine di sicurezza, poi rivaluta il DCA.",
-          });
-        }
-        if (maxAsset > 18 || topSector.value / total > 0.4) {
-          steps.push({
-            title: "Ribilanciare le concentrazioni principali",
-            text: "Evita nuovi acquisti automatici sulle aree gia sovrappesate e canalizza il prossimo capitale su asset decorrelati.",
-          });
-        }
-        if (priceCoverage < 100) {
-          steps.push({
-            title: "Completare i prezzi mancanti",
-            text: "Aggiornare i NAV/prezzi migliora ranking DCA, P&L e lettura del rischio.",
-          });
-        }
-        steps.push({
-          title: "Mantenere una checklist mensile",
-          text: "Controlla pesi, liquidita, performance e duplicazioni prima di ogni nuovo ingresso.",
-        });
-
-        comments.push(
-          "Il portafoglio appare orientato alla crescita, con una forte componente tematica e tecnologica.",
-        );
-        if (cashPct > 25)
-          comments.push(
-            "La liquidita disponibile e alta: puo diventare un piano di ingresso graduale invece di restare inattiva.",
-          );
-        if (cryptoPct > 25)
-          comments.push(
-            "La volatilita crypto richiede disciplina: definire un peso massimo aiuta a non inseguire il mercato.",
-          );
-        if (topSector.key !== "—")
-          comments.push(
-            "L'esposizione a " +
-              topSector.key +
-              " e il principale driver strategico da monitorare.",
-          );
-
-        return {
-          health: health,
-          state: state,
-          topType: topType,
-          topSector: topSector,
-          topRegion: topRegion,
-          cryptoPct: cryptoPct,
-          etfPct: etfPct,
-          fondiPct: fondiPct,
-          cashPct: cashPct,
-          maxAsset: maxAsset,
-          priceCoverage: priceCoverage,
-          strengths: strengths.slice(0, 6),
-          risks: risks.length
-            ? risks.slice(0, 7)
-            : ["Nessuna criticita evidente dai dati disponibili."],
-          steps: steps.slice(0, 6),
-          comments: comments,
-        };
-      }
-
-      function advisorOpportunities(s, a) {
-        var total = s.totals.value;
-        var sectorShare = function (name) {
-          return advShare(s.bySector, name, total);
-        };
-        var regionShare = function (name) {
-          return advShare(s.byRegion, name, total);
-        };
-        var opps = [
-          {
-            name: "ETF World / All Country",
-            motive:
-              "Base globale ampia per ridurre la dipendenza dai temi singoli.",
-            today:
-              a.topSector.value / total > 0.38
-                ? "Interessante per diluire la concentrazione settoriale."
-                : "Utile come nucleo stabile di lungo periodo.",
-            risk: "Basso/Medio",
-            riskClass: "low",
-            horizon: "5-10 anni",
-            role: "Core globale",
-            score: 78 + Math.max(0, a.maxAsset - 15),
-          },
-          {
-            name: "Obbligazioni governative / aggregate bond",
-            motive:
-              "Aggiungono stabilita e una fonte di rendimento diversa dall'azionario.",
-            today:
-              "Sono assenti dal portafoglio e possono ridurre volatilita complessiva.",
-            risk: "Basso/Medio",
-            riskClass: "low",
-            horizon: "2-5 anni",
-            role: "Stabilizzatore",
-            score: 74 + (a.cryptoPct > 25 ? 14 : 0),
-          },
-          {
-            name: "Oro e metalli preziosi",
-            motive:
-              "Asset reale storicamente decorrelato da azioni growth e crypto.",
-            today:
-              "Puo coprire scenari di stress, inflazione o debolezza valutaria.",
-            risk: "Medio",
-            riskClass: "med",
-            horizon: "3-7 anni",
-            role: "Hedge difensivo",
-            score: 70 + (a.topSector.value / total > 0.4 ? 10 : 0),
-          },
-          {
-            name: "Healthcare globale",
-            motive:
-              "Settore difensivo-growth con domanda strutturale meno ciclica.",
-            today:
-              "Bilancia tecnologia, AI e crypto con ricavi meno dipendenti dal ciclo.",
-            risk: "Medio",
-            riskClass: "med",
-            horizon: "5+ anni",
-            role: "Diversificazione settoriale",
-            score: 72 + (sectorShare("Tecnologia") > 18 ? 10 : 0),
-          },
-          {
-            name: "India / Asia ex-China",
-            motive: "Crescita demografica, consumi interni e digitalizzazione.",
-            today:
-              regionShare("Asia emergente") < 12
-                ? "Interessante per aumentare emergenti senza concentrare tutto su USA/Europa."
-                : "Gia parzialmente rappresentata: valutare solo incrementi disciplinati.",
-            risk: "Alto",
-            riskClass: "high",
-            horizon: "7-10 anni",
-            role: "Growth geografico",
-            score: 68 + (regionShare("Asia emergente") < 10 ? 14 : 0),
-          },
-          {
-            name: "REIT globali / infrastrutture",
-            motive:
-              "Esposizione a immobili, data center, logistica e servizi essenziali.",
-            today:
-              "Aggiunge flussi real-asset e riduce la dipendenza dal solo equity tematico.",
-            risk: "Medio",
-            riskClass: "med",
-            horizon: "4-8 anni",
-            role: "Income e real asset",
-            score: 69,
-          },
-          {
-            name: "Acqua e infrastrutture idriche",
-            motive:
-              "Tema strutturale legato a scarsita, reti e qualita delle risorse.",
-            today:
-              "Tema meno sovrapposto a crypto e semiconduttori, utile per diversificare.",
-            risk: "Medio",
-            riskClass: "med",
-            horizon: "5-10 anni",
-            role: "Tema difensivo",
-            score: 67,
-          },
-          {
-            name: "Small Cap quality",
-            motive: "Espone a societa meno presenti nei grandi indici globali.",
-            today:
-              "Potrebbe ampliare il motore di rendimento oltre mega-cap e temi tech.",
-            risk: "Alto",
-            riskClass: "high",
-            horizon: "7+ anni",
-            role: "Rendimento satellite",
-            score: 63 + (a.maxAsset < 14 ? 4 : 0),
-          },
-          {
-            name: "Difesa e cybersecurity",
-            motive: "Spesa strutturale in sicurezza fisica e digitale.",
-            today:
-              sectorShare("Cybersecurity") > 8
-                ? "Cyber gia presente: evitare duplicazioni e valutare solo strumenti complementari."
-                : "Interessante se manca esposizione security dedicata.",
-            risk: "Medio/Alto",
-            riskClass: "high",
-            horizon: "4-8 anni",
-            role: "Satellite strategico",
-            score: sectorShare("Cybersecurity") > 8 ? 55 : 69,
-          },
-          {
-            name: "Rame, uranio e materiali critici",
-            motive:
-              "Beneficiano di elettrificazione, reti, energia e supply chain industriali.",
-            today:
-              "Gia presenti in parte: utili solo se il peso resta controllato.",
-            risk: "Alto",
-            riskClass: "high",
-            horizon: "5-10 anni",
-            role: "Ciclico tematico",
-            score:
-              sectorShare("Rame e materiali") +
-                sectorShare("Uranio ed energia") >
-              14
-                ? 54
-                : 66,
-          },
-        ];
-        return opps
-          .sort(function (x, y) {
-            return y.score - x.score;
-          })
-          .slice(0, 8);
-      }
-
-      function advList(items, tone) {
-        return (
-          '<div class="adv-list">' +
-          items
-            .map(function (item) {
-              return (
-                '<div class="adv-item"><span class="adv-dot ' +
-                (tone || "") +
-                '"></span><span>' +
-                advEsc(item) +
-                "</span></div>"
-              );
-            })
-            .join("") +
-          "</div>"
-        );
-      }
-
-      function advBars(title, map, total) {
-        var rows = Object.keys(map)
-          .map(function (key) {
-            return { key: key, pct: total > 0 ? (map[key] / total) * 100 : 0 };
-          })
-          .sort(function (a, b) {
-            return b.pct - a.pct;
-          })
-          .slice(0, 7);
-        return (
-          '<div class="adv-card"><h3>' +
-          title +
-          '</h3><div class="adv-bars">' +
-          rows
-            .map(function (row) {
-              return (
-                '<div class="adv-bar-row"><div class="adv-bar-name">' +
-                advEsc(row.key) +
-                '</div><div class="adv-track"><div class="adv-fill" style="width:' +
-                Math.min(100, row.pct).toFixed(1) +
-                '%"></div></div><div class="adv-bar-val">' +
-                row.pct.toFixed(1) +
-                "%</div></div>"
-              );
-            })
-            .join("") +
-          "</div></div>"
-        );
-      }
-
-      function renderAdvisor(portfolio) {
-        portfolio = portfolio || portfolioSnapshot();
-        var add = parseFloat(g("addAmt").value) || 0;
-        var s = buildAdvisorSnapshot(add, portfolio);
-        var a = analyzeAdvisor(s);
-        var opps = advisorOpportunities(s, a);
-        var budgetLine =
-          s.budget && s.budget.investible !== undefined
-            ? "Investibile budget: " + advMoney(Number(s.budget.investible))
-            : "Budget non ancora valorizzato";
-        var el = g("sec-advisor");
-        if (!el) return;
-        el.innerHTML =
-          '<div class="adv-wrap">' +
-          '<div class="adv-hero">' +
-          '<div class="adv-panel primary">' +
-          '<div class="adv-eyebrow">AI Portfolio Advisor</div>' +
-          '<div class="adv-title">Investment Strategy Center</div>' +
-          '<p class="adv-copy">Report automatico generato dai dati gia presenti in WIPS: composizione, prezzi, performance, allocazione, esposizioni e budget investibile. Le indicazioni sono operative ma non sostituiscono una consulenza finanziaria personalizzata.</p>' +
-          '<div class="adv-badges">' +
-          '<span class="adv-badge">' +
-          s.rows.length +
-          " asset analizzati</span>" +
-          '<span class="adv-badge">Copertura prezzi ' +
-          a.priceCoverage.toFixed(0) +
-          "%</span>" +
-          '<span class="adv-badge">' +
-          budgetLine +
-          "</span>" +
-          '<span class="adv-badge">Aggiornato ora</span>' +
-          "</div></div>" +
-          '<div class="adv-panel adv-scorebox">' +
-          '<div class="adv-score-ring" style="--score:' +
-          a.health +
-          '"><div><strong>' +
-          a.health +
-          "</strong><span>/100</span></div></div>" +
-          '<div class="adv-score-label">Portfolio Health Score</div>' +
-          '<p class="adv-copy" style="margin-top:0;">' +
-          advEsc(a.state) +
-          ". Score basato su diversificazione, concentrazione, asset mix, esposizioni, liquidita e qualita dei dati.</p>" +
-          "</div></div>" +
-          '<div class="adv-metrics">' +
-          '<div class="adv-metric"><span>Valore stimato</span><strong>' +
-          advMoney(s.totals.value) +
-          "</strong></div>" +
-          '<div class="adv-metric"><span>P&L prezzi caricati</span><strong class="' +
-          (s.pnl >= 0 ? "g" : "r") +
-          '">' +
-          (s.pnl >= 0 ? "+" : "") +
-          advMoney(s.pnl) +
-          "</strong></div>" +
-          '<div class="adv-metric"><span>Asset principale</span><strong>' +
-          a.maxAsset.toFixed(1) +
-          "%</strong></div>" +
-          '<div class="adv-metric"><span>Liquidita</span><strong>' +
-          a.cashPct.toFixed(1) +
-          "%</strong></div>" +
-          "</div>" +
-          '<div class="adv-grid">' +
-          '<div class="adv-card"><h3>Executive Summary</h3>' +
-          advList([
-            a.state,
-            "Asset mix: crypto " +
-              a.cryptoPct.toFixed(1) +
-              "%, ETF " +
-              a.etfPct.toFixed(1) +
-              "%, fondi " +
-              a.fondiPct.toFixed(1) +
-              "%.",
-            "Area dominante: " +
-              a.topSector.key +
-              " (" +
-              ((a.topSector.value / s.totals.value) * 100).toFixed(1) +
-              "%).",
-            "Geografia prevalente: " +
-              a.topRegion.key +
-              " (" +
-              ((a.topRegion.value / s.totals.value) * 100).toFixed(1) +
-              "%).",
-          ]) +
-          '</div><div class="adv-card"><h3>Stato Attuale</h3>' +
-          advList(
-            [
-              "Diversificazione: " +
-                (s.rows.length >= 14 ? "buona" : "da ampliare") +
-                ".",
-              "Concentrazione principale: " +
-                a.maxAsset.toFixed(1) +
-                "% sul primo asset.",
-              "Rischio stimato: " +
-                (a.cryptoPct > 30
-                  ? "alto per peso crypto"
-                  : a.topSector.value / s.totals.value > 0.4
-                    ? "medio/alto per concentrazione settoriale"
-                    : "controllato dai dati disponibili") +
-                ".",
-              "Liquidita stimata: " +
-                a.cashPct.toFixed(1) +
-                "% del patrimonio leggibile.",
-            ],
-            "warn",
-          ) +
-          "</div></div>" +
-          '<div class="adv-card"><h3>Commenti Automatici</h3>' +
-          advList(a.comments, "warn") +
-          "</div>" +
-          '<div class="adv-grid">' +
-          '<div class="adv-card"><h3>Punti di forza</h3>' +
-          advList(a.strengths, "good") +
-          '</div><div class="adv-card"><h3>Criticita</h3>' +
-          advList(a.risks, "risk") +
-          "</div></div>" +
-          '<div class="adv-grid">' +
-          advBars("Esposizione per asset class", s.byType, s.totals.value) +
-          advBars(
-            "Esposizione settoriale stimata",
-            s.bySector,
-            s.totals.value,
-          ) +
-          "</div>" +
-          '<div class="adv-grid">' +
-          advBars(
-            "Esposizione geografica stimata",
-            s.byRegion,
-            s.totals.value,
-          ) +
-          '<div class="adv-card"><h3>Idee di diversificazione</h3>' +
-          advList(
-            [
-              "Aggiungere un core globale o obbligazionario se vuoi ridurre dipendenza da temi growth.",
-              "Usare oro, bond o infrastrutture come componenti decorrelate da tecnologia e crypto.",
-              "Limitare nuovi ingressi sulle aree gia dominanti finche il peso non rientra nel target personale.",
-              "Valutare healthcare, acqua o real asset per aumentare stabilita settoriale.",
-            ],
-            "good",
-          ) +
-          "</div></div>" +
-          '<div class="adv-card"><h3>Opportunita di mercato e ruoli possibili</h3><div class="adv-opps">' +
-          opps
-            .map(function (o) {
-              return (
-                '<div class="adv-opp"><div class="adv-opp-head"><div class="adv-opp-title">' +
-                advEsc(o.name) +
-                '</div><span class="adv-pill ' +
-                o.riskClass +
-                '">' +
-                advEsc(o.risk) +
-                "</span></div>" +
-                "<p><strong>Motivazione:</strong> " +
-                advEsc(o.motive) +
-                "</p><p><strong>Perche oggi:</strong> " +
-                advEsc(o.today) +
-                '</p><div class="adv-opp-meta"><span class="adv-pill">' +
-                advEsc(o.horizon) +
-                '</span><span class="adv-pill">' +
-                advEsc(o.role) +
-                "</span></div></div>"
-              );
-            })
-            .join("") +
-          "</div></div>" +
-          '<div class="adv-grid">' +
-          '<div class="adv-card"><h3>Next Steps</h3>' +
-          a.steps
-            .map(function (step) {
-              return (
-                '<div class="adv-action"><span class="adv-check"></span><div><strong>' +
-                advEsc(step.title) +
-                "</strong><p>" +
-                advEsc(step.text) +
-                "</p></div></div>"
-              );
-            })
-            .join("") +
-          '</div><div class="adv-card"><h3>Piano d\'azione</h3>' +
-          [
-            "Verificare prezzi/NAV mancanti.",
-            "Definire peso massimo per crypto e singolo tema.",
-            "Allocare il prossimo capitale solo dopo controllo budget.",
-            "Ribilanciare se una singola posizione supera il 20%.",
-            "Aggiornare il report dopo ogni modifica di portafoglio.",
-          ]
-            .map(function (item) {
-              return (
-                '<div class="adv-action"><span class="adv-check"></span><div><strong>' +
-                advEsc(item) +
-                "</strong></div></div>"
-              );
-            })
-            .join("") +
-          "</div></div>" +
-          "</div>";
+        h += kpi("&#9650; Positivi", '<span class="g">' + totals.positive + "</span>", "kg", "asset totali");
+        h += kpi("&#9660; Negativi", '<span class="r">' + totals.negative + "</span>", "kr", "asset totali");
+        return h + "</div></div>";
       }
 
       /* ══ RENDER FONDI ════════════════════════════════════════════════════ */
-      function renderFondi(add, portfolio) {
++      function renderFondi(add, portfolio) {
         portfolio = portfolio || P;
         var el = document.getElementById("sec-fondi");
         if (!el || !portfolio.fondi.length) return;
@@ -6090,8 +4717,6 @@
         renderTables(add, portfolio);
         if (portfolio.fondi.length) renderFondi(add, portfolio);
         renderAllSection(add, portfolio);
-        if (g("sec-advisor") && g("sec-advisor").classList.contains("on"))
-          renderAdvisor(portfolioSnapshot(portfolio));
         if (
           g("sec-allocation") &&
           g("sec-allocation").classList.contains("on") &&

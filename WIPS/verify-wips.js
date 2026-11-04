@@ -31,7 +31,6 @@ const REQUIRED_APP_FUNCTIONS = [
   "save",
   "load",
   "refreshCryptoQuotes",
-  "renderAdvisor",
   "renderBudget",
   "exportFullBackup",
   "openBackupImport",
@@ -45,6 +44,7 @@ const REQUIRED_ALLOCATION_FUNCTIONS = [
   "allocationSetAmount",
   "allocationSimulate",
   "allocationSimulateAtPrice",
+  "allocationSetRankingScope",
 ];
 
 const errors = [];
@@ -191,6 +191,11 @@ function validateAllocationLabSource() {
   }
   for (const marker of ['id="nb-allocation"', 'id="sec-allocation"']) {
     if (!html.includes(marker)) fail(`Elemento Allocation Lab mancante: ${marker}`);
+  }
+  for (const retiredMarker of ["nb-advisor", "sec-advisor", "renderAdvisor"]) {
+    if (html.includes(retiredMarker)) {
+      fail(`Riferimento Advisor non rimosso: ${retiredMarker}`);
+    }
   }
   for (const name of REQUIRED_ALLOCATION_FUNCTIONS) {
     if (!new RegExp(`function\\s+${name}\\s*\\(`).test(source)) {

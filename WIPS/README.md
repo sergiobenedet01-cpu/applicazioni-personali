@@ -1,7 +1,7 @@
 # WIPS
 
 WIPS (What-If Portfolio Simulator) è una dashboard personale statica per
-analizzare portfolio, P&L, scenari What-If, Budget e Advisor.
+analizzare portfolio, P&L, scenari What-If, Budget e Allocazione.
 
 L'app non richiede build, backend, account applicativi o dipendenze npm:
 funziona come una pagina HTML statica ed è pubblicata su GitHub Pages.
@@ -36,8 +36,8 @@ iniziali.
 ```text
 WIPS.html                         Interfaccia e logica dell'app
 WIPS-data.js                      Portfolio e prezzi iniziali/fallback
-WIPS-allocation-lab.js            Console simulativa separata per l'allocazione
-WIPS-allocation-lab.css           Stili della console Allocation Lab
+WIPS-allocation-lab.js            Ranking e console simulativa di Allocazione
+WIPS-allocation-lab.css           Stili della sezione Allocazione
 WIPS-mobile.js                    Renderer della modalità Mobile (stesso stato e calcoli)
 WIPS-mobile.css                   Stili touch della modalità Mobile
 verify-wips.js                    Controllo locale in sola lettura
@@ -60,15 +60,17 @@ La modalità Mobile usa le stesse posizioni, quotazioni, `calc()`, What-If,
 copy dei valori e persistenza della vista Desktop. Sostituisce solo la
 presentazione: header di sintesi, card espandibili per gli asset, pannelli
 Portfolio / What-If / Analisi / Strumenti e controlli touch da almeno 44 px.
-Budget, Advisor, Allocation Lab, editor, backup e CSV restano tutti
+Budget, Allocazione, editor, backup e CSV restano tutti
 raggiungibili dal pannello **Strumenti** e si aprono nella vista Desktop
 completa, evitando di nascondere funzioni o creare una seconda logica.
 
-## Allocation Lab
+## Allocazione
 
-Il tab **🧭 Allocazione** è una console di supporto decisionale visuale. Permette
-di simulare come distribuire una liquidità scelta dall'utente, confrontando:
+Il tab **🧭 Allocazione** è il punto unico per confrontare ranking Globale,
+Crypto e ETF e simulare come distribuire una liquidità scelta dall'utente.
+Permette di confrontare:
 
+- ranking filtrabile con i criteri WIPS esistenti;
 - distanza dal P.M. e impatto stimato sul nuovo P.M.;
 - peso attuale e peso dopo il piano;
 - limite di concentrazione per singola posizione;
@@ -76,9 +78,13 @@ di simulare come distribuire una liquidità scelta dall'utente, confrontando:
 - obiettivo di capitale storico per una posizione.
 
 Il modulo è intenzionalmente separato dal What-If principale: non modifica
-posizioni, prezzi, Budget, Advisor, CSV, backup, Kraken o dati in
+posizioni, prezzi, Budget, CSV, backup, Kraken o dati in
 `WIPS-data.js`. Salva solo la bozza del piano e le preferenze nel proprio
 `localStorage` (`wips_allocation_lab_v1`).
+
+La mappa di liquidità è raggruppata in categorie espandibili. Ogni riepilogo
+mostra numero strumenti, peso attuale e post-piano, scostamento e quota
+suggerita del piano simulato.
 
 Gli score e i livelli a tranche sono regole trasparenti di simulazione, non
 previsioni di mercato, segnali di acquisto né consulenza finanziaria. Ogni
@@ -211,7 +217,7 @@ funzionale usata per la release.
 Controllare almeno:
 
 1. apertura di `WIPS.html` senza errori;
-2. Portfolio, What-If, Advisor e Budget;
+2. Portfolio, What-If, Allocazione e Budget;
 3. salvataggio e reload della pagina;
 4. esportazione CSV;
 5. passaggio Desktop ↔ Mobile, reload e What-If in entrambe le viste;

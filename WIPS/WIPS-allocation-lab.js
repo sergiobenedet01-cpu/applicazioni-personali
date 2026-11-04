@@ -22,7 +22,6 @@
   }
 
   function allocEscape(value) {
-    if (typeof advEsc === "function") return advEsc(value);
     return String(value)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -54,6 +53,7 @@
       maxWeight: ALLOCATION_LAB_DEFAULT_MAX_WEIGHT,
       scenario: "custom",
       allocations: {},
+      rankingScope: "global",
       goalAsset: ethereum,
       goalCapital: 6000,
       timelineAsset: ethereum,
@@ -85,6 +85,10 @@
           ? raw.scenario
           : defaults.scenario,
       allocations: {},
+      rankingScope:
+        ["global", "crypto", "etf"].indexOf(raw.rankingScope) >= 0
+          ? raw.rankingScope
+          : defaults.rankingScope,
       goalAsset:
         ids.indexOf(raw.goalAsset) >= 0 ? raw.goalAsset : defaults.goalAsset,
       goalCapital: allocClamp(
@@ -117,10 +121,16 @@
   }
 
   function allocationBaseRows(portfolio) {
-    var snapshot = buildAdvisorSnapshot(0, portfolio || P);
-    return snapshot.rows.filter(function (row) {
-      return row.c.price !== null && row.c.price > 0;
+    portfolio = portfolio || P;
+    var rows = [];
+    PORTFOLIO_TYPES.forEach(function (type) {
+      (portfolio[type] || []).forEach(function (asset) {
+        var c = calc(asset, 0);
+        if (c.price !== null && c.price > 0)
+          rows.push({ a: asset, t: type, c: c });
+      });
     });
+    return rows;
   }
 
   function allocationState(rows) {
@@ -225,7 +235,6 @@
         a: base.a,
         t: base.t,
         c: base.c,
-        profile: advAssetProfile(base.a, base.t),
         value: value,
         weight: weight,
         allocation: allocation,
@@ -297,6 +306,14 @@
     var snap = allocationBuildSnapshot();
     snap.state.maxWeight = allocClamp(allocFinite(value, snap.state.maxWeight), 3, 60);
     snap.state.scenario = "custom";
+    allocationSave();
+    renderAllocationLab();
+  }
+
+  function allocationSetRankingScope(scope) {
+    var snap = allocationBuildSnapshot();
+    if (["global", "crypto", "etf"].indexOf(scope) < 0) return;
+    snap.state.rankingScope = scope;
     allocationSave();
     renderAllocationLab();
   }
@@ -533,83 +550,195 @@
       .join("");
   }
 
+  function allocationTypeLabel(type) {
+    if (type === "crypto") return "Crypto";
+    if (type === "etf") return "ETF";
+    return "Fondi";
+  }
+
+  function allocationMapRow(snapshot, row) {
+    var simulation = allocationSimulate(row, row.allocation);
+    var pmChange = simulation ? simulation.changePct : null;
+    var quote = JSON.stringify(row.a.id).replace(/\"/g, "&quot;");
+    var maxAmount = Math.max(row.allocation, Math.min(snapshot.state.pool, row.maxAllocation));
+    var rangeDisabled = maxAmount <= 0.001 ? " disabled" : "";
+    var scoreMeta =
+      "P.M. " +
+      (row.discount >= 0 ? "-" : "+") +
+      allocPlain(Math.abs(row.discount), 1) +
+      "% · rischio " +
+      row.risk +
+      "/100";
+    var pmText =
+      pmChange === null
+        ? '<span class="mu">—</span>'
+        : '<span class="' +
+          (pmChange < 0 ? "g" : pmChange > 0 ? "r" : "mu") +
+          '">' +
+          (pmChange <= 0 ? "↓ " : "↑ ") +
+          allocPlain(pmChange, 2) +
+          "%</span>";
+    return (
+      '<div class="alloc-row">' +
+      '<div class="alloc-asset-name"><span class="alloc-type ' +
+      (row.t === "crypto" ? "crypto" : row.t === "fondi" ? "fondi" : "") +
+      '">' +
+      allocationTypeLabel(row.t) +
+      "</span><b title=\"" +
+      allocEscape(row.a.name) +
+      "\">" +
+      allocEscape(row.a.name) +
+      "</b></div>" +
+      '<div><div class="alloc-score"><strong>' +
+      row.score +
+      "</strong><span>/100</span></div><small>" +
+      scoreMeta +
+      "</small></div>" +
+      '<div class="alloc-metric"><span class="' +
+      (row.discount > 0 ? "g" : row.discount < 0 ? "r" : "mu") +
+      '">' +
+      (row.discount > 0 ? "↓ " : row.discount < 0 ? "↑ " : "") +
+      allocPlain(Math.abs(row.discount), 2) +
+      "%</span><small>dist. dal P.M. · spazio " +
+      allocPlain(row.maxAllocation, 0) +
+      " €</small></div>" +
+      '<div class="alloc-metric">' +
+      allocPlain(row.weight, 1) +
+      "% → <strong>" +
+      allocPlain(row.postWeight, 1) +
+      "%</strong><small>P.M. simulato: " +
+      pmText +
+      "</small></div>" +
+      '<div class="alloc-plan-control"><input class="alloc-input" aria-label="Piano per ' +
+      allocEscape(row.a.name) +
+      '" type="number" min="0" max="' +
+      maxAmount.toFixed(2) +
+      '" step="25" value="' +
+      row.allocation.toFixed(2) +
+      '" onchange="allocationSetAmount(' +
+      quote +
+      ', this.value)"><input class="alloc-range" type="range" min="0" max="' +
+      maxAmount.toFixed(2) +
+      '" step="25" value="' +
+      Math.min(row.allocation, maxAmount).toFixed(2) +
+      '" onchange="allocationSetAmount(' +
+      quote +
+      ', this.value)"' +
+      rangeDisabled +
+      "></div>" +
+      '<div class="alloc-plan-note">Piano virtuale: non modifica la posizione reale.</div>' +
+      "</div>"
+    );
+  }
+
   function allocationMapRows(snapshot) {
-    return snapshot.rows
-      .map(function (row) {
-        var simulation = allocationSimulate(row, row.allocation);
-        var pmChange = simulation ? simulation.changePct : null;
-        var quote = JSON.stringify(row.a.id).replace(/\"/g, "&quot;");
-        var maxAmount = Math.max(row.allocation, Math.min(snapshot.state.pool, row.maxAllocation));
-        var rangeDisabled = maxAmount <= 0.001 ? " disabled" : "";
-        var scoreMeta =
-          "P.M. " +
-          (row.discount >= 0 ? "-" : "+") +
-          allocPlain(Math.abs(row.discount), 1) +
-          "% · rischio " +
-          row.risk +
-          "/100";
-        var pmText =
-          pmChange === null
-            ? '<span class="mu">—</span>'
-            : '<span class="' +
-              (pmChange < 0 ? "g" : pmChange > 0 ? "r" : "mu") +
-              '">' +
-              (pmChange <= 0 ? "↓ " : "↑ ") +
-              allocPlain(pmChange, 2) +
-              "%</span>";
+    var types = ["etf", "crypto", "fondi"];
+    return types
+      .map(function (type) {
+        var rows = snapshot.rows.filter(function (row) {
+          return row.t === type;
+        });
+        if (!rows.length) return "";
+        var currentValue = rows.reduce(function (sum, row) {
+          return sum + row.value;
+        }, 0);
+        var planned = rows.reduce(function (sum, row) {
+          return sum + row.allocation;
+        }, 0);
+        var currentWeight =
+          snapshot.totalValue > 0 ? (currentValue / snapshot.totalValue) * 100 : 0;
+        var postWeight =
+          snapshot.postTotal > 0 ? ((currentValue + planned) / snapshot.postTotal) * 100 : 0;
+        var shift = postWeight - currentWeight;
+        var suggestedShare =
+          snapshot.planned > 0 ? (planned / snapshot.planned) * 100 : 0;
         return (
-          '<div class="alloc-row">' +
-          '<div class="alloc-asset-name"><span class="alloc-type ' +
-          (row.t === "crypto" ? "crypto" : "") +
+          '<details class="alloc-category" open><summary class="alloc-category-summary">' +
+          '<span class="alloc-category-title"><span class="alloc-dot ' +
+          type +
+          '"></span>' +
+          allocationTypeLabel(type) +
+          "</span>" +
+          '<span class="alloc-category-count">' +
+          rows.length +
+          (rows.length === 1 ? " strumento" : " strumenti") +
+          "</span>" +
+          '<span class="alloc-category-metric">Peso <strong>' +
+          allocPlain(currentWeight, 1) +
+          "% → " +
+          allocPlain(postWeight, 1) +
+          "%</strong></span>" +
+          '<span class="alloc-category-metric">Scost. <strong class="' +
+          (shift > 0.01 ? "g" : shift < -0.01 ? "r" : "mu") +
           '">' +
-          (row.t === "crypto" ? "Crypto" : "ETF") +
-          "</span><b title=\"" +
-          allocEscape(row.a.name) +
-          "\">" +
-          allocEscape(row.a.name) +
-          "</b></div>" +
-          '<div><div class="alloc-score"><strong>' +
-          row.score +
-          "</strong><span>/100</span></div><small>" +
-          scoreMeta +
-          "</small></div>" +
-          '<div class="alloc-metric"><span class="' +
-          (row.discount > 0 ? "g" : row.discount < 0 ? "r" : "mu") +
-          '">' +
-          (row.discount > 0 ? "↓ " : row.discount < 0 ? "↑ " : "") +
-          allocPlain(Math.abs(row.discount), 2) +
-          "%</span><small>dist. dal P.M. · spazio " +
-          allocPlain(row.maxAllocation, 0) +
-          " €</small></div>" +
-          '<div class="alloc-metric">' +
-          allocPlain(row.weight, 1) +
-          "% → <strong>" +
-          allocPlain(row.postWeight, 1) +
-          "%</strong><small>P.M. simulato: " +
-          pmText +
-          "</small></div>" +
-          '<div class="alloc-plan-control"><input class="alloc-input" aria-label="Piano per ' +
-          allocEscape(row.a.name) +
-          '" type="number" min="0" max="' +
-          maxAmount.toFixed(2) +
-          '" step="25" value="' +
-          row.allocation.toFixed(2) +
-          '" onchange="allocationSetAmount(' +
-          quote +
-          ', this.value)"><input class="alloc-range" type="range" min="0" max="' +
-          maxAmount.toFixed(2) +
-          '" step="25" value="' +
-          Math.min(row.allocation, maxAmount).toFixed(2) +
-          '" onchange="allocationSetAmount(' +
-          quote +
-          ', this.value)"' +
-          rangeDisabled +
-          "></div>" +
-          '<div class="alloc-plan-note">Budget virtuale: non modifica la posizione reale.</div>' +
-          "</div>"
+          (shift > 0 ? "+" : "") +
+          allocPlain(shift, 1) +
+          "%</strong></span>" +
+          '<span class="alloc-category-metric">Quota piano <strong>' +
+          (snapshot.planned > 0 ? allocPlain(suggestedShare, 1) + "%" : "—") +
+          "</strong></span>" +
+          '<span class="alloc-category-toggle" aria-hidden="true">⌄</span></summary>' +
+          '<div class="alloc-category-body"><div class="alloc-map-head"><span>Asset</span><span>Score</span><span>Distanza / spazio</span><span>Peso / P.M.</span><span>Piano €</span></div>' +
+          rows.map(function (row) {
+            return allocationMapRow(snapshot, row);
+          }).join("") +
+          "</div></details>"
         );
       })
       .join("");
+  }
+
+  function allocationRankingHtml(snapshot) {
+    var state = snapshot.state;
+    var scope = state.rankingScope;
+    var addInput = document.getElementById("addAmt");
+    var add = addInput ? Math.max(0, allocFinite(addInput.value, 0)) : 0;
+    var scopeRows = snapshot.rows
+      .filter(function (row) {
+        return scope === "global" ? row.t !== "fondi" : row.t === scope;
+      })
+      .map(function (row) {
+        var c = calc(row.a, add);
+        return { a: row.a, t: row.t, c: c, sc: asc(c) };
+      })
+      .sort(function (left, right) {
+        return right.sc - left.sc;
+      });
+    var maxScore = scopeRows.reduce(function (max, row) {
+      return Math.max(max, row.sc);
+    }, 1);
+    var labels = {
+      global: "Globale",
+      crypto: "Crypto",
+      etf: "ETF",
+    };
+    var tabs = ["global", "crypto", "etf"]
+      .map(function (kind) {
+        return '<button class="alloc-btn ' +
+          (scope === kind ? "active" : "") +
+          '" type="button" aria-pressed="' +
+          (scope === kind ? "true" : "false") +
+          '" onclick="allocationSetRankingScope(\'' +
+          kind +
+          '\')">' +
+          labels[kind] +
+          "</button>";
+      })
+      .join("");
+    return (
+      '<section class="alloc-card alloc-ranking"><div class="alloc-card-head"><div><h2>Ranking convenienza</h2><p class="alloc-card-sub">Unico ranking WIPS: usa i criteri esistenti di prezzo rispetto al P.M., perdita % e effetto del What‑If. Non è consulenza finanziaria.</p></div><div class="alloc-actions alloc-ranking-tabs" role="group" aria-label="Ambito ranking">' +
+      tabs +
+      "</div></div>" +
+      (typeof allocCard === "function"
+        ? allocCard(
+            "Priorità " + labels[scope] + " · prossimi " + allocMoney(add, 2),
+            scopeRows,
+            maxScore,
+            add,
+          )
+        : '<p class="alloc-disclaimer">Ranking non disponibile.</p>') +
+      "</section>"
+    );
   }
 
   function allocationMatrixBubbles(snapshot) {
@@ -756,8 +885,8 @@
     el.innerHTML =
       '<div class="alloc-wrap">' +
       '<div class="alloc-hero">' +
-      '<section class="alloc-panel alloc-hero-main"><div class="alloc-eyebrow">Decision support · simulazione locale</div><h1 class="alloc-title">Allocation Lab</h1>' +
-      '<p class="alloc-copy">Trasforma la liquidità in un piano leggibile: considera prezzo attuale, distanza dal P.M., peso già in portafoglio e limite di concentrazione scelto da te. La console non acquista, non modifica il portfolio e non fa previsioni.</p>' +
+      '<section class="alloc-panel alloc-hero-main"><div class="alloc-eyebrow">Decision support · simulazione locale</div><h1 class="alloc-title">Allocazione</h1>' +
+      '<p class="alloc-copy">Il punto unico per confrontare priorità Globali, Crypto ed ETF e trasformare la liquidità in un piano leggibile. Considera prezzo attuale, distanza dal P.M., peso già in portafoglio e limite di concentrazione scelto da te.</p>' +
       '<div class="alloc-note"><span>ⓘ</span><span>Gli score sono una regola trasparente di disciplina, non una raccomandazione finanziaria. Il risultato resta una simulazione da verificare con il tuo piano, rischio e orizzonte.</span></div></section>' +
       '<section class="alloc-panel"><div class="alloc-eyebrow">Impostazioni del piano</div><div class="alloc-control-grid">' +
       '<label class="alloc-field"><span class="alloc-label">Liquidità da simulare<small>Non aggiorna il Budget e resta indipendente dal What‑If principale.</small></span><input class="alloc-input" type="number" min="0" step="50" value="' +
@@ -799,7 +928,8 @@
       '<div class="alloc-kpi"><span class="alloc-label">Limite concentrazione</span><strong>' +
       allocPercent(state.maxWeight, 0) +
       '</strong><small>Sul valore post-piano</small></div></div>' +
-      '<div class="alloc-grid"><section class="alloc-card"><h2>Mappa dove distribuire la liquidità</h2><p class="alloc-card-sub">Score = sconto dal P.M. (max 38) + spazio sotto il limite (max 25) + ruolo nel mix (max 18) + intensità di rischio (max 12). Modifica liberamente ogni importo.</p><div class="alloc-map"><div class="alloc-map-head"><span>Asset</span><span>Score</span><span>Distanza / spazio</span><span>Peso / P.M.</span><span>Piano €</span></div>' +
+      allocationRankingHtml(snapshot) +
+      '<div class="alloc-grid"><section class="alloc-card"><h2>Mappa di distribuzione per categoria</h2><p class="alloc-card-sub">Le categorie sono espandibili: il riepilogo mostra strumenti, peso attuale → post-piano, scostamento e quota del piano. Score = sconto dal P.M. (max 38) + spazio sotto il limite (max 25) + ruolo nel mix (max 18) + intensità di rischio (max 12).</p><div class="alloc-map">' +
       allocationMapRows(snapshot) +
       "</div></section>" +
       '<aside class="alloc-card"><h2>Mix dopo il piano</h2><p class="alloc-card-sub">La torta riflette solo gli importi simulati, non sposta davvero le posizioni.</p><div class="alloc-composition"><div class="alloc-donut" style="--alloc-donut:' +
@@ -817,7 +947,7 @@
       '<div style="height:20px"></div><h2>Piano a tranche</h2><p class="alloc-card-sub">Confronta l’effetto di ingressi ripartiti sul P.M. con prezzi ipotetici in discesa.</p>' +
       allocationTimelineHtml(snapshot) +
       "</section></div>" +
-      '<p class="alloc-disclaimer">Allocation Lab usa esclusivamente i dati già presenti in WIPS. Non altera posizioni, prezzi, CSV, backup, Kraken, Budget, Advisor o il What‑If globale. I valori evidenziati sono copiabili con un click, come nelle tabelle.</p>' +
+      '<p class="alloc-disclaimer">Allocazione usa esclusivamente i dati già presenti in WIPS. Non altera posizioni, prezzi, CSV, backup, Kraken, Budget o il What‑If globale. I valori evidenziati sono copiabili con un click, come nelle tabelle.</p>' +
       "</div>";
   }
 
@@ -825,6 +955,7 @@
   window.renderAllocationLab = renderAllocationLab;
   window.allocationSetPool = allocationSetPool;
   window.allocationSetMaxWeight = allocationSetMaxWeight;
+  window.allocationSetRankingScope = allocationSetRankingScope;
   window.allocationSetAmount = allocationSetAmount;
   window.allocationClearPlan = allocationClearPlan;
   window.allocationApplyScenario = allocationApplyScenario;
