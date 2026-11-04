@@ -183,10 +183,10 @@ function validateAllocationLabSource() {
   const style = fs.readFileSync(stylePath, "utf8");
 
   compileJavaScript(source, "WIPS-allocation-lab.js");
-  if (!html.includes('href="WIPS-allocation-lab.css"')) {
+  if (!/href="WIPS-allocation-lab\.css(?:\?[^\"]*)?"/.test(html)) {
     fail("WIPS.html non carica lo stile Allocation Lab");
   }
-  if (!html.includes('src="WIPS-allocation-lab.js"')) {
+  if (!/src="WIPS-allocation-lab\.js(?:\?[^\"]*)?"/.test(html)) {
     fail("WIPS.html non carica il modulo Allocation Lab");
   }
   for (const marker of ['id="nb-allocation"', 'id="sec-allocation"']) {
@@ -250,8 +250,8 @@ function validateMobileModeSource() {
 
   compileJavaScript(source, "WIPS-mobile.js");
   for (const marker of [
-    'href="WIPS-mobile.css"',
-    'src="WIPS-mobile.js"',
+    'href="WIPS-mobile.css',
+    'src="WIPS-mobile.js',
     'id="mobile-shell"',
     'id="mode-desktop"',
     'id="mode-mobile"',
