@@ -61,6 +61,7 @@
 
 .wips-analytic-chart-legend .positive { background: var(--go); }
 .wips-analytic-chart-legend .negative { background: var(--re); }
+.wips-analytic-chart-legend .warning { background: var(--ye); }
 
 .wips-analytic-chart-row {
   display: grid;
@@ -126,6 +127,8 @@
 
 .wips-analytic-chart-bar.positive { left: 50%; background: var(--go); }
 .wips-analytic-chart-bar.negative { right: 50%; background: var(--re); }
+.wips-analytic-chart-bar.warning { right: 50%; background: var(--ye); }
+.wips-analytic-chart-bar.neutral { display: none; }
 
 .wips-analytic-chart-metric {
   min-width: 0;
@@ -139,6 +142,8 @@
 
 .wips-analytic-chart-metric.positive { color: var(--go); }
 .wips-analytic-chart-metric.negative { color: var(--re); }
+.wips-analytic-chart-metric.warning { color: var(--ye); }
+.wips-analytic-chart-metric.neutral { color: var(--t3); }
 
 @media (max-width: 960px) {
   .wips-analytic-charts { grid-template-columns: 1fr; }

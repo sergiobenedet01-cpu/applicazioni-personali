@@ -49,8 +49,8 @@
     return description + " · i primi " + Math.min(3, rows.length) + " spiegano " + number((top / total) * 100, 1) + "% dell’impatto";
   }
 
-  function chartRow(row, value, metricHtml, aggregate) {
-    var signClass = value >= 0 ? "positive" : "negative";
+  function chartRow(row, value, metricHtml, aggregate, tone) {
+    var signClass = tone || (value >= 0 ? "positive" : "negative");
     return '<div class="wips-analytic-chart-row" role="listitem" title="' + esc(row.a.name + ": " + metricHtml.replace(/<[^>]*>/g, "")) + '" aria-label="' + esc(row.a.name + ": " + metricHtml.replace(/<[^>]*>/g, "")) + '">' +
       '<div class="wips-analytic-chart-name">' + esc(row.a.name) + kind(row, aggregate) + '</div>' +
       '<div class="wips-analytic-chart-track" aria-hidden="true"><span class="wips-analytic-chart-bar ' + signClass + '" style="--bar-size:' + row._chartWidth + '"></span></div>' +
@@ -58,7 +58,7 @@
       '</div>';
   }
 
-  function chart(title, rows, value, metric, description, aggregate) {
+  function chart(title, rows, value, metric, description, aggregate, tone, legend) {
     var sorted = rows.slice().sort(function (left, right) {
       return Math.abs(value(right)) - Math.abs(value(left));
     });
@@ -70,9 +70,9 @@
     var html = '<section class="wips-analytic-chart" aria-label="' + esc(title) + '">' +
       '<div class="wips-analytic-chart-header"><h2 class="wips-analytic-chart-title">' + esc(title) + '</h2>' +
       '<div class="wips-analytic-chart-note">' + esc(paretoNote(sorted, value, description)) + '</div>' +
-      '<div class="wips-analytic-chart-legend"><span><i class="positive"></i> positivo / sopra P.M.</span><span><i class="negative"></i> negativo / sotto P.M.</span></div></div>' +
+      '<div class="wips-analytic-chart-legend">' + (legend || '<span><i class="positive"></i> profitto</span><span><i class="negative"></i> perdita</span>') + '</div></div>' +
       '<div role="list">';
-    sorted.forEach(function (row) { html += chartRow(row, value(row), metric(row), aggregate); });
+    sorted.forEach(function (row) { html += chartRow(row, value(row), metric(row), aggregate, tone ? tone(row) : ""); });
     return html + '</div></section>';
   }
 
@@ -88,12 +88,21 @@
       aggregate,
     );
     var mean = chart(
-      "Prezzo attuale vs prezzo medio",
+      "Nuovo P.M. con What‑If",
       valid,
-      function (row) { return row.c.rp; },
-      function (row) { return signed(row.c.price - row.c.pm, " €", 3) + " · " + signed(row.c.rp, "%", 2); },
-      "Pareto: variazione percentuale assoluta dal P.M., decrescente",
+      function (row) { return finite(row.c.dpp) ? row.c.dpp : 0; },
+      function (row) {
+        var delta = finite(row.c.dpp) ? row.c.dpp : 0;
+        var arrow = delta < 0 ? "↓ " : delta > 0 ? "↑ +" : "→ ";
+        return "Nuovo P.M. " + number(row.c.np, 3) + " € · " + arrow + number(Math.abs(delta), 3) + "%";
+      },
+      "Pareto: variazione percentuale assoluta del nuovo P.M., decrescente",
       aggregate,
+      function (row) {
+        if (!finite(row.c.dpp) || row.c.dpp === 0) return "neutral";
+        return row.c.dpp < 0 ? "positive" : "warning";
+      },
+      '<span><i class="positive"></i> P.M. ridotto</span><span><i class="warning"></i> P.M. aumentato</span>',
     );
     return '<section class="wips-analytic-charts" aria-label="Grafici analitici ' + esc(scope === "all" ? "portafoglio globale" : scope) + '">' + pnl + mean + '</section>';
   }

@@ -14,7 +14,7 @@ e `Rimosso`.
 
 ### Aggiunto
 
-- Grafici analitici P&L e prezzo attuale vs P.M. nelle sezioni Crypto, ETF e
+- Grafici analitici P&L e Nuovo P.M. What-If nelle sezioni Crypto, ETF e
   Portafoglio Globale: barre orizzontali, segno accessibile, dettagli testuali
   e ordinamento Pareto circoscritto ai grafici.
 - Visualizzazione dei grafici anche nella sezione Analisi della modalità Mobile,

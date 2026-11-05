@@ -308,18 +308,18 @@ function validateAnalyticsChartsSource() {
     vm.runInNewContext(source, sandbox, { filename: "WIPS-analytics-charts.js" });
     const render = sandbox.window.buildWipsAnalyticsCharts;
     const rows = [
-      { a: { id: "small", name: "Small" }, type: "crypto", c: { price: 110, pm: 100, re: 20, rp: 10 } },
-      { a: { id: "loss", name: "Loss" }, type: "etf", c: { price: 80, pm: 100, re: -100, rp: -20 } },
-      { a: { id: "swing", name: "Swing" }, type: "crypto", c: { price: 200, pm: 100, re: 50, rp: 100 } },
+      { a: { id: "small", name: "Small" }, type: "crypto", c: { price: 110, pm: 100, re: 20, rp: 10, np: 99, dpp: -1 } },
+      { a: { id: "loss", name: "Loss" }, type: "etf", c: { price: 80, pm: 100, re: -100, rp: -20, np: 105, dpp: 5 } },
+      { a: { id: "swing", name: "Swing" }, type: "crypto", c: { price: 200, pm: 100, re: 50, rp: 100, np: 90, dpp: -10 } },
     ];
     const output = render(rows, "all");
-    const priceSection = output.indexOf("Prezzo attuale vs prezzo medio");
+    const priceSection = output.indexOf("Nuovo P.M. con What‑If");
     if (priceSection < 0 || output.indexOf("Loss") > output.indexOf("Swing") || output.indexOf("Swing") > output.indexOf("Small")) {
       fail("Grafici analitici: ordinamento Pareto P&L non valido");
     }
     const meanOutput = output.slice(priceSection);
     if (meanOutput.indexOf("Swing") > meanOutput.indexOf("Loss") || meanOutput.indexOf("Loss") > meanOutput.indexOf("Small")) {
-      fail("Grafici analitici: ordinamento Pareto variazione P.M. non valido");
+      fail("Grafici analitici: ordinamento Pareto del nuovo P.M. non valido");
     }
   } catch (error) {
     fail(`Grafici analitici: test runtime non superato: ${error.message}`);
