@@ -24,6 +24,8 @@ const REQUIRED_FILES = [
   "WIPS-allocation-lab.css",
   "WIPS-mobile.js",
   "WIPS-mobile.css",
+  "WIPS-analytics-charts.js",
+  "WIPS-analytics-charts.css",
 ];
 const PORTFOLIO_TYPES = ["crypto", "etf", "fondi"];
 const REQUIRED_APP_FUNCTIONS = [
@@ -277,6 +279,54 @@ function validateMobileModeSource() {
   if (!errors.length) pass("Modalità Mobile: selettore, renderer e stili presenti");
 }
 
+function validateAnalyticsChartsSource() {
+  const html = fs.readFileSync(path.join(ROOT, "WIPS.html"), "utf8");
+  const sourcePath = path.join(ROOT, "WIPS-analytics-charts.js");
+  const stylePath = path.join(ROOT, "WIPS-analytics-charts.css");
+  const source = fs.readFileSync(sourcePath, "utf8");
+  const style = fs.readFileSync(stylePath, "utf8");
+
+  compileJavaScript(source, "WIPS-analytics-charts.js");
+  for (const marker of [
+    'href="WIPS-analytics-charts.css',
+    'src="WIPS-analytics-charts.js',
+    "renderWipsAnalyticsCharts(type, portfolio, add)",
+    'renderWipsAnalyticsCharts("all", portfolio, add)',
+  ]) {
+    if (!html.includes(marker)) fail(`Integrazione grafici analitici mancante: ${marker}`);
+  }
+  for (const selector of [
+    ".wips-analytic-charts",
+    ".wips-analytic-chart-row",
+    ".wips-analytic-chart-track",
+  ]) {
+    if (!style.includes(selector)) fail(`Stile grafici analitici mancante: ${selector}`);
+  }
+
+  const sandbox = { window: {} };
+  try {
+    vm.runInNewContext(source, sandbox, { filename: "WIPS-analytics-charts.js" });
+    const render = sandbox.window.buildWipsAnalyticsCharts;
+    const rows = [
+      { a: { id: "small", name: "Small" }, type: "crypto", c: { price: 110, pm: 100, re: 20, rp: 10 } },
+      { a: { id: "loss", name: "Loss" }, type: "etf", c: { price: 80, pm: 100, re: -100, rp: -20 } },
+      { a: { id: "swing", name: "Swing" }, type: "crypto", c: { price: 200, pm: 100, re: 50, rp: 100 } },
+    ];
+    const output = render(rows, "all");
+    const priceSection = output.indexOf("Prezzo attuale vs prezzo medio");
+    if (priceSection < 0 || output.indexOf("Loss") > output.indexOf("Swing") || output.indexOf("Swing") > output.indexOf("Small")) {
+      fail("Grafici analitici: ordinamento Pareto P&L non valido");
+    }
+    const meanOutput = output.slice(priceSection);
+    if (meanOutput.indexOf("Swing") > meanOutput.indexOf("Loss") || meanOutput.indexOf("Loss") > meanOutput.indexOf("Small")) {
+      fail("Grafici analitici: ordinamento Pareto variazione P.M. non valido");
+    }
+  } catch (error) {
+    fail(`Grafici analitici: test runtime non superato: ${error.message}`);
+  }
+  if (!errors.length) pass("Grafici analitici: integrazione, stili e ordinamento Pareto validi");
+}
+
 function validateUpdaterSyntax() {
   for (const file of ["update-wips-crypto-prices.js", "update-wips-etf-prices.js"]) {
     compileJavaScript(fs.readFileSync(path.join(ROOT, file), "utf8"), file);
@@ -293,6 +343,7 @@ function main() {
     validateAllocationLabSource();
     validateAllocationMathInvariants();
     validateMobileModeSource();
+validateAnalyticsChartsSource();
     validateUpdaterSyntax();
   }
 

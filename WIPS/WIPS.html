@@ -2927,6 +2927,7 @@
     </style>
     <link rel="stylesheet" href="WIPS-allocation-lab.css?v=2026-11-04-alloc" />
     <link rel="stylesheet" href="WIPS-mobile.css?v=2026-11-04-alloc" />
+    <link rel="stylesheet" href="WIPS-analytics-charts.css?v=2026-11-05-charts" />
   </head>
   <body class="tab-crypto">
     <!--
@@ -3129,6 +3130,7 @@
     </footer>
 
     <script src="WIPS-data.js"></script>
+    <script src="WIPS-analytics-charts.js?v=2026-11-05-charts"></script>
     <script>
       /* ═══════════════════════════════════════════════════════════════════
         DATA & STORAGE
@@ -3249,6 +3251,46 @@
           console.warn("WIPS: impossibile salvare localStorage", e);
         }
       }
+
+      /* Aggiorna soltanto i valori predefiniti salvati in precedenza: non
+         sovrascrive mai una posizione o una quotazione modificata dall'utente. */
+      function migrateNovemberEtfAlignment() {
+        var changed = false;
+        var uranium = P.etf.find(function (asset) {
+          return asset.id === "WNUC.L";
+        });
+        if (
+          uranium &&
+          uranium.cap === 3203.97 &&
+          uranium.qty === 62.994202 &&
+          uranium.pm0 === 50.86
+        ) {
+          uranium.cap = 3704.59;
+          uranium.qty = 76.970442;
+          uranium.pm0 = 48.13;
+          changed = true;
+        }
+
+        var legacyEtfPrices = {
+          "XAIX.DE": 189.86,
+          "QNTM.L": 20.28,
+          "RBOT.L": 16.8,
+          CIBR: 50.23,
+          "CEA1.DE": 225.65,
+          COPX: 49.26,
+          "core-stoxx-europe-600": 320.3,
+          "msci-japan": 98.28,
+          "ftse-developed-asia-pacific": 44.37,
+        };
+        Object.keys(legacyEtfPrices).forEach(function (id) {
+          if (prices[id] === legacyEtfPrices[id]) {
+            prices[id] = DEFAULT_PRICES[id];
+            changed = true;
+          }
+        });
+        return changed;
+      }
+
       function load() {
         try {
           var d = localStorage.getItem(STORAGE_KEY);
@@ -3273,6 +3315,7 @@
                 return;
               }
             }
+            if (migrateNovemberEtfAlignment()) save();
           }
         } catch (e) {
           console.warn("WIPS: impossibile leggere localStorage", e);
@@ -4682,7 +4725,10 @@
           "<tbody>" +
           rows(type, add, portfolio) +
           "</tbody></table></div>" +
-          analytics(type, add, portfolio);
+          analytics(type, add, portfolio) +
+          (typeof renderWipsAnalyticsCharts === "function"
+            ? renderWipsAnalyticsCharts(type, portfolio, add)
+            : "");
       }
       function renderTables(add, portfolio) {
         renderSec("crypto", add, portfolio);
@@ -4695,6 +4741,9 @@
         var allEl = g("sec-all");
         allEl.innerHTML =
           globalAnalytics(add, portfolio) +
+          (typeof renderWipsAnalyticsCharts === "function"
+            ? renderWipsAnalyticsCharts("all", portfolio, add)
+            : "") +
           '<div style="margin-top:28px;"><div class="anh"><div class="ant">&#128196; Tutte le Posizioni</div><div class="anl"></div></div>' +
           '<div class="tw"><table>' +
           mkTH() +

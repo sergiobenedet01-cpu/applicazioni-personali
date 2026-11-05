@@ -1,0 +1,161 @@
+/* WIPS · Grafici analitici per singola sezione
+   Le barre rappresentano le stesse metriche della tabella, senza alterare
+   lo stato del portafoglio o i calcoli. */
+.wips-analytic-charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4, 16px);
+  margin-top: var(--sp-5, 24px);
+}
+
+.wips-analytic-chart {
+  min-width: 0;
+  padding: var(--sp-4, 16px);
+  border: 1px solid var(--rim);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--d2);
+}
+
+.wips-analytic-chart-header {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.wips-analytic-chart-title {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--SA);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.wips-analytic-chart-note,
+.wips-analytic-chart-empty {
+  color: var(--t3);
+  font-family: var(--MO);
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+.wips-analytic-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--t2);
+  font-family: var(--MO);
+  font-size: 0.6rem;
+}
+
+.wips-analytic-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wips-analytic-chart-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.wips-analytic-chart-legend .positive { background: var(--go); }
+.wips-analytic-chart-legend .negative { background: var(--re); }
+
+.wips-analytic-chart-row {
+  display: grid;
+  grid-template-columns: minmax(105px, 0.8fr) minmax(120px, 1.45fr) minmax(104px, 0.72fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.055);
+}
+
+.wips-analytic-chart-row:last-child { border-bottom: 0; }
+
+.wips-analytic-chart-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--SA);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wips-analytic-chart-kind {
+  display: inline-block;
+  margin-left: 5px;
+  color: var(--t3);
+  font-family: var(--MO);
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wips-analytic-chart-track {
+  position: relative;
+  height: 13px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.035);
+}
+
+.wips-analytic-chart-track::before {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(255,255,255,0.26);
+  content: "";
+}
+
+.wips-analytic-chart-bar {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: calc(var(--bar-size) * 0.48%);
+  min-width: 1px;
+  border-radius: 999px;
+}
+
+.wips-analytic-chart-bar.positive { left: 50%; background: var(--go); }
+.wips-analytic-chart-bar.negative { right: 50%; background: var(--re); }
+
+.wips-analytic-chart-metric {
+  min-width: 0;
+  color: var(--t2);
+  font-family: var(--MO);
+  font-size: 0.64rem;
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wips-analytic-chart-metric.positive { color: var(--go); }
+.wips-analytic-chart-metric.negative { color: var(--re); }
+
+@media (max-width: 960px) {
+  .wips-analytic-charts { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .wips-analytic-charts { gap: 12px; margin-top: 16px; }
+  .wips-analytic-chart { padding: 13px; }
+  .wips-analytic-chart-row {
+    grid-template-columns: minmax(90px, 1fr) minmax(100px, 1.15fr);
+    gap: 8px;
+    min-height: 46px;
+  }
+  .wips-analytic-chart-metric { grid-column: 1 / -1; text-align: left; }
+  .wips-analytic-chart-name { font-size: 0.7rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wips-analytic-chart-bar { transition: width 160ms ease; }
+}

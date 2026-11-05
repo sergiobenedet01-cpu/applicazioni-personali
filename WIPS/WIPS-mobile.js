@@ -221,6 +221,13 @@
     var total = totals(rows);
     var pnl = total.value - total.invested;
     var pct = total.invested > 0 ? (pnl / total.invested) * 100 : 0;
+    var chartRows = ui.filter === "all"
+      ? rows
+      : rows.filter(function (row) { return row.type === ui.filter; });
+    var chartScope = ui.filter === "all" ? "all" : ui.filter;
+    var charts = typeof window.buildWipsAnalyticsCharts === "function"
+      ? window.buildWipsAnalyticsCharts(chartRows, chartScope)
+      : "";
     return (
       '<section class="m-panel" aria-label="Analisi mobile">' +
       '<h1 class="m-panel-title">Analisi</h1>' +
@@ -229,7 +236,7 @@
       '<div class="m-kpi"><span class="m-label">Valore</span><strong class="m-kpi-value">' + money(total.value) + "</strong></div>" +
       '<div class="m-kpi"><span class="m-label">P&L</span><strong class="m-kpi-value ' + pnlClass(pnl) + '">' + signedMoney(pnl) + "</strong></div>" +
       '<div class="m-kpi"><span class="m-label">P&L %</span><strong class="m-kpi-value ' + pnlClass(pct) + '">' + (pct >= 0 ? "+" : "") + num(pct, 3) + "%</strong></div>" +
-      '</div><div class="m-surface"><div class="m-section-label">Priorità e piano liquidità</div><div class="m-whatif-current">Ranking Global, Crypto ed ETF e piano di distribuzione sono riuniti in Allocazione.</div><button class="m-secondary-btn" type="button" style="margin-top:12px" onclick="mobileOpenDesktopTab(\'allocation\')">Apri Allocazione</button></div>' +
+      '</div>' + charts + '<div class="m-surface"><div class="m-section-label">Priorità e piano liquidità</div><div class="m-whatif-current">Ranking Global, Crypto ed ETF e piano di distribuzione sono riuniti in Allocazione.</div><button class="m-secondary-btn" type="button" style="margin-top:12px" onclick="mobileOpenDesktopTab(\'allocation\')">Apri Allocazione</button></div>' +
       "</section>"
     );
   }

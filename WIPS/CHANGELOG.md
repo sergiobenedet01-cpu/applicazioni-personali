@@ -14,6 +14,14 @@ e `Rimosso`.
 
 ### Aggiunto
 
+- Grafici analitici P&L e prezzo attuale vs P.M. nelle sezioni Crypto, ETF e
+  Portafoglio Globale: barre orizzontali, segno accessibile, dettagli testuali
+  e ordinamento Pareto circoscritto ai grafici.
+- Visualizzazione dei grafici anche nella sezione Analisi della modalità Mobile,
+  con filtro di categoria e senza overflow orizzontale.
+- Migrazione non distruttiva dei soli valori ETF predefiniti obsoleti: riallinea
+  Uranium e le quotazioni standard solo quando la copia locale coincide con i
+  precedenti fallback; le modifiche manuali restano inalterate.
 - Selettore persistente Desktop / Mobile: al primo accesso sceglie la vista
   adatta alla viewport, poi conserva sempre la preferenza esplicita.
 - Vista Mobile dedicata: sintesi portfolio, card asset espandibili, What-If
