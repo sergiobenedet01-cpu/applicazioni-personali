@@ -58,8 +58,14 @@
       '</div>';
   }
 
-  function chart(title, rows, value, metric, description, aggregate, tone, legend) {
+  function chart(title, rows, value, metric, description, aggregate, tone, legend, splitByTone) {
     var sorted = rows.slice().sort(function (left, right) {
+      if (splitByTone) {
+        var tones = { positive: 0, warning: 1, neutral: 2 };
+        var leftTone = tone(left);
+        var rightTone = tone(right);
+        if (tones[leftTone] !== tones[rightTone]) return tones[leftTone] - tones[rightTone];
+      }
       return Math.abs(value(right)) - Math.abs(value(left));
     });
     if (!sorted.length) {
@@ -72,7 +78,20 @@
       '<div class="wips-analytic-chart-note">' + esc(paretoNote(sorted, value, description)) + '</div>' +
       '<div class="wips-analytic-chart-legend">' + (legend || '<span><i class="positive"></i> profitto</span><span><i class="negative"></i> perdita</span>') + '</div></div>' +
       '<div role="list">';
-    sorted.forEach(function (row) { html += chartRow(row, value(row), metric(row), aggregate, tone ? tone(row) : ""); });
+    var previousTone = "";
+    sorted.forEach(function (row) {
+      var currentTone = tone ? tone(row) : "";
+      if (splitByTone && currentTone !== previousTone) {
+        var groupLabel = currentTone === "positive"
+          ? "↓ Riduce il P.M."
+          : currentTone === "warning"
+            ? "↑ Aumenta il P.M."
+            : "→ P.M. invariato";
+        html += '<div class="wips-analytic-chart-group ' + currentTone + '">' + groupLabel + '</div>';
+        previousTone = currentTone;
+      }
+      html += chartRow(row, value(row), metric(row), aggregate, currentTone);
+    });
     return html + '</div></section>';
   }
 
@@ -96,13 +115,14 @@
         var arrow = delta < 0 ? "↓ " : delta > 0 ? "↑ +" : "→ ";
         return "Nuovo P.M. " + number(row.c.np, 3) + " € · " + arrow + number(Math.abs(delta), 3) + "%";
       },
-      "Pareto: variazione percentuale assoluta del nuovo P.M., decrescente",
+      "Riduzioni prima, aumenti dopo · Pareto per variazione percentuale assoluta all’interno di ogni gruppo",
       aggregate,
       function (row) {
         if (!finite(row.c.dpp) || row.c.dpp === 0) return "neutral";
         return row.c.dpp < 0 ? "positive" : "warning";
       },
       '<span><i class="positive"></i> P.M. ridotto</span><span><i class="warning"></i> P.M. aumentato</span>',
+      true,
     );
     return '<section class="wips-analytic-charts" aria-label="Grafici analitici ' + esc(scope === "all" ? "portafoglio globale" : scope) + '">' + pnl + mean + '</section>';
   }

@@ -318,7 +318,7 @@ function validateAnalyticsChartsSource() {
       fail("Grafici analitici: ordinamento Pareto P&L non valido");
     }
     const meanOutput = output.slice(priceSection);
-    if (meanOutput.indexOf("Swing") > meanOutput.indexOf("Loss") || meanOutput.indexOf("Loss") > meanOutput.indexOf("Small")) {
+    if (meanOutput.indexOf("Swing") > meanOutput.indexOf("Small") || meanOutput.indexOf("Small") > meanOutput.indexOf("Loss")) {
       fail("Grafici analitici: ordinamento Pareto del nuovo P.M. non valido");
     }
   } catch (error) {
