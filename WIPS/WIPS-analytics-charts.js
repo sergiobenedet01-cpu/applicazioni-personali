@@ -65,6 +65,10 @@
         var leftTone = tone(left);
         var rightTone = tone(right);
         if (tones[leftTone] !== tones[rightTone]) return tones[leftTone] - tones[rightTone];
+        /* Sopra: maggiore riduzione del P.M. per prima. Sotto: l'aumento
+           minimo per primo, così la lettura privilegia sempre l'impatto
+           favorevole o, nel gruppo arancione, il minore peggioramento. */
+        if (leftTone === "warning") return Math.abs(value(left)) - Math.abs(value(right));
       }
       return Math.abs(value(right)) - Math.abs(value(left));
     });
@@ -115,7 +119,7 @@
         var arrow = delta < 0 ? "↓ " : delta > 0 ? "↑ +" : "→ ";
         return "Nuovo P.M. " + number(row.c.np, 3) + " € · " + arrow + number(Math.abs(delta), 3) + "%";
       },
-      "Riduzioni prima, aumenti dopo · Pareto per variazione percentuale assoluta all’interno di ogni gruppo",
+      "Riduzioni: maggiore → minore · aumenti: minore → maggiore",
       aggregate,
       function (row) {
         if (!finite(row.c.dpp) || row.c.dpp === 0) return "neutral";

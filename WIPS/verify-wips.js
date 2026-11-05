@@ -311,6 +311,7 @@ function validateAnalyticsChartsSource() {
       { a: { id: "small", name: "Small" }, type: "crypto", c: { price: 110, pm: 100, re: 20, rp: 10, np: 99, dpp: -1 } },
       { a: { id: "loss", name: "Loss" }, type: "etf", c: { price: 80, pm: 100, re: -100, rp: -20, np: 105, dpp: 5 } },
       { a: { id: "swing", name: "Swing" }, type: "crypto", c: { price: 200, pm: 100, re: 50, rp: 100, np: 90, dpp: -10 } },
+      { a: { id: "increase-large", name: "IncreaseLarge" }, type: "etf", c: { price: 120, pm: 100, re: 5, rp: 20, np: 108, dpp: 8 } },
     ];
     const output = render(rows, "all");
     const priceSection = output.indexOf("Nuovo P.M. con What‑If");
@@ -318,7 +319,7 @@ function validateAnalyticsChartsSource() {
       fail("Grafici analitici: ordinamento Pareto P&L non valido");
     }
     const meanOutput = output.slice(priceSection);
-    if (meanOutput.indexOf("Swing") > meanOutput.indexOf("Small") || meanOutput.indexOf("Small") > meanOutput.indexOf("Loss")) {
+    if (meanOutput.indexOf("Swing") > meanOutput.indexOf("Small") || meanOutput.indexOf("Small") > meanOutput.indexOf("Loss") || meanOutput.indexOf("Loss") > meanOutput.indexOf("IncreaseLarge")) {
       fail("Grafici analitici: ordinamento Pareto del nuovo P.M. non valido");
     }
   } catch (error) {
