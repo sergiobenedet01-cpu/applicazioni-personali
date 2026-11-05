@@ -78,9 +78,9 @@ window.WIPS_DATA = {
       {
         name: "Uranium",
         id: "WNUC.L",
-        cap: 3203.97,
-        qty: 62.994202,
-        pm0: 50.86,
+        cap: 3704.59,
+        qty: 76.970442,
+        pm0: 48.13,
       },
       {
         name: "Quantum",
@@ -154,16 +154,16 @@ window.WIPS_DATA = {
     dogecoin: 0.064,
     cardano: 0.1627,
 
-    "XAIX.DE": 189.86,
+    "XAIX.DE": 189.48,
     "WNUC.L": 33.05,
-    "QNTM.L": 20.28,
-    "RBOT.L": 16.8,
-    CIBR: 50.23,
-    "CEA1.DE": 225.65,
-    COPX: 49.26,
-    "core-stoxx-europe-600": 320.3,
-    "msci-japan": 98.28,
-    "ftse-developed-asia-pacific": 44.37,
+    "QNTM.L": 20.26,
+    "RBOT.L": 16.72,
+    CIBR: 50.63,
+    "CEA1.DE": 225.75,
+    COPX: 49.12,
+    "core-stoxx-europe-600": 320.2,
+    "msci-japan": 98.47,
+    "ftse-developed-asia-pacific": 44.36,
 
   },
 };
