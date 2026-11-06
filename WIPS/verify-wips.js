@@ -42,11 +42,12 @@ const REQUIRED_APP_FUNCTIONS = [
 ];
 const REQUIRED_ALLOCATION_FUNCTIONS = [
   "renderAllocationLab",
-  "allocationApplyScenario",
-  "allocationSetAmount",
-  "allocationSimulate",
-  "allocationSimulateAtPrice",
-  "allocationSetRankingScope",
+  "buildSnapshot",
+  "setPool",
+  "setCategoryTarget",
+  "setAmount",
+  "applyScenario",
+  "clearPlan",
 ];
 
 const errors = [];
@@ -204,8 +205,13 @@ function validateAllocationLabSource() {
       fail(`Funzione Allocation Lab attesa non trovata: ${name}`);
     }
   }
-  for (const selector of [".alloc-wrap", ".alloc-map", ".alloc-matrix"]) {
+  for (const selector of [".alloc-wrap", ".alloc-map", ".alloc-targets", ".alloc-impact-list"]) {
     if (!style.includes(selector)) fail(`Stile Allocation Lab mancante: ${selector}`);
+  }
+  for (const retiredMarker of ["allocationSetRankingScope", "alloc-ranking", "alloc-matrix", "alloc-score", "rankingScope"]) {
+    if (source.includes(retiredMarker) || style.includes(retiredMarker)) {
+      fail(`Riferimento alla vecchia logica di ranking non rimosso: ${retiredMarker}`);
+    }
   }
   if (!errors.length) pass("Allocation Lab: modulo, stili e punti di integrazione presenti");
 }

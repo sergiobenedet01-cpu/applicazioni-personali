@@ -36,7 +36,7 @@ iniziali.
 ```text
 WIPS.html                         Interfaccia e logica dell'app
 WIPS-data.js                      Portfolio e prezzi iniziali/fallback
-WIPS-allocation-lab.js            Ranking e console simulativa di Allocazione
+WIPS-allocation-lab.js            Guida simulativa di Allocazione con target e scenari
 WIPS-allocation-lab.css           Stili della sezione Allocazione
 WIPS-mobile.js                    Renderer della modalità Mobile (stesso stato e calcoli)
 WIPS-mobile.css                   Stili touch della modalità Mobile
@@ -58,24 +58,26 @@ rispetta sempre quella scelta anche dopo il reload.
 
 La modalità Mobile usa le stesse posizioni, quotazioni, `calc()`, What-If,
 copy dei valori e persistenza della vista Desktop. Sostituisce solo la
-presentazione: header di sintesi, card espandibili per gli asset, pannelli
-Portfolio / What-If / Analisi / Strumenti e controlli touch da almeno 44 px.
-Budget, Allocazione, editor, backup e CSV restano tutti
-raggiungibili dal pannello **Strumenti** e si aprono nella vista Desktop
-completa, evitando di nascondere funzioni o creare una seconda logica.
+presentazione: header di sintesi, card espandibili per gli asset e controlli
+touch da almeno 44 px. Portfolio, What-If, Analisi, Allocazione, Budget e
+Strumenti sono disponibili direttamente nella vista mobile; editor prezzi,
+backup, ripristino e CSV restano raggiungibili dalla sezione **Strumenti**.
+Non esiste una seconda logica: ogni modifica è immediatamente visibile anche
+nella modalità Desktop.
 
 ## Allocazione
 
-Il tab **🧭 Allocazione** è il punto unico per confrontare ranking Globale,
-Crypto e ETF e simulare come distribuire una liquidità scelta dall'utente.
-Permette di confrontare:
+Il tab **🧭 Allocazione** è una guida locale per visualizzare il mix attuale,
+impostare target personali e simulare l'uso di una liquidità scelta dall'utente.
+Il flusso è: situazione attuale, confronto con i target, liquidità, scenari
+trasparenti, modifica per asset e impatto stimato.
 
-- ranking filtrabile con i criteri WIPS esistenti;
+- peso attuale e peso dopo il piano per ETF, Crypto e Fondi;
+- target personali modificabili che rimangono sempre uguali al 100%;
 - distanza dal P.M. e impatto stimato sul nuovo P.M.;
-- peso attuale e peso dopo il piano;
 - limite di concentrazione per singola posizione;
-- mix Crypto/ETF post-piano, matrice opportunità × rischio e piano a tranche;
-- obiettivo di capitale storico per una posizione.
+- mix delle categorie e concentrazione dopo il piano;
+- scenario verso i target, prevalenza ETF o prevalenza Crypto.
 
 Il modulo è intenzionalmente separato dal What-If principale: non modifica
 posizioni, prezzi, Budget, CSV, backup, Kraken o dati in
@@ -83,13 +85,28 @@ posizioni, prezzi, Budget, CSV, backup, Kraken o dati in
 `localStorage` (`wips_allocation_lab_v1`).
 
 La mappa di liquidità è raggruppata in categorie espandibili. Ogni riepilogo
-mostra numero strumenti, peso attuale e post-piano, scostamento e quota
-suggerita del piano simulato.
+mostra numero strumenti, peso attuale e post-piano, scostamento e importo
+simulato.
 
-Gli score e i livelli a tranche sono regole trasparenti di simulazione, non
-previsioni di mercato, segnali di acquisto né consulenza finanziaria. Ogni
-importo resta modificabile e i numeri visualizzati possono essere copiati con
-un click, come nelle tabelle del portfolio.
+Gli scenari non sono previsioni, segnali di acquisto né consulenza finanziaria:
+sono semplici distribuzioni uniformi, sempre modificabili riga per riga e
+limitate dal tetto di concentrazione scelto. I numeri visualizzati restano
+copiabili come nelle tabelle del portfolio.
+
+## Budget e calendario decisionale
+
+Il tab **💰 Budget** mette in alto la liquidità attuale, le uscite previste,
+il margine di sicurezza e l'importo effettivamente investibile fino al prossimo
+stipendio. La liquidità viene salvata nello stesso stato locale del Budget e
+può essere riportata in Allocazione con il pulsante **Usa Budget**.
+
+I valori iniziali per un nuovo browser sono: pieno carburante 100 €, spesa
+supermercato 90 € e margine di sicurezza 100 €. Se il browser contiene già un
+Budget personalizzato, quei valori hanno sempre la precedenza.
+
+Il calendario decisionale mostra il mese corrente e quello successivo: include
+solo ricorrenze, spese personalizzate e date di stipendio già presenti nel
+Budget. Su desktop i due mesi sono affiancati; su Mobile sono in sequenza.
 
 ## Backup locale completo
 

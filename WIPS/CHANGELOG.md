@@ -6,6 +6,18 @@ e `Rimosso`.
 
 ## Non pubblicato
 
+### Modificato
+
+- Allocazione ricostruita come guida con target per categoria, liquidità,
+  scenari trasparenti, limite di concentrazione e impatto sul nuovo P.M.;
+  rimossi ranking di convenienza, score, matrice e tranche.
+- Budget semplificato con liquidità attuale in evidenza e calendario
+  decisionale dei due mesi successivi al posto della Timeline.
+- Modalità Mobile estesa con pannelli diretti per Allocazione e Budget,
+  inclusi calendario, target, scenari e importi per asset.
+- Fallback delle quotazioni aggiornati dagli screenshot del 6 novembre 2026;
+  aggiornata anche la posizione Uranium (quantità, P.M. e capitale).
+
 ### Rimosso
 
 - Posizione completamente disinvestita nel fondo NEF Ethical Global Trends di

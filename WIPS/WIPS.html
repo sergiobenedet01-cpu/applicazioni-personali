@@ -1345,121 +1345,6 @@
       .bmetric.metric-eur {
         color: var(--t3);
       }
-      .ac {
-        background: var(--d2);
-        border: 1px solid var(--rim);
-        border-radius: 8px;
-        padding: 16px 18px;
-        margin-bottom: 22px;
-      }
-      .rank-help {
-        margin: 7px 0 4px;
-        font-family: var(--SA);
-        font-size: 0.7rem;
-        color: var(--t2);
-      }
-      .rank-help summary {
-        display: inline-flex;
-        cursor: pointer;
-        color: var(--t3);
-        list-style: none;
-      }
-      .rank-help summary::-webkit-details-marker {
-        display: none;
-      }
-      .rank-help summary:hover {
-        color: var(--acc);
-      }
-      .rank-help span {
-        display: block;
-        margin-top: 6px;
-        color: var(--t3);
-        line-height: 1.45;
-      }
-      .rank-help strong {
-        color: var(--text);
-      }
-      .arow {
-        display: grid;
-        grid-template-columns: 26px minmax(116px, 0.8fr) minmax(150px, 1.8fr) 42px 66px 78px auto;
-        align-items: center;
-        gap: 9px;
-        padding: 8px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      }
-      .arow:last-child {
-        border-bottom: none;
-      }
-      .ank {
-        font-family: var(--BE);
-        font-size: 0.92rem;
-        color: var(--t3);
-        text-align: center;
-      }
-      .ank.tp {
-        color: var(--go);
-      }
-      .anmw {
-        font-family: var(--SA);
-        font-size: 0.78rem;
-        font-weight: 600;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .ascw {
-        min-width: 0;
-      }
-      .atrk {
-        height: 7px;
-        background: var(--d4);
-        border-radius: 999px;
-      }
-      .afil {
-        height: 100%;
-        border-radius: 999px;
-        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .ascore-val {
-        font-family: var(--MO);
-        font-size: 0.68rem;
-        color: var(--text);
-        font-weight: 700;
-        white-space: nowrap;
-      }
-      .arow-metric {
-        font-family: var(--MO);
-        font-size: 0.66rem;
-        white-space: nowrap;
-      }
-      .adca {
-        color: var(--t3);
-      }
-      .adca.good {
-        color: var(--go);
-      }
-      .adca.warn {
-        color: var(--em);
-      }
-      .rank-action {
-        border: 1px solid var(--rim2);
-        border-radius: 999px;
-        padding: 3px 7px;
-        font-family: var(--MO);
-        font-size: 0.6rem;
-        color: var(--t3);
-        white-space: nowrap;
-      }
-      .rank-action.priority {
-        color: var(--go);
-        background: var(--go2);
-        border-color: rgba(0, 229, 160, 0.2);
-      }
-      .rank-action.review {
-        color: var(--em);
-        background: var(--em2);
-        border-color: rgba(240, 192, 64, 0.2);
-      }
       .gg {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
@@ -1682,13 +1567,6 @@
         .ew {
           grid-template-columns: 1fr;
         }
-        .arow {
-          grid-template-columns: 24px minmax(94px, 1fr) minmax(90px, 1.3fr) 36px 54px 62px;
-          gap: 6px;
-        }
-        .rank-action {
-          display: none;
-        }
         .brow {
           grid-template-columns: 92px minmax(0, 1fr) 64px 92px;
           gap: 6px;
@@ -1906,6 +1784,28 @@
         color: var(--text);
         line-height: 1.1;
       }
+      .bdg-liquidity-input {
+        border-color: rgba(56, 217, 255, 0.32);
+        background: linear-gradient(145deg, rgba(56, 217, 255, 0.1), var(--d3));
+      }
+      .bdg-liq-edit {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .bdg-liq-edit .bdg-inp {
+        min-width: 0;
+        flex: 1;
+        font-size: 1rem;
+        color: var(--text);
+      }
+      .bdg-liq-edit span,
+      .bdg-liquidity-input small {
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.65rem;
+      }
+      .bdg-liquidity-input small { display: block; margin-top: 6px; }
       .bdg-forecast-card {
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1996,9 +1896,6 @@
         letter-spacing: 0.08em;
         font-size: 0.62rem;
       }
-      .bdg-card-timeline {
-        border-color: rgba(249, 115, 22, 0.18);
-      }
       .bdg-input-card {
         border-color: rgba(255, 255, 255, 0.12);
       }
@@ -2024,39 +1921,9 @@
         background: rgba(255, 61, 90, 0.14);
         color: var(--re);
       }
-      .bdg-timeline {
+      .bdg-event-list {
         display: grid;
         gap: 8px;
-      }
-      .bdg-timeline-row {
-        display: grid;
-        grid-template-columns: 56px minmax(0, 1fr) 100px;
-        gap: 10px;
-        align-items: center;
-        padding: 12px 14px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-      }
-      .bdg-timeline-row.paid {
-        opacity: 0.65;
-      }
-      .bdg-timeline-row.upcoming {
-        box-shadow: inset 0 0 0 1px rgba(249, 115, 22, 0.15);
-      }
-      .bdg-timeline-row.today {
-        box-shadow: inset 0 0 0 1px rgba(0, 229, 160, 0.18);
-      }
-      .bdg-line-day {
-        font-family: var(--BE);
-        font-size: 1.2rem;
-        color: var(--text);
-        line-height: 1;
-      }
-      .bdg-line-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
       }
       .bdg-line-name {
         font-family: var(--SA);
@@ -2198,6 +2065,14 @@
         border-radius: 20px;
         padding: 18px;
       }
+      .bdg-calendar-note {
+        max-width: 920px;
+        margin: -6px 0 16px;
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.68rem;
+        line-height: 1.5;
+      }
       .calendar-header {
         font-family: var(--SA);
         font-size: 0.95rem;
@@ -2283,6 +2158,11 @@
         box-shadow:
           inset 0 0 0 1px rgba(249, 115, 22, 0.08),
           0 0 16px rgba(249, 115, 22, 0.05);
+      }
+      .calendar-day.income {
+        border-color: rgba(0, 229, 160, 0.32);
+        background: rgba(0, 229, 160, 0.1);
+        box-shadow: inset 0 0 0 1px rgba(0, 229, 160, 0.08);
       }
       .calendar-day.current {
         background: linear-gradient(
@@ -2847,8 +2727,7 @@
         margin-bottom: var(--sp-5);
       }
       .card,
-      .eb,
-      .ac {
+      .eb {
         border-radius: var(--radius-lg);
         padding: var(--sp-4);
       }
@@ -2875,8 +2754,6 @@
       .kv,
       .ks,
       .bmetric,
-      .ascore-val,
-      .arow-metric,
       .bdg-kpi-value,
       .bdg-line-amount,
       .bdg-bamt,
@@ -2925,8 +2802,8 @@
       }
       /* ═══════════════════════════════════════════════════════════════════ */
     </style>
-    <link rel="stylesheet" href="WIPS-allocation-lab.css?v=2026-11-04-alloc" />
-    <link rel="stylesheet" href="WIPS-mobile.css?v=2026-11-04-alloc" />
+    <link rel="stylesheet" href="WIPS-allocation-lab.css?v=2026-11-05-guided" />
+    <link rel="stylesheet" href="WIPS-mobile.css?v=2026-11-05-guided" />
     <link rel="stylesheet" href="WIPS-analytics-charts.css?v=2026-11-05-charts-2" />
   </head>
   <body class="tab-crypto">
@@ -3254,36 +3131,34 @@
 
       /* Aggiorna soltanto i valori predefiniti salvati in precedenza: non
          sovrascrive mai una posizione o una quotazione modificata dall'utente. */
-      function migrateNovemberEtfAlignment() {
+        function migrateNovemberQuoteSnapshot() {
         var changed = false;
         var uranium = P.etf.find(function (asset) {
           return asset.id === "WNUC.L";
         });
-        if (
-          uranium &&
-          uranium.cap === 3203.97 &&
-          uranium.qty === 62.994202 &&
-          uranium.pm0 === 50.86
-        ) {
-          uranium.cap = 3704.59;
-          uranium.qty = 76.970442;
-          uranium.pm0 = 48.13;
+        if (uranium && (
+          (uranium.cap === 3704.59 && uranium.qty === 76.970442 && uranium.pm0 === 48.13) ||
+          (uranium.cap === 3203.97 && uranium.qty === 62.994202 && uranium.pm0 === 50.86)
+        )) {
+          uranium.cap = 4206.08;
+          uranium.qty = 91.855824;
+          uranium.pm0 = 45.79;
           changed = true;
         }
 
-        var legacyEtfPrices = {
-          "XAIX.DE": 189.86,
-          "QNTM.L": 20.28,
-          "RBOT.L": 16.8,
-          CIBR: 50.23,
-          "CEA1.DE": 225.65,
-          COPX: 49.26,
-          "core-stoxx-europe-600": 320.3,
-          "msci-japan": 98.28,
-          "ftse-developed-asia-pacific": 44.37,
+        var knownFallbackPrices = {
+          bitcoin: [67535.03], ethereum: [1992.19], solana: [79.61],
+          polkadot: [0.8232], ripple: [1.0862], avalanche: [7.39],
+          chainlink: [9.49], dogecoin: [0.064], cardano: [0.1627],
+          "XAIX.DE": [189.86, 189.48], "WNUC.L": [33.05],
+          "QNTM.L": [20.28, 20.26], "RBOT.L": [16.8, 16.72],
+          CIBR: [50.23, 50.63], "CEA1.DE": [225.65, 225.75],
+          COPX: [49.26, 49.12], "core-stoxx-europe-600": [320.3, 320.2],
+          "msci-japan": [98.28, 98.47],
+          "ftse-developed-asia-pacific": [44.37, 44.36],
         };
-        Object.keys(legacyEtfPrices).forEach(function (id) {
-          if (prices[id] === legacyEtfPrices[id]) {
+        Object.keys(knownFallbackPrices).forEach(function (id) {
+          if (knownFallbackPrices[id].indexOf(prices[id]) >= 0) {
             prices[id] = DEFAULT_PRICES[id];
             changed = true;
           }
@@ -3315,7 +3190,7 @@
                 return;
               }
             }
-            if (migrateNovemberEtfAlignment()) save();
+            if (migrateNovemberQuoteSnapshot()) save();
           }
         } catch (e) {
           console.warn("WIPS: impossibile leggere localStorage", e);
@@ -4066,18 +3941,6 @@
       }
 
       /* ═══════════════════════════════════════════════════════════════════
-            FORMATTERS & SCORE HELPERS
-            ═══════════════════════════════════════════════════════════════════ */
-      function asc(c) {
-        if (c.price === null) return 0;
-        var s = 0;
-        if (c.dm !== null && c.dm > 0) s += 30;
-        if (c.rp !== null && c.rp < 0) s += Math.min(40, Math.abs(c.rp));
-        if (c.dpp !== null && c.dpp < 0) s += Math.min(30, Math.abs(c.dpp) * 3);
-        return Math.round(s);
-      }
-
-      /* ═══════════════════════════════════════════════════════════════════
             FORMATTERS & HELPERS
             ═══════════════════════════════════════════════════════════════════ */
       var UI_MAX_DECIMALS = 3;
@@ -4249,145 +4112,6 @@
           (s ? '<div class="ks">' + s + "</div>" : "") +
           "</div>"
         );
-      }
-
-      /* ══ BAR CARD: barra e ordinamento sulla percentuale ═══════════════ */
-      function barCard(title, items, eurFn, pctFn, colFn) {
-        var maxMagnitude = 0;
-        items.forEach(function (x) {
-          var pct = pctFn(x.c);
-          if (Math.abs(pct) > maxMagnitude) maxMagnitude = Math.abs(pct);
-        });
-        if (!maxMagnitude) maxMagnitude = 1;
-        var h =
-          '<div class="card"><div class="card-hdr"><h4>' +
-          title +
-          "</h4></div>";
-        items.forEach(function (x) {
-          var eur = eurFn(x.c);
-          var pct = pctFn(x.c);
-          if (eur === null) {
-            return;
-          }
-          var w = (Math.abs(pct) / maxMagnitude) * 100;
-          var col = colFn(x.c);
-          var eurLabel =
-            (eur >= 0 ? "+" : "") +
-            eur.toLocaleString("it-IT", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }) +
-            " €";
-          var pctLabel =
-            pct === null ? "—" : (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%";
-          var tnm = x.t
-            ? x.t === "crypto"
-              ? "🪙 "
-              : x.t === "etf"
-                ? "📈 "
-                : "🏦 "
-            : "";
-          h +=
-            '<div class="brow"><div class="blbl">' +
-            tnm +
-            x.a.name +
-            "</div>" +
-            '<div class="btrk"><div class="bfil" style="width:' +
-            w +
-            "%;background:" +
-            col +
-            '"></div></div>' +
-            '<span class="bmetric metric-pct" style="color:' +
-            col +
-            '">' +
-            pctLabel +
-            '</span><span class="bmetric metric-eur">' +
-            eurLabel +
-            "</span></div>";
-        });
-        return h + "</div>";
-      }
-
-      /* ══ ALLOCATION PRIORITY RANKING ════════════════════════════════════ */
-      function allocCard(title, sc2, maxSc, addA) {
-        var cols = [
-          "var(--go)",
-          "var(--bl)",
-          "var(--em)",
-          "var(--pu)",
-          "var(--or)",
-        ];
-        var h =
-          '<div class="ac"><div style="margin-bottom:10px;"><h4 style="font-family:var(--SA);font-size:.82rem;font-weight:700;color:var(--text);">' +
-          title +
-          '</h4><details class="rank-help"><summary>ⓘ Come viene calcolato</summary><span><strong>0–100 pt:</strong> +30 se il P.M. è sopra il mercato, fino a +40 in base alla perdita %, fino a +30 se il DCA riduce il P.M.</span></details>' +
-          "</div>";
-        for (var i = 0; i < sc2.length; i++) {
-          var x = sc2[i];
-          var col = i < cols.length ? cols[i] : "var(--rim2)";
-          var w = (x.sc / maxSc) * 100;
-          var pnlText =
-            x.c.rp === null
-              ? "—"
-              : (x.c.rp >= 0 ? "+" : "") + x.c.rp.toFixed(1) + "%";
-          var dcaText =
-            x.c.dpp === null
-              ? "—"
-              : (x.c.dpp < 0 ? "↓ " : "↑ ") +
-                Math.abs(x.c.dpp).toFixed(1) +
-                "%";
-          var action =
-            x.c.price === null
-              ? { label: "Prezzo", cl: "review" }
-              : x.sc >= 70
-                ? { label: "Priorità", cl: "priority" }
-                : x.sc >= 40
-                  ? { label: "Valuta", cl: "review" }
-                  : { label: "Attendi", cl: "" };
-          var tag = x.t
-            ? ' <span style="font-size:.55rem;color:var(--t3);">' +
-              (x.t === "crypto" ? "🪙" : x.t === "etf" ? "📈" : "🏦") +
-              "</span>"
-            : "";
-          h +=
-            '<div class="arow">' +
-            '<div class="ank' +
-            (i < 3 ? " tp" : "") +
-            '">' +
-            (i + 1) +
-            "</div>" +
-            '<div class="anmw" style="color:' +
-            col +
-            '">' +
-            x.a.name +
-            tag +
-            "</div>" +
-            '<div class="ascw"><div class="atrk"><div class="afil" style="width:' +
-            w +
-            "%;background:" +
-            col +
-            '"></div></div></div>' +
-            '<span class="ascore-val" title="Score convenienza">' +
-            x.sc +
-            "/100</span>" +
-            '<span class="arow-metric ' +
-            (x.c.rp !== null && x.c.rp < 0 ? "r" : "g") +
-            '" title="P&amp;L corrente">' +
-            pnlText +
-            "</span>" +
-            '<span class="arow-metric adca ' +
-            (x.c.dpp !== null ? (x.c.dpp < 0 ? "good" : "warn") : "") +
-            '" title="Variazione del P.M. con il DCA">' +
-            dcaText +
-            "</span>" +
-            '<span class="rank-action ' +
-            action.cl +
-            '">' +
-            action.label +
-            "</span>" +
-            "</div>";
-        }
-        return h + "</div>";
       }
 
       /* ═══════════════════════════════════════════════════════════════════
@@ -5399,11 +5123,11 @@
         function loadState() {
           var defaults = {
             liq: 0,
-            safety: 150,
+            safety: 100,
             bDom: 50,
-            bSp: 80,
+            bSp: 90,
             nPieni: 2,
-            cPieno: 80,
+            cPieno: 100,
             domTouched: false,
             settTouched: false,
             nDom: null,
@@ -5524,6 +5248,14 @@
 
         function decisionWindow(ref) {
           return { start: cloneDay(ref), end: nextPayday(ref) };
+        }
+
+        function decisionCalendarWindow(ref) {
+          var d = cloneDay(ref);
+          return {
+            start: new Date(d.getFullYear(), d.getMonth(), 1),
+            end: new Date(d.getFullYear(), d.getMonth() + 2, 1),
+          };
         }
 
         function inWindow(date, window) {
@@ -5755,6 +5487,7 @@
         function calculate() {
           var now = today();
           var win = decisionWindow(now);
+          var calendarWin = decisionCalendarWindow(now);
           var cycle = salaryCycle(now);
           var sundays = getWeekdayDates(win.start, win.end, 0);
           var autoNdom = sundays.length;
@@ -5813,6 +5546,31 @@
             .filter(function (item) {
               return item.amount > 0 && inWindow(item.date, win);
             })
+            .sort(function (a, b) {
+              return a.date - b.date || a.name.localeCompare(b.name);
+            });
+
+          /* Il calendario mostra solo eventi già presenti nel Budget: le
+             ricorrenze e le spese datate dei prossimi due mesi, più le voci
+             variabili effettivamente conteggiate prima del prossimo stipendio. */
+          var paydayEvent = makeItem(
+            "Stipendio",
+            0,
+            win.end,
+            "Entrata",
+            "stipendio",
+            "Data stipendio configurata",
+          );
+          paydayEvent.kind = "income";
+          var calendarItems = []
+            .concat(monthlyItems(calendarWin))
+            .concat(customItems(calendarWin))
+            .concat(
+              items.filter(function (item) {
+                return ["domeniche", "supermercato", "carburante"].indexOf(item.group) >= 0;
+              }),
+            )
+            .concat([paydayEvent])
             .sort(function (a, b) {
               return a.date - b.date || a.name.localeCompare(b.name);
             });
@@ -5883,7 +5641,7 @@
               : "Nessuna uscita",
             statusType: statusType,
             statusLabel: statusLabel,
-            timeline: items,
+            calendarItems: calendarItems,
             excluded: excludedPreview(win),
             breakdown: {
               affitto: sumGroup(items, "affitto"),
@@ -5900,92 +5658,6 @@
         window.bdgGetSnapshot = function () {
           return calculate();
         };
-
-        function groupByDate(items) {
-          var groups = {};
-          items.forEach(function (item) {
-            var key = isoDate(item.date);
-            if (!groups[key]) {
-              groups[key] = {
-                date: item.date,
-                dateLabel: item.dateLabel,
-                items: [],
-                total: 0,
-              };
-            }
-            groups[key].items.push(item);
-            groups[key].total += item.amount;
-          });
-          return Object.keys(groups)
-            .map(function (key) {
-              return groups[key];
-            })
-            .sort(function (a, b) {
-              return a.date - b.date;
-            });
-        }
-
-        function timelineHtml(items) {
-          var groups = groupByDate(items);
-          if (!groups.length) {
-            return '<div class="bdg-empty-state">Nessuna spesa prevista tra oggi e il prossimo stipendio.</div>';
-          }
-          return groups
-            .map(function (group) {
-              var rows = group.items
-                .map(function (item) {
-                  return (
-                    '<div class="bdg-line-item ' +
-                    item.status +
-                    '">' +
-                    '<div class="bdg-line-item-left">' +
-                    '<span class="bdg-line-name">' +
-                    escapeHtml(item.name) +
-                    "</span>" +
-                    '<span class="bdg-line-meta">' +
-                    escapeHtml(item.category) +
-                    (item.note ? " · " + escapeHtml(item.note) : "") +
-                    "</span>" +
-                    "</div>" +
-                    '<div class="bdg-line-item-right">' +
-                    '<span class="bdg-line-amount">' +
-                    formatCurrency(item.amount) +
-                    "</span>" +
-                    '<span class="bdg-line-badge ' +
-                    item.status +
-                    '">' +
-                    item.label +
-                    "</span>" +
-                    "</div>" +
-                    "</div>"
-                  );
-                })
-                .join("");
-              return (
-                '<details class="bdg-expense-group" open>' +
-                '<summary class="bdg-group-summary">' +
-                "<div>" +
-                '<span class="bdg-group-title">' +
-                group.dateLabel +
-                "</span>" +
-                '<span class="bdg-group-subtitle">' +
-                group.items.length +
-                " voce" +
-                (group.items.length > 1 ? "i" : "") +
-                "</span>" +
-                "</div>" +
-                "<strong>" +
-                formatCurrency(group.total) +
-                "</strong>" +
-                "</summary>" +
-                '<div class="bdg-group-items">' +
-                rows +
-                "</div>" +
-                "</details>"
-              );
-            })
-            .join("");
-        }
 
         function excludedHtml(items) {
           if (!items.length) {
@@ -6016,11 +5688,12 @@
         }
 
         function calendarHtml(r) {
-          var expenseDays = r.timeline.reduce(function (map, item) {
+          var expenseDays = r.calendarItems.reduce(function (map, item) {
             var key = isoDate(item.date);
-            if (!map[key]) map[key] = { total: 0, items: [] };
+            if (!map[key]) map[key] = { total: 0, items: [], hasIncome: false };
             map[key].total += item.amount;
             map[key].items.push(item);
+            if (item.kind === "income") map[key].hasIncome = true;
             return map;
           }, {});
 
@@ -6052,7 +5725,7 @@
                 classes.push("in-range");
               if (date.getDay() === 6 || date.getDay() === 0)
                 classes.push("weekend");
-              if (entry) classes.push("expense");
+              if (entry) classes.push(entry.hasIncome ? "income" : "expense");
               if (isoDate(date) === isoDate(r.today)) classes.push("current");
               var tooltip = "";
               var amountHtml = "";
@@ -6067,16 +5740,14 @@
                     .join("\n") +
                   "\nTotale -> " +
                   formatCurrency(entry.total);
-                amountHtml =
-                  '<span class="day-total">' +
-                  formatCurrency(entry.total) +
-                  "</span>";
+                if (entry.total > 0)
+                  amountHtml = '<span class="day-total">' + formatCurrency(entry.total) + "</span>";
               }
               html +=
                 '<span class="' +
                 classes.join(" ") +
                 '"' +
-                (tooltip ? ' data-tooltip="' + escapeHtml(tooltip) + '"' : "") +
+                (tooltip ? ' data-tooltip="' + escapeHtml(tooltip) + '" aria-label="' + escapeHtml(tooltip.replace(/\n/g, ", ")) + '"' : "") +
                 '><span class="day-number">' +
                 day +
                 "</span>" +
@@ -6087,24 +5758,10 @@
             return html;
           }
 
-          var months = [];
-          var cursor = new Date(
-            r.windowStart.getFullYear(),
-            r.windowStart.getMonth(),
-            1,
-          );
-          var endMonth = new Date(
-            r.windowEnd.getFullYear(),
-            r.windowEnd.getMonth(),
-            1,
-          );
-          while (cursor <= endMonth) {
-            months.push({
-              year: cursor.getFullYear(),
-              month: cursor.getMonth(),
-            });
-            cursor.setMonth(cursor.getMonth() + 1);
-          }
+          var months = [
+            { year: r.today.getFullYear(), month: r.today.getMonth() },
+            { year: new Date(r.today.getFullYear(), r.today.getMonth() + 1, 1).getFullYear(), month: new Date(r.today.getFullYear(), r.today.getMonth() + 1, 1).getMonth() },
+          ];
           return (
             '<div class="bdg-calendar-months">' +
             months
@@ -6207,8 +5864,6 @@
             "Liquidita - spese future datate - margine di sicurezza.",
           );
 
-          var timelineRoot = g("bdg-timeline");
-          if (timelineRoot) timelineRoot.innerHTML = timelineHtml(r.timeline);
           var calendarRoot = g("bdg-calendar");
           if (calendarRoot) calendarRoot.innerHTML = calendarHtml(r);
           var excludedRoot = g("bdg-excluded");
@@ -6288,6 +5943,15 @@
         }
 
         window.bdgUpdate = update;
+        window.bdgSetLiquidity = function (value) {
+          state.liq = clampNumber(value, { min: 0 });
+          var input = g("bdg-liq");
+          if (input) input.value = state.liq;
+          saveState();
+          update();
+          if (typeof window.renderMobileExperience === "function")
+            window.renderMobileExperience();
+        };
         window.bdgTouchDom = function () {
           state.domTouched = true;
           update();
@@ -6353,7 +6017,9 @@
             '<div class="bdg-card bdg-full bdg-card-hl">',
             '  <div class="bdg-sect">🎯 Decisione immediata</div>',
             '  <div class="bdg-decision-grid">',
-            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Liquidità attuale</div><div class="bdg-kpi-value" id="bdg-kpi-liq">—</div></div>',
+            '    <div class="bdg-kpi-card bdg-liquidity-input"><label class="bdg-kpi-label" for="bdg-liq">Liquidità attuale</label><div class="bdg-liq-edit"><input class="bdg-inp" id="bdg-liq" type="number" min="0" step="10" value="' +
+              state.liq +
+              '" oninput="bdgUpdate()"><span>€</span></div><small>Usata subito nei calcoli</small></div>',
             '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Giorni allo stipendio</div><div class="bdg-kpi-value" id="bdg-kpi-days">—</div></div>',
             '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Spese residue</div><div class="bdg-kpi-value" id="bdg-kpi-exp">—</div></div>',
             '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Margine sicurezza</div><div class="bdg-kpi-value" id="bdg-kpi-safe">—</div></div>',
@@ -6378,9 +6044,6 @@
             "</div>",
             '<div class="bdg-card bdg-input-card">',
             '  <div class="bdg-sect">📥 Dati di input</div>',
-            '  <div class="bdg-irow"><label class="bdg-ilbl">Liquidità attuale</label><input class="bdg-inp" id="bdg-liq" type="number" min="0" step="10" value="' +
-              state.liq +
-              '" oninput="bdgUpdate()"><span class="bdg-inp-unit">€</span></div>',
             '  <div class="bdg-irow"><label class="bdg-ilbl">Margine di sicurezza<small>liquidità da non investire</small></label><input class="bdg-inp" id="bdg-safety" type="number" min="0" step="10" value="' +
               state.safety +
               '" oninput="bdgUpdate()"><span class="bdg-inp-unit">€</span></div>',
@@ -6430,9 +6093,8 @@
               "</div>",
             '  <button class="earb" style="margin-top:12px;" onclick="bdgAddCustom()">+ Aggiungi spesa datata</button>',
             "</div>",
-            '<div class="bdg-card bdg-full bdg-card-calendar bdg-card-hl"><div class="bdg-sect">🗓️ Calendario della finestra decisionale</div><div class="bdg-calendar" id="bdg-calendar"></div></div>',
-            '<div class="bdg-card bdg-full bdg-card-timeline"><div class="bdg-sect">📅 Timeline delle spese conteggiate</div><div class="bdg-timeline" id="bdg-timeline"></div></div>',
-            '<div class="bdg-card bdg-full"><div class="bdg-sect">🚫 Spese escluse dal calcolo attuale</div><div class="bdg-timeline" id="bdg-excluded"></div></div>',
+            '<div class="bdg-card bdg-full bdg-card-calendar bdg-card-hl"><div class="bdg-sect">🗓️ Calendario decisionale · mese corrente e successivo</div><p class="bdg-calendar-note">Mostra ricorrenze, spese datate e la data del prossimo stipendio già presenti nel Budget. Il calcolo investibile continua a considerare solo la finestra prima dello stipendio.</p><div class="bdg-calendar" id="bdg-calendar"></div></div>',
+            '<div class="bdg-card bdg-full"><div class="bdg-sect">🚫 Voci fuori dalla finestra Budget</div><div class="bdg-event-list" id="bdg-excluded"></div></div>',
             '<div class="bdg-card bdg-card-hl">',
             '  <div class="bdg-sect">🎯 Formula finale</div>',
             '  <div class="bdg-res-center"><div class="bdg-res-lbl">Capitale investibile oggi</div><div class="bdg-res-val zero" id="bdg-res-val">0,00 €</div><div class="bdg-res-msg" id="bdg-res-msg">Inserisci la tua liquidità</div><div class="bdg-bar"><div class="bdg-bar-fill pos" id="bdg-bar-fill" style="width:0%"></div></div></div>',
@@ -6467,7 +6129,7 @@
 
       /* ═════════════════════════════════════════════════════════════════════ */
     </script>
-    <script src="WIPS-allocation-lab.js?v=2026-11-04-alloc"></script>
-    <script src="WIPS-mobile.js?v=2026-11-04-alloc"></script>
+    <script src="WIPS-allocation-lab.js?v=2026-11-05-guided"></script>
+    <script src="WIPS-mobile.js?v=2026-11-05-guided"></script>
   </body>
 </html>

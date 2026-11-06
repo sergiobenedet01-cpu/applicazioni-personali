@@ -1,367 +1,248 @@
 /*
-  WIPS · Allocation Lab
-  Console separata di simulazione. Non modifica P, prices, CSV, backup o
-  localStorage principale dell'app: conserva solo preferenze e bozze di piano.
+  WIPS · Allocazione
+  Guida locale di riequilibrio: usa le posizioni e le quotazioni già presenti,
+  ma non modifica mai portfolio, prezzi, CSV, backup o What-If globale.
 */
 (function () {
   "use strict";
 
-  var ALLOCATION_LAB_STORAGE_KEY = "wips_allocation_lab_v1";
-  var ALLOCATION_LAB_DEFAULT_POOL = 5600;
-  var ALLOCATION_LAB_DEFAULT_MAX_WEIGHT = 15;
-  var ALLOCATION_LAB_MAX_POOL = 1000000;
-  var allocationLabState = null;
+  var ALLOCATION_STORAGE_KEY = "wips_allocation_lab_v1";
+  var DEFAULT_POOL = 5600;
+  var DEFAULT_MAX_WEIGHT = 15;
+  var MAX_POOL = 1000000;
+  var TYPES = ["etf", "crypto", "fondi"];
+  var allocationState = null;
 
-  function allocFinite(value, fallback) {
-    var n = Number(value);
-    return Number.isFinite(n) ? n : fallback;
+  function finite(value, fallback) {
+    var number = Number(value);
+    return Number.isFinite(number) ? number : fallback;
   }
 
-  function allocClamp(value, min, max) {
+  function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
   }
 
-  function allocEscape(value) {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\"/g, "&quot;")
-      .replace(/'/g, "&#39;");
+  function escapeHtml(value) {
+    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
-  function allocMoney(value, digits) {
+  function money(value, digits) {
     if (!Number.isFinite(value)) return '<span class="mu">—</span>';
     return N(value, digits === undefined ? 2 : digits, " €");
   }
 
-  function allocPercent(value, digits) {
-    if (!Number.isFinite(value)) return '<span class="mu">—</span>';
-    return N(value, digits === undefined ? 1 : digits, "%");
-  }
-
-  function allocPlain(value, digits) {
+  function plain(value, digits) {
     if (!Number.isFinite(value)) return "—";
     return formatDisplayNumber(value, digits === undefined ? 2 : digits);
   }
 
-  function allocStateDefaults(ids) {
-    var first = ids[0] || "";
-    var ethereum = ids.indexOf("ethereum") >= 0 ? "ethereum" : first;
-    return {
-      pool: ALLOCATION_LAB_DEFAULT_POOL,
-      maxWeight: ALLOCATION_LAB_DEFAULT_MAX_WEIGHT,
-      scenario: "custom",
-      allocations: {},
-      rankingScope: "global",
-      goalAsset: ethereum,
-      goalCapital: 6000,
-      timelineAsset: ethereum,
-      timelineAmount: 1000,
-      tranches: 3,
-    };
+  function percent(value, digits) {
+    if (!Number.isFinite(value)) return "—";
+    return plain(value, digits === undefined ? 1 : digits) + "%";
   }
 
-  function allocSanitizeState(raw, rows) {
-    var ids = rows.map(function (row) {
-      return row.a.id;
-    });
-    var defaults = allocStateDefaults(ids);
+  function typeLabel(type) {
+    return type === "crypto" ? "Crypto" : type === "etf" ? "ETF" : "Fondi";
+  }
+
+  function activeTypes(rows) {
+    return TYPES.filter(function (type) { return rows.some(function (row) { return row.t === type; }); });
+  }
+
+  function defaultTargets(rows) {
+    var active = activeTypes(rows);
+    var values = { crypto: 0, etf: 0, fondi: 0 };
+    if (active.length === 1) values[active[0]] = 100;
+    else if (active.length === 2) { values[active[0]] = 50; values[active[1]] = 50; }
+    else if (active.length === 3) { values.etf = 50; values.crypto = 40; values.fondi = 10; }
+    return values;
+  }
+
+  function normalizedTargets(raw, rows) {
+    var defaults = defaultTargets(rows);
+    if (!raw || typeof raw !== "object") return defaults;
+    var active = activeTypes(rows);
+    var values = { crypto: 0, etf: 0, fondi: 0 };
+    var total = 0;
+    active.forEach(function (type) { values[type] = clamp(finite(raw[type], defaults[type]), 0, 100); total += values[type]; });
+    if (total <= 0) return defaults;
+    active.forEach(function (type) { values[type] = (values[type] / total) * 100; });
+    return values;
+  }
+
+  function stateDefaults(rows) {
+    return { pool: DEFAULT_POOL, maxWeight: DEFAULT_MAX_WEIGHT, scenario: "custom", allocations: {}, targets: defaultTargets(rows) };
+  }
+
+  function sanitizeState(raw, rows) {
     raw = raw && typeof raw === "object" ? raw : {};
-    var allowedScenarios = ["custom", "prudent", "balanced", "dynamic"];
-    var cleaned = {
-      pool: allocClamp(
-        allocFinite(raw.pool, defaults.pool),
-        0,
-        ALLOCATION_LAB_MAX_POOL,
-      ),
-      maxWeight: allocClamp(
-        allocFinite(raw.maxWeight, defaults.maxWeight),
-        3,
-        60,
-      ),
-      scenario:
-        allowedScenarios.indexOf(raw.scenario) >= 0
-          ? raw.scenario
-          : defaults.scenario,
-      allocations: {},
-      rankingScope:
-        ["global", "crypto", "etf"].indexOf(raw.rankingScope) >= 0
-          ? raw.rankingScope
-          : defaults.rankingScope,
-      goalAsset:
-        ids.indexOf(raw.goalAsset) >= 0 ? raw.goalAsset : defaults.goalAsset,
-      goalCapital: allocClamp(
-        allocFinite(raw.goalCapital, defaults.goalCapital),
-        0,
-        ALLOCATION_LAB_MAX_POOL * 10,
-      ),
-      timelineAsset:
-        ids.indexOf(raw.timelineAsset) >= 0
-          ? raw.timelineAsset
-          : defaults.timelineAsset,
-      timelineAmount: allocClamp(
-        allocFinite(raw.timelineAmount, defaults.timelineAmount),
-        0,
-        ALLOCATION_LAB_MAX_POOL,
-      ),
-      tranches: [3, 4, 6].indexOf(Number(raw.tranches)) >= 0
-        ? Number(raw.tranches)
-        : defaults.tranches,
-    };
-    var sourceAllocations =
-      raw.allocations && typeof raw.allocations === "object"
-        ? raw.allocations
-        : {};
+    var defaults = stateDefaults(rows);
+    var ids = rows.map(function (row) { return row.a.id; });
+    var source = raw.allocations && typeof raw.allocations === "object" ? raw.allocations : {};
+    var allocations = {};
     ids.forEach(function (id) {
-      var amount = allocFinite(sourceAllocations[id], 0);
-      if (amount > 0) cleaned.allocations[id] = Math.min(amount, ALLOCATION_LAB_MAX_POOL);
+      var amount = clamp(finite(source[id], 0), 0, MAX_POOL);
+      if (amount > 0) allocations[id] = amount;
     });
-    return cleaned;
+    return {
+      pool: clamp(finite(raw.pool, defaults.pool), 0, MAX_POOL),
+      maxWeight: clamp(finite(raw.maxWeight, defaults.maxWeight), 3, 60),
+      scenario: ["custom", "target", "etf", "crypto"].indexOf(raw.scenario) >= 0 ? raw.scenario : defaults.scenario,
+      allocations: allocations,
+      targets: normalizedTargets(raw.targets, rows),
+    };
   }
 
-  function allocationBaseRows(portfolio) {
+  function baseRows(portfolio) {
     portfolio = portfolio || P;
     var rows = [];
     PORTFOLIO_TYPES.forEach(function (type) {
       (portfolio[type] || []).forEach(function (asset) {
-        var c = calc(asset, 0);
-        if (c.price !== null && c.price > 0)
-          rows.push({ a: asset, t: type, c: c });
+        var result = calc(asset, 0);
+        if (result.price !== null && result.price > 0) rows.push({ a: asset, t: type, c: result });
       });
     });
     return rows;
   }
 
-  function allocationState(rows) {
-    if (!allocationLabState) {
+  function getState(rows) {
+    if (!allocationState) {
       var saved = null;
-      try {
-        var raw = localStorage.getItem(ALLOCATION_LAB_STORAGE_KEY);
-        saved = raw ? JSON.parse(raw) : null;
-      } catch (error) {
-        console.warn("WIPS Allocation Lab: stato locale non leggibile", error);
-      }
-      allocationLabState = allocSanitizeState(saved, rows);
-    } else {
-      allocationLabState = allocSanitizeState(allocationLabState, rows);
-    }
-    return allocationLabState;
+      try { var raw = localStorage.getItem(ALLOCATION_STORAGE_KEY); saved = raw ? JSON.parse(raw) : null; }
+      catch (error) { console.warn("WIPS Allocazione: stato locale non leggibile", error); }
+      allocationState = sanitizeState(saved, rows);
+      saveState();
+    } else allocationState = sanitizeState(allocationState, rows);
+    return allocationState;
   }
 
-  function allocationSave() {
-    try {
-      localStorage.setItem(
-        ALLOCATION_LAB_STORAGE_KEY,
-        JSON.stringify(allocationLabState),
-      );
-    } catch (error) {
-      console.warn("WIPS Allocation Lab: impossibile salvare la bozza", error);
-    }
+  function saveState() {
+    try { localStorage.setItem(ALLOCATION_STORAGE_KEY, JSON.stringify(allocationState)); }
+    catch (error) { console.warn("WIPS Allocazione: impossibile salvare la simulazione", error); }
   }
 
-  function allocationRisk(row) {
-    var id = String(row.a.id).toLowerCase();
-    var name = String(row.a.name).toLowerCase();
-    if (row.t === "crypto") {
-      if (id === "bitcoin") return 72;
-      if (id === "ethereum") return 78;
-      if (id === "ripple" || id === "chainlink") return 84;
-      return 91;
-    }
-    if (id.indexOf("core-stoxx") >= 0) return 42;
-    if (id.indexOf("msci-japan") >= 0) return 54;
-    if (id.indexOf("ftse-developed") >= 0) return 59;
-    if (id.indexOf("cea1") >= 0 || name.indexOf("asia") >= 0) return 71;
-    if (id.indexOf("xaix") >= 0 || name.indexOf("ai") >= 0) return 74;
-    if (id.indexOf("cibr") >= 0 || name.indexOf("cyber") >= 0) return 73;
-    if (id.indexOf("qntm") >= 0 || name.indexOf("quantum") >= 0) return 87;
-    if (id.indexOf("wnuc") >= 0 || name.indexOf("uran") >= 0) return 82;
-    if (id.indexOf("copx") >= 0 || name.indexOf("copper") >= 0) return 79;
-    if (id.indexOf("rbot") >= 0 || name.indexOf("automation") >= 0) return 72;
-    return 65;
+  function categorySummary(rows, state, totalValue, postTotal) {
+    var summary = {};
+    TYPES.forEach(function (type) {
+      var groupRows = rows.filter(function (row) { return row.t === type; });
+      var current = groupRows.reduce(function (sum, row) { return sum + row.value; }, 0);
+      var planned = groupRows.reduce(function (sum, row) { return sum + row.allocation; }, 0);
+      var currentWeight = totalValue > 0 ? (current / totalValue) * 100 : 0;
+      var afterWeight = postTotal > 0 ? ((current + planned) / postTotal) * 100 : 0;
+      var target = state.targets[type] || 0;
+      summary[type] = { type: type, rows: groupRows, current: current, planned: planned, currentWeight: currentWeight, afterWeight: afterWeight, target: target, delta: target - currentWeight, afterDelta: target - afterWeight };
+    });
+    return summary;
   }
 
-  function allocationRoleBonus(row) {
-    var id = String(row.a.id).toLowerCase();
-    if (
-      id.indexOf("core-stoxx") >= 0 ||
-      id.indexOf("msci-japan") >= 0 ||
-      id.indexOf("ftse-developed") >= 0
-    )
-      return 18;
-    if (row.t === "etf") return 11;
-    if (row.a.id === "bitcoin" || row.a.id === "ethereum") return 7;
-    return 3;
-  }
-
-  function allocationBuildSnapshot(portfolio) {
-    var baseRows = allocationBaseRows(portfolio);
-    var state = allocationState(baseRows);
-    var totalValue = baseRows.reduce(function (sum, row) {
-      return sum + (row.c.va !== null ? row.c.va : row.c.cost);
-    }, 0);
-    var planned = Object.keys(state.allocations).reduce(function (sum, id) {
-      return sum + Math.max(0, allocFinite(state.allocations[id], 0));
-    }, 0);
-    var denominatorWithPool = totalValue + state.pool;
+  function buildSnapshot(portfolio) {
+    var sourceRows = baseRows(portfolio);
+    var state = getState(sourceRows);
+    var totalValue = sourceRows.reduce(function (sum, row) { return sum + (row.c.va !== null ? row.c.va : row.c.cost); }, 0);
+    var planned = Object.keys(state.allocations).reduce(function (sum, id) { return sum + Math.max(0, finite(state.allocations[id], 0)); }, 0);
     var postTotal = totalValue + planned;
-    var rows = baseRows.map(function (base) {
+    var capBase = totalValue + state.pool;
+    var rows = sourceRows.map(function (base) {
       var value = base.c.va !== null ? base.c.va : base.c.cost;
+      var allocation = Math.max(0, finite(state.allocations[base.a.id], 0));
       var weight = totalValue > 0 ? (value / totalValue) * 100 : 0;
-      var allocation = Math.max(0, allocFinite(state.allocations[base.a.id], 0));
-      var postWeight =
-        postTotal > 0 ? ((value + allocation) / postTotal) * 100 : 0;
-      var discount =
-        base.c.pm > 0 && base.c.price !== null
-          ? ((base.c.pm - base.c.price) / base.c.pm) * 100
-          : 0;
-      var downFromPm = Math.max(0, discount);
-      var capValue = (state.maxWeight / 100) * denominatorWithPool;
-      var maxAllocation = Math.max(0, capValue - value);
-      var capacityScore = allocClamp(
-        ((state.maxWeight - weight) / state.maxWeight) * 25,
-        0,
-        25,
-      );
-      var score = Math.round(
-        allocClamp(downFromPm * 1.15, 0, 38) +
-          capacityScore +
-          allocationRoleBonus(base) +
-          allocClamp((100 - allocationRisk(base)) * 0.12, 0, 12),
-      );
-      score = allocClamp(score, 0, 100);
-      return {
-        a: base.a,
-        t: base.t,
-        c: base.c,
-        value: value,
-        weight: weight,
-        allocation: allocation,
-        postWeight: postWeight,
-        discount: discount,
-        risk: allocationRisk(base),
-        score: score,
-        maxAllocation: maxAllocation,
-        capacityScore: capacityScore,
-      };
-    });
-    rows.sort(function (left, right) {
-      if (right.score !== left.score) return right.score - left.score;
-      return right.discount - left.discount;
-    });
-    return {
-      rows: rows,
-      state: state,
-      totalValue: totalValue,
-      planned: planned,
-      postTotal: postTotal,
-      remaining: state.pool - planned,
-    };
+      var postWeight = postTotal > 0 ? ((value + allocation) / postTotal) * 100 : 0;
+      var gapFromPm = base.c.pm > 0 && base.c.price !== null ? ((base.c.price - base.c.pm) / base.c.pm) * 100 : 0;
+      return { a: base.a, t: base.t, c: base.c, value: value, allocation: allocation, weight: weight, postWeight: postWeight, gapFromPm: gapFromPm, maxAllocation: Math.max(0, (state.maxWeight / 100) * capBase - value) };
+    }).sort(function (left, right) { return left.t.localeCompare(right.t) || left.a.name.localeCompare(right.a.name); });
+    return { rows: rows, state: state, totalValue: totalValue, postTotal: postTotal, planned: planned, remaining: state.pool - planned, categories: categorySummary(rows, state, totalValue, postTotal) };
   }
 
-  function allocationRowById(snapshot, id) {
-    return snapshot.rows.find(function (row) {
-      return row.a.id === id;
-    });
-  }
+  function rowById(snapshot, id) { return snapshot.rows.find(function (row) { return row.a.id === id; }); }
 
-  function allocationSimulate(row, amount) {
-    var add = Math.max(0, allocFinite(amount, 0));
+  function simulate(row, amount) {
+    var add = Math.max(0, finite(amount, 0));
     if (!row || row.c.price === null || row.c.price <= 0) return null;
-    var addedQty = add / row.c.price;
-    var qty = row.c.nq === null ? row.a.qty + addedQty : row.a.qty + addedQty;
+    var quantity = row.a.qty + add / row.c.price;
     var cost = row.c.cost + add;
-    var mean = qty > 0 ? cost / qty : row.c.pm;
-    return {
-      amount: add,
-      addedQty: addedQty,
-      qty: qty,
-      cost: cost,
-      pm: mean,
-      changePct: row.c.pm > 0 ? ((mean - row.c.pm) / row.c.pm) * 100 : 0,
-    };
+    var pm = quantity > 0 ? cost / quantity : row.c.pm;
+    return { amount: add, pm: pm, changePct: row.c.pm > 0 ? ((pm - row.c.pm) / row.c.pm) * 100 : 0 };
   }
 
-  function allocationSimulateAtPrice(cost, qty, amount, price) {
-    if (price <= 0) return { cost: cost, qty: qty, pm: qty > 0 ? cost / qty : 0 };
-    var newCost = cost + amount;
-    var newQty = qty + amount / price;
-    return {
-      cost: newCost,
-      qty: newQty,
-      pm: newQty > 0 ? newCost / newQty : 0,
-    };
+  function render() { renderAllocationLab(); }
+
+  function setPool(value) {
+    var snapshot = buildSnapshot();
+    snapshot.state.pool = clamp(finite(value, snapshot.state.pool), 0, MAX_POOL);
+    snapshot.state.scenario = "custom";
+    saveState(); render();
   }
 
-  function allocationSetPool(value) {
-    var snap = allocationBuildSnapshot();
-    snap.state.pool = allocClamp(allocFinite(value, snap.state.pool), 0, ALLOCATION_LAB_MAX_POOL);
-    snap.state.scenario = "custom";
-    allocationSave();
-    renderAllocationLab();
+  function useBudgetLiquidity() {
+    if (typeof window.bdgGetSnapshot !== "function") return;
+    var snapshot = buildSnapshot();
+    var budget = window.bdgGetSnapshot();
+    snapshot.state.pool = Math.max(0, finite(budget && budget.investible, 0));
+    snapshot.state.scenario = "custom";
+    saveState(); render();
+    if (typeof showToast === "function") showToast("Importo investibile del Budget applicato alla simulazione");
   }
 
-  function allocationSetMaxWeight(value) {
-    var snap = allocationBuildSnapshot();
-    snap.state.maxWeight = allocClamp(allocFinite(value, snap.state.maxWeight), 3, 60);
-    snap.state.scenario = "custom";
-    allocationSave();
-    renderAllocationLab();
+  function setMaxWeight(value) {
+    var snapshot = buildSnapshot();
+    snapshot.state.maxWeight = clamp(finite(value, snapshot.state.maxWeight), 3, 60);
+    snapshot.state.scenario = "custom";
+    saveState(); render();
   }
 
-  function allocationSetRankingScope(scope) {
-    var snap = allocationBuildSnapshot();
-    if (["global", "crypto", "etf"].indexOf(scope) < 0) return;
-    snap.state.rankingScope = scope;
-    allocationSave();
-    renderAllocationLab();
-  }
-
-  function allocationSetAmount(id, value) {
-    var snap = allocationBuildSnapshot();
-    var row = allocationRowById(snap, id);
-    if (!row) return;
-    var wanted = Math.max(0, allocFinite(value, 0));
-    var otherPlanned = snap.planned - row.allocation;
-    var availablePool = Math.max(0, snap.state.pool - otherPlanned);
-    var allowed = Math.min(row.maxAllocation, availablePool);
-    var applied = Math.min(wanted, allowed);
-    if (applied > 0) snap.state.allocations[id] = applied;
-    else delete snap.state.allocations[id];
-    snap.state.scenario = "custom";
-    allocationSave();
-    if (wanted > allowed + 0.009 && typeof showToast === "function") {
-      showToast("Importo limitato da liquidita o peso massimo impostato");
+  function setCategoryTarget(type, value) {
+    var snapshot = buildSnapshot();
+    var active = activeTypes(snapshot.rows);
+    if (active.indexOf(type) < 0) return;
+    var next = clamp(finite(value, snapshot.state.targets[type]), 0, 100);
+    var others = active.filter(function (candidate) { return candidate !== type; });
+    snapshot.state.targets[type] = next;
+    if (!others.length) snapshot.state.targets[type] = 100;
+    else {
+      var available = 100 - next;
+      var oldTotal = others.reduce(function (sum, candidate) { return sum + snapshot.state.targets[candidate]; }, 0);
+      others.forEach(function (candidate) { snapshot.state.targets[candidate] = oldTotal > 0 ? (snapshot.state.targets[candidate] / oldTotal) * available : available / others.length; });
     }
-    renderAllocationLab();
+    snapshot.state.scenario = "custom";
+    saveState(); render();
   }
 
-  function allocationClearPlan() {
-    var snap = allocationBuildSnapshot();
-    snap.state.allocations = {};
-    snap.state.scenario = "custom";
-    allocationSave();
-    renderAllocationLab();
+  function setAmount(id, value) {
+    var snapshot = buildSnapshot();
+    var row = rowById(snapshot, id);
+    if (!row) return;
+    var wanted = Math.max(0, finite(value, 0));
+    var otherPlanned = snapshot.planned - row.allocation;
+    var allowed = Math.min(row.maxAllocation, Math.max(0, snapshot.state.pool - otherPlanned));
+    var applied = Math.min(wanted, allowed);
+    if (applied > 0) snapshot.state.allocations[id] = applied;
+    else delete snapshot.state.allocations[id];
+    snapshot.state.scenario = "custom";
+    saveState();
+    if (wanted > allowed + 0.009 && typeof showToast === "function") showToast("Importo limitato dalla liquidità o dal limite di concentrazione");
+    render();
+  }
+
+  function clearPlan() {
+    var snapshot = buildSnapshot();
+    snapshot.state.allocations = {};
+    snapshot.state.scenario = "custom";
+    saveState(); render();
     if (typeof showToast === "function") showToast("Piano di allocazione azzerato");
   }
 
-  function allocationDistribute(rows, budget, allocations) {
-    var remaining = Math.max(0, budget);
-    var active = rows.slice();
-    var guard = 0;
-    while (remaining > 0.01 && active.length && guard < 40) {
-      var share = remaining / active.length;
-      var moved = 0;
+  function distributeEvenly(rows, budget, allocations) {
+    var remaining = Math.max(0, budget), active = rows.slice(), guard = 0;
+    while (remaining > 0.01 && active.length && guard < 50) {
+      var share = remaining / active.length, moved = 0;
       active = active.filter(function (row) {
-        var existing = allocations[row.a.id] || 0;
-        var room = Math.max(0, row.maxAllocation - existing);
+        var already = allocations[row.a.id] || 0;
+        var room = Math.max(0, row.maxAllocation - already);
         if (room <= 0.01) return false;
-        var give = Math.min(room, share);
-        allocations[row.a.id] = existing + give;
-        remaining -= give;
-        moved += give;
-        return room - give > 0.01;
+        var grant = Math.min(room, share);
+        allocations[row.a.id] = already + grant;
+        remaining -= grant; moved += grant;
+        return room - grant > 0.01;
       });
       if (moved <= 0.01) break;
       guard++;
@@ -369,600 +250,104 @@
     return remaining;
   }
 
-  function allocationApplyScenario(kind) {
-    var snap = allocationBuildSnapshot();
-    var rows = snap.rows.slice();
-    var etfs = rows.filter(function (row) {
-      return row.t === "etf";
+  function scenarioTargets(kind, snapshot) {
+    var targets = Object.assign({}, snapshot.state.targets);
+    var active = activeTypes(snapshot.rows);
+    var hasEtf = active.indexOf("etf") >= 0, hasCrypto = active.indexOf("crypto") >= 0;
+    if (kind === "etf" && hasEtf) { targets.etf = hasCrypto ? 75 : 100; if (hasCrypto) targets.crypto = 25; if (active.indexOf("fondi") >= 0) targets.fondi = 0; }
+    if (kind === "crypto" && hasCrypto) { targets.crypto = hasEtf ? 60 : 100; if (hasEtf) targets.etf = 40; if (active.indexOf("fondi") >= 0) targets.fondi = 0; }
+    return normalizedTargets(targets, snapshot.rows);
+  }
+
+  function applyScenario(kind) {
+    var snapshot = buildSnapshot();
+    if (["target", "etf", "crypto"].indexOf(kind) < 0) return;
+    var targets = scenarioTargets(kind, snapshot), allocations = {}, postTotal = snapshot.totalValue + snapshot.state.pool;
+    TYPES.forEach(function (type) {
+      var group = snapshot.categories[type];
+      if (!group || !group.rows.length) return;
+      var needed = Math.max(0, (targets[type] / 100) * postTotal - group.current);
+      distributeEvenly(group.rows, needed, allocations);
     });
-    var cryptos = rows.filter(function (row) {
-      return row.t === "crypto";
+    snapshot.state.allocations = allocations;
+    snapshot.state.scenario = kind;
+    saveState(); render();
+    if (typeof showToast === "function") showToast("Scenario trasparente aggiornato: " + scenarioLabel(kind));
+  }
+
+  function scenarioLabel(kind) { return kind === "target" ? "Verso i target" : kind === "etf" ? "Prevalenza ETF" : kind === "crypto" ? "Prevalenza Crypto" : "Personalizzato"; }
+
+  function donut(snapshot) {
+    var groups = { crypto: { value: 0, color: "#a78bfa", label: "Crypto" }, etf: { value: 0, color: "#38d9ff", label: "ETF" }, fondi: { value: 0, color: "#f0c040", label: "Fondi" } };
+    snapshot.rows.forEach(function (row) { groups[row.t].value += row.value + row.allocation; });
+    var cursor = 0, parts = [];
+    TYPES.forEach(function (type) {
+      var part = snapshot.postTotal > 0 ? (groups[type].value / snapshot.postTotal) * 100 : 0;
+      if (part <= 0) return;
+      parts.push(groups[type].color + " " + cursor.toFixed(2) + "% " + (cursor + part).toFixed(2) + "%"); cursor += part;
     });
-    var allocations = {};
-    var left = snap.state.pool;
-    if (kind === "prudent") {
-      etfs.sort(function (a, b) {
-        return a.risk - b.risk || b.score - a.score;
-      });
-      left = allocationDistribute(etfs, left, allocations);
-    } else if (kind === "balanced") {
-      etfs.sort(function (a, b) {
-        return b.score - a.score;
-      });
-      cryptos.sort(function (a, b) {
-        return a.risk - b.risk || b.score - a.score;
-      });
-      left = allocationDistribute(etfs, snap.state.pool * 0.7, allocations);
-      left += allocationDistribute(cryptos, snap.state.pool * 0.3, allocations);
-    } else {
-      etfs.sort(function (a, b) {
-        return b.score - a.score || b.risk - a.risk;
-      });
-      cryptos.sort(function (a, b) {
-        return b.score - a.score || b.risk - a.risk;
-      });
-      left = allocationDistribute(etfs, snap.state.pool * 0.45, allocations);
-      left += allocationDistribute(cryptos, snap.state.pool * 0.55, allocations);
-    }
-    /* Prova a usare l'eventuale quota non allocata soltanto dove c'è ancora
-       spazio entro il limite di concentrazione scelto dall'utente. */
-    if (left > 0.01) {
-      rows.sort(function (a, b) {
-        return b.score - a.score;
-      });
-      allocationDistribute(rows, left, allocations);
-    }
-    snap.state.allocations = allocations;
-    snap.state.scenario = kind;
-    allocationSave();
-    renderAllocationLab();
-    if (typeof showToast === "function") {
-      showToast("Scenario simulativo aggiornato: " + allocationScenarioLabel(kind));
-    }
+    return { css: "conic-gradient(" + (parts.length ? parts.join(",") : "#202534 0 100%") + ")", groups: groups };
   }
 
-  function allocationScenarioLabel(kind) {
-    if (kind === "prudent") return "Prudente";
-    if (kind === "balanced") return "Bilanciato";
-    if (kind === "dynamic") return "Dinamico";
-    return "Personalizzato";
+  function concentration(snapshot) {
+    return snapshot.rows.slice().sort(function (a, b) { return b.postWeight - a.postWeight; }).slice(0, 7).map(function (row) {
+      var ratio = row.postWeight / snapshot.state.maxWeight;
+      var tone = ratio > 1 ? "risk" : ratio > 0.75 ? "warn" : "good";
+      var label = ratio > 1 ? "oltre limite" : ratio > 0.75 ? "vicino al limite" : "entro limite";
+      return '<div class="alloc-conc-row"><span class="alloc-conc-name" title="' + escapeHtml(row.a.name) + '">' + escapeHtml(row.a.name) + '</span><div class="alloc-conc-track"><div class="alloc-conc-fill ' + tone + '" style="width:' + clamp(ratio * 100, 0, 100).toFixed(1) + '%"></div></div><span class="alloc-conc-state ' + (tone === "risk" ? "r" : tone === "warn" ? "y" : "g") + '">' + percent(row.postWeight, 1) + ' · ' + label + '</span></div>';
+    }).join("");
   }
 
-  function allocationSetGoalAsset(id) {
-    var snap = allocationBuildSnapshot();
-    if (!allocationRowById(snap, id)) return;
-    snap.state.goalAsset = id;
-    allocationSave();
-    renderAllocationLab();
+  function targetRows(snapshot) {
+    return TYPES.filter(function (type) { return snapshot.categories[type].rows.length; }).map(function (type) {
+      var group = snapshot.categories[type], deltaClass = group.delta > 0.1 ? "g" : group.delta < -0.1 ? "r" : "mu";
+      var direction = group.delta > 0.1 ? "sotto target" : group.delta < -0.1 ? "sopra target" : "in linea";
+      return '<div class="alloc-target-row"><div><span class="alloc-dot ' + type + '"></span><strong>' + typeLabel(type) + '</strong><small>Oggi ' + percent(group.currentWeight, 1) + ' · dopo piano ' + percent(group.afterWeight, 1) + '</small></div><label><span>Target</span><input class="alloc-input" type="number" min="0" max="100" step="1" value="' + group.target.toFixed(2) + '" aria-label="Target ' + typeLabel(type) + '" onchange="allocationSetCategoryTarget(\'' + type + '\', this.value)"><em>%</em></label><span class="alloc-target-delta ' + deltaClass + '">' + (group.delta > 0 ? "+" : "") + percent(group.delta, 1) + '<small>' + direction + '</small></span></div>';
+    }).join("");
   }
 
-  function allocationSetGoalCapital(value) {
-    var snap = allocationBuildSnapshot();
-    snap.state.goalCapital = allocClamp(allocFinite(value, snap.state.goalCapital), 0, ALLOCATION_LAB_MAX_POOL * 10);
-    allocationSave();
-    renderAllocationLab();
-  }
-
-  function allocationSetTimelineAsset(id) {
-    var snap = allocationBuildSnapshot();
-    if (!allocationRowById(snap, id)) return;
-    snap.state.timelineAsset = id;
-    allocationSave();
-    renderAllocationLab();
-  }
-
-  function allocationSetTimelineAmount(value) {
-    var snap = allocationBuildSnapshot();
-    snap.state.timelineAmount = allocClamp(allocFinite(value, snap.state.timelineAmount), 0, ALLOCATION_LAB_MAX_POOL);
-    allocationSave();
-    renderAllocationLab();
-  }
-
-  function allocationSetTranches(value) {
-    var snap = allocationBuildSnapshot();
-    var count = Number(value);
-    if ([3, 4, 6].indexOf(count) >= 0) snap.state.tranches = count;
-    allocationSave();
-    renderAllocationLab();
-  }
-
-  function allocationSelectAsset(id) {
-    var snap = allocationBuildSnapshot();
-    if (!allocationRowById(snap, id)) return;
-    snap.state.goalAsset = id;
-    snap.state.timelineAsset = id;
-    allocationSave();
-    renderAllocationLab();
-    if (typeof showToast === "function") showToast("Asset selezionato per obiettivo e piano ingressi");
-  }
-
-  function allocationOptions(rows, selected) {
-    return rows
-      .map(function (row) {
-        return (
-          '<option value="' +
-          allocEscape(row.a.id) +
-          '"' +
-          (row.a.id === selected ? " selected" : "") +
-          ">" +
-          allocEscape(row.a.name) +
-          " · " +
-          (row.t === "crypto" ? "Crypto" : "ETF") +
-          "</option>"
-        );
-      })
-      .join("");
-  }
-
-  function allocationDonutStyle(snapshot) {
-    var groups = {
-      crypto: { value: 0, color: "#a78bfa", label: "Crypto" },
-      etf: { value: 0, color: "#38d9ff", label: "ETF" },
-      fondi: { value: 0, color: "#f0c040", label: "Fondi" },
-    };
-    snapshot.rows.forEach(function (row) {
-      groups[row.t].value += row.value + row.allocation;
-    });
-    var total = snapshot.postTotal;
-    var cursor = 0;
-    var parts = [];
-    Object.keys(groups).forEach(function (type) {
-      var pct = total > 0 ? (groups[type].value / total) * 100 : 0;
-      if (pct <= 0) return;
-      parts.push(groups[type].color + " " + cursor.toFixed(2) + "% " + (cursor + pct).toFixed(2) + "%");
-      cursor += pct;
-    });
-    return {
-      css: "conic-gradient(" + (parts.length ? parts.join(",") : "#202534 0 100%") + ")",
-      groups: groups,
-    };
-  }
-
-  function allocationConcentration(snapshot) {
-    return snapshot.rows
-      .slice()
-      .sort(function (a, b) {
-        return b.postWeight - a.postWeight;
-      })
-      .slice(0, 7)
-      .map(function (row) {
-        var ratio = row.postWeight / snapshot.state.maxWeight;
-        var tone = ratio > 1 ? "risk" : ratio > 0.75 ? "warn" : "good";
-        var label = ratio > 1 ? "oltre" : ratio > 0.75 ? "attenzione" : "ok";
-        return (
-          '<div class="alloc-conc-row"><span class="alloc-conc-name" title="' +
-          allocEscape(row.a.name) +
-          '">' +
-          allocEscape(row.a.name) +
-          '</span><div class="alloc-conc-track"><div class="alloc-conc-fill ' +
-          tone +
-          '" style="width:' +
-          allocClamp(ratio * 100, 0, 100).toFixed(1) +
-          '%"></div></div><span class="alloc-conc-state ' +
-          (tone === "risk" ? "r" : tone === "warn" ? "y" : "g") +
-          '">' +
-          allocPlain(row.postWeight, 1) +
-          "% · " +
-          label +
-          "</span></div>"
-        );
-      })
-      .join("");
-  }
-
-  function allocationTypeLabel(type) {
-    if (type === "crypto") return "Crypto";
-    if (type === "etf") return "ETF";
-    return "Fondi";
-  }
-
-  function allocationMapRow(snapshot, row) {
-    var simulation = allocationSimulate(row, row.allocation);
-    var pmChange = simulation ? simulation.changePct : null;
-    var quote = JSON.stringify(row.a.id).replace(/\"/g, "&quot;");
+  function mapRow(snapshot, row) {
+    var simulation = simulate(row, row.allocation), pmChange = simulation ? simulation.changePct : null;
     var maxAmount = Math.max(row.allocation, Math.min(snapshot.state.pool, row.maxAllocation));
-    var rangeDisabled = maxAmount <= 0.001 ? " disabled" : "";
-    var scoreMeta =
-      "P.M. " +
-      (row.discount >= 0 ? "-" : "+") +
-      allocPlain(Math.abs(row.discount), 1) +
-      "% · rischio " +
-      row.risk +
-      "/100";
-    var pmText =
-      pmChange === null
-        ? '<span class="mu">—</span>'
-        : '<span class="' +
-          (pmChange < 0 ? "g" : pmChange > 0 ? "r" : "mu") +
-          '">' +
-          (pmChange <= 0 ? "↓ " : "↑ ") +
-          allocPlain(pmChange, 2) +
-          "%</span>";
-    return (
-      '<div class="alloc-row">' +
-      '<div class="alloc-asset-name"><span class="alloc-type ' +
-      (row.t === "crypto" ? "crypto" : row.t === "fondi" ? "fondi" : "") +
-      '">' +
-      allocationTypeLabel(row.t) +
-      "</span><b title=\"" +
-      allocEscape(row.a.name) +
-      "\">" +
-      allocEscape(row.a.name) +
-      "</b></div>" +
-      '<div><div class="alloc-score"><strong>' +
-      row.score +
-      "</strong><span>/100</span></div><small>" +
-      scoreMeta +
-      "</small></div>" +
-      '<div class="alloc-metric"><span class="' +
-      (row.discount > 0 ? "g" : row.discount < 0 ? "r" : "mu") +
-      '">' +
-      (row.discount > 0 ? "↓ " : row.discount < 0 ? "↑ " : "") +
-      allocPlain(Math.abs(row.discount), 2) +
-      "%</span><small>dist. dal P.M. · spazio " +
-      allocPlain(row.maxAllocation, 0) +
-      " €</small></div>" +
-      '<div class="alloc-metric">' +
-      allocPlain(row.weight, 1) +
-      "% → <strong>" +
-      allocPlain(row.postWeight, 1) +
-      "%</strong><small>P.M. simulato: " +
-      pmText +
-      "</small></div>" +
-      '<div class="alloc-plan-control"><input class="alloc-input" aria-label="Piano per ' +
-      allocEscape(row.a.name) +
-      '" type="number" min="0" max="' +
-      maxAmount.toFixed(2) +
-      '" step="25" value="' +
-      row.allocation.toFixed(2) +
-      '" onchange="allocationSetAmount(' +
-      quote +
-      ', this.value)"><input class="alloc-range" type="range" min="0" max="' +
-      maxAmount.toFixed(2) +
-      '" step="25" value="' +
-      Math.min(row.allocation, maxAmount).toFixed(2) +
-      '" onchange="allocationSetAmount(' +
-      quote +
-      ', this.value)"' +
-      rangeDisabled +
-      "></div>" +
-      '<div class="alloc-plan-note">Piano virtuale: non modifica la posizione reale.</div>' +
-      "</div>"
-    );
+    var quote = JSON.stringify(row.a.id).replace(/\"/g, "&quot;");
+    var pmText = pmChange === null ? '<span class="mu">—</span>' : '<span class="' + (pmChange < 0 ? "g" : pmChange > 0 ? "y" : "mu") + '">' + (pmChange < 0 ? "↓ " : pmChange > 0 ? "↑ " : "→ ") + percent(Math.abs(pmChange), 2) + "</span>";
+    return '<div class="alloc-row"><div class="alloc-asset-name"><span class="alloc-type ' + (row.t === "crypto" ? "crypto" : row.t === "fondi" ? "fondi" : "") + '">' + typeLabel(row.t) + '</span><b title="' + escapeHtml(row.a.name) + '">' + escapeHtml(row.a.name) + '</b></div><div class="alloc-metric"><span class="' + (row.gapFromPm < 0 ? "g" : row.gapFromPm > 0 ? "y" : "mu") + '">' + (row.gapFromPm < 0 ? "↓ " : row.gapFromPm > 0 ? "↑ " : "→ ") + percent(Math.abs(row.gapFromPm), 2) + '</span><small>Prezzo vs P.M.</small></div><div class="alloc-metric">' + percent(row.weight, 1) + ' → <strong>' + percent(row.postWeight, 1) + '</strong><small>peso portfolio</small></div><div class="alloc-metric">' + pmText + '<small>variazione P.M. simulato</small></div><div class="alloc-plan-control"><input class="alloc-input" aria-label="Piano per ' + escapeHtml(row.a.name) + '" type="number" min="0" max="' + maxAmount.toFixed(2) + '" step="25" value="' + row.allocation.toFixed(2) + '" onchange="allocationSetAmount(' + quote + ', this.value)"><input class="alloc-range" type="range" min="0" max="' + maxAmount.toFixed(2) + '" step="25" value="' + Math.min(row.allocation, maxAmount).toFixed(2) + '" onchange="allocationSetAmount(' + quote + ', this.value)"' + (maxAmount <= 0.001 ? " disabled" : "") + '></div><div class="alloc-plan-note">Massimo ' + money(row.maxAllocation, 0) + ' con il limite attuale.</div></div>';
   }
 
-  function allocationMapRows(snapshot) {
-    var types = ["etf", "crypto", "fondi"];
-    return types
-      .map(function (type) {
-        var rows = snapshot.rows.filter(function (row) {
-          return row.t === type;
-        });
-        if (!rows.length) return "";
-        var currentValue = rows.reduce(function (sum, row) {
-          return sum + row.value;
-        }, 0);
-        var planned = rows.reduce(function (sum, row) {
-          return sum + row.allocation;
-        }, 0);
-        var currentWeight =
-          snapshot.totalValue > 0 ? (currentValue / snapshot.totalValue) * 100 : 0;
-        var postWeight =
-          snapshot.postTotal > 0 ? ((currentValue + planned) / snapshot.postTotal) * 100 : 0;
-        var shift = postWeight - currentWeight;
-        var suggestedShare =
-          snapshot.planned > 0 ? (planned / snapshot.planned) * 100 : 0;
-        return (
-          '<details class="alloc-category" open><summary class="alloc-category-summary">' +
-          '<span class="alloc-category-title"><span class="alloc-dot ' +
-          type +
-          '"></span>' +
-          allocationTypeLabel(type) +
-          "</span>" +
-          '<span class="alloc-category-count">' +
-          rows.length +
-          (rows.length === 1 ? " strumento" : " strumenti") +
-          "</span>" +
-          '<span class="alloc-category-metric">Peso <strong>' +
-          allocPlain(currentWeight, 1) +
-          "% → " +
-          allocPlain(postWeight, 1) +
-          "%</strong></span>" +
-          '<span class="alloc-category-metric">Scost. <strong class="' +
-          (shift > 0.01 ? "g" : shift < -0.01 ? "r" : "mu") +
-          '">' +
-          (shift > 0 ? "+" : "") +
-          allocPlain(shift, 1) +
-          "%</strong></span>" +
-          '<span class="alloc-category-metric">Quota piano <strong>' +
-          (snapshot.planned > 0 ? allocPlain(suggestedShare, 1) + "%" : "—") +
-          "</strong></span>" +
-          '<span class="alloc-category-toggle" aria-hidden="true">⌄</span></summary>' +
-          '<div class="alloc-category-body"><div class="alloc-map-head"><span>Asset</span><span>Score</span><span>Distanza / spazio</span><span>Peso / P.M.</span><span>Piano €</span></div>' +
-          rows.map(function (row) {
-            return allocationMapRow(snapshot, row);
-          }).join("") +
-          "</div></details>"
-        );
-      })
-      .join("");
+  function mapRows(snapshot) {
+    return TYPES.map(function (type) {
+      var group = snapshot.categories[type]; if (!group.rows.length) return "";
+      var delta = group.target - group.currentWeight;
+      return '<details class="alloc-category" open><summary class="alloc-category-summary"><span class="alloc-category-title"><span class="alloc-dot ' + type + '"></span>' + typeLabel(type) + '</span><span class="alloc-category-count">' + group.rows.length + (group.rows.length === 1 ? " strumento" : " strumenti") + '</span><span class="alloc-category-metric">Oggi <strong>' + percent(group.currentWeight, 1) + '</strong></span><span class="alloc-category-metric">Target <strong>' + percent(group.target, 1) + '</strong></span><span class="alloc-category-metric">Scostamento <strong class="' + (delta > 0.1 ? "g" : delta < -0.1 ? "r" : "mu") + '">' + (delta > 0 ? "+" : "") + percent(delta, 1) + '</strong></span><span class="alloc-category-toggle" aria-hidden="true">⌄</span></summary><div class="alloc-category-body"><div class="alloc-map-head"><span>Asset</span><span>Prezzo vs P.M.</span><span>Peso</span><span>Nuovo P.M.</span><span>Piano €</span></div>' + group.rows.map(function (row) { return mapRow(snapshot, row); }).join("") + '</div></details>';
+    }).join("");
   }
 
-  function allocationRankingHtml(snapshot) {
-    var state = snapshot.state;
-    var scope = state.rankingScope;
-    var addInput = document.getElementById("addAmt");
-    var add = addInput ? Math.max(0, allocFinite(addInput.value, 0)) : 0;
-    var scopeRows = snapshot.rows
-      .filter(function (row) {
-        return scope === "global" ? row.t !== "fondi" : row.t === scope;
-      })
-      .map(function (row) {
-        var c = calc(row.a, add);
-        return { a: row.a, t: row.t, c: c, sc: asc(c) };
-      })
-      .sort(function (left, right) {
-        return right.sc - left.sc;
-      });
-    var maxScore = scopeRows.reduce(function (max, row) {
-      return Math.max(max, row.sc);
-    }, 1);
-    var labels = {
-      global: "Globale",
-      crypto: "Crypto",
-      etf: "ETF",
-    };
-    var tabs = ["global", "crypto", "etf"]
-      .map(function (kind) {
-        return '<button class="alloc-btn ' +
-          (scope === kind ? "active" : "") +
-          '" type="button" aria-pressed="' +
-          (scope === kind ? "true" : "false") +
-          '" onclick="allocationSetRankingScope(\'' +
-          kind +
-          '\')">' +
-          labels[kind] +
-          "</button>";
-      })
-      .join("");
-    return (
-      '<section class="alloc-card alloc-ranking"><div class="alloc-card-head"><div><h2>Ranking convenienza</h2><p class="alloc-card-sub">Unico ranking WIPS: usa i criteri esistenti di prezzo rispetto al P.M., perdita % e effetto del What‑If. Non è consulenza finanziaria.</p></div><div class="alloc-actions alloc-ranking-tabs" role="group" aria-label="Ambito ranking">' +
-      tabs +
-      "</div></div>" +
-      (typeof allocCard === "function"
-        ? allocCard(
-            "Priorità " + labels[scope] + " · prossimi " + allocMoney(add, 2),
-            scopeRows,
-            maxScore,
-            add,
-          )
-        : '<p class="alloc-disclaimer">Ranking non disponibile.</p>') +
-      "</section>"
-    );
-  }
-
-  function allocationMatrixBubbles(snapshot) {
-    return snapshot.rows
-      .map(function (row) {
-        var x = allocClamp(Math.max(0, row.discount) / 42, 0.04, 0.96) * 100;
-        var y = allocClamp((100 - row.risk) / 100, 0.08, 0.9) * 100;
-        var size = allocClamp(28 + Math.sqrt(Math.max(0, row.weight)) * 9, 34, 68);
-        var color = row.t === "crypto" ? "#a78bfa" : row.risk >= 78 ? "#f0c040" : "#38d9ff";
-        return (
-          '<button type="button" class="alloc-bubble" style="--x:' +
-          x.toFixed(2) +
-          "%;--y:" +
-          y.toFixed(2) +
-          "%;--size:" +
-          size.toFixed(0) +
-          "px;--bubble:" +
-          color +
-          '" title="' +
-          allocEscape(row.a.name) +
-          " · scostamento dal P.M. " +
-          allocPlain(row.discount, 1) +
-          "% · rischio " +
-          row.risk +
-          '/100" onclick="allocationSelectAsset(' +
-          JSON.stringify(row.a.id).replace(/\"/g, "&quot;") +
-          ')"><span>' +
-          allocEscape(row.a.name.slice(0, 10)) +
-          "</span></button>"
-        );
-      })
-      .join("");
-  }
-
-  function allocationGoalHtml(snapshot) {
-    var row = allocationRowById(snapshot, snapshot.state.goalAsset);
-    if (!row) return '<p class="alloc-disclaimer">Nessun asset con prezzo disponibile.</p>';
-    var missing = Math.max(0, snapshot.state.goalCapital - row.c.cost);
-    var sim = allocationSimulate(row, missing);
-    return (
-      '<div class="alloc-goal-grid"><select class="alloc-select" onchange="allocationSetGoalAsset(this.value)">' +
-      allocationOptions(snapshot.rows, row.a.id) +
-      '</select><input class="alloc-input" type="number" min="0" step="100" value="' +
-      snapshot.state.goalCapital.toFixed(2) +
-      '" aria-label="Obiettivo capitale investito" onchange="allocationSetGoalCapital(this.value)"></div>' +
-      '<div class="alloc-goal-results">' +
-      '<div class="alloc-result-row"><span>Capitale storico attuale</span><strong>' +
-      allocMoney(row.c.cost, 2) +
-      "</strong></div>" +
-      '<div class="alloc-result-row"><span>Da simulare per l’obiettivo</span><strong class="' +
-      (missing > 0 ? "y" : "g") +
-      '">' +
-      allocMoney(missing, 2) +
-      "</strong></div>" +
-      '<div class="alloc-result-row"><span>Nuovo P.M. al prezzo corrente</span><strong>' +
-      (sim ? allocMoney(sim.pm, 3) : "—") +
-      "</strong></div>" +
-      '<div class="alloc-result-row"><span>Variazione P.M.</span><strong class="' +
-      (sim && sim.changePct < 0 ? "g" : "mu") +
-      '">' +
-      (sim ? (sim.changePct < 0 ? "↓ " : "") + allocPercent(sim.changePct, 2) : "—") +
-      "</strong></div>" +
-      "</div>"
-    );
-  }
-
-  function allocationTimelineHtml(snapshot) {
-    var row = allocationRowById(snapshot, snapshot.state.timelineAsset);
-    if (!row) return '<p class="alloc-disclaimer">Nessun asset con prezzo disponibile.</p>';
-    var count = snapshot.state.tranches;
-    var multipliers = {
-      3: [1, 0.95, 0.9],
-      4: [1, 0.96, 0.92, 0.88],
-      6: [1, 0.97, 0.94, 0.91, 0.88, 0.85],
-    }[count];
-    var tranche = snapshot.state.timelineAmount / count;
-    var rollingCost = row.c.cost;
-    var rollingQty = row.a.qty;
-    var rows = multipliers
-      .map(function (multiplier, index) {
-        var assumedPrice = row.c.price * multiplier;
-        var next = allocationSimulateAtPrice(rollingCost, rollingQty, tranche, assumedPrice);
-        rollingCost = next.cost;
-        rollingQty = next.qty;
-        return (
-          '<div class="alloc-tranche"><span class="alloc-tranche-label">Step ' +
-          (index + 1) +
-          "/" +
-          count +
-          "</span><span>" +
-          allocMoney(tranche, 2) +
-          " a " +
-          allocMoney(assumedPrice, 3) +
-          "</span><strong>P.M. " +
-          allocMoney(next.pm, 3) +
-          "</strong></div>"
-        );
-      })
-      .join("");
-    return (
-      '<div class="alloc-timeline-head"><select class="alloc-select" onchange="allocationSetTimelineAsset(this.value)">' +
-      allocationOptions(snapshot.rows, row.a.id) +
-      '</select><input class="alloc-input" style="max-width:132px" type="number" min="0" step="100" value="' +
-      snapshot.state.timelineAmount.toFixed(2) +
-      '" aria-label="Importo piano a tranche" onchange="allocationSetTimelineAmount(this.value)"><select class="alloc-select" style="max-width:95px" onchange="allocationSetTranches(this.value)">' +
-      [3, 4, 6]
-        .map(function (value) {
-          return '<option value="' + value + '"' + (value === count ? " selected" : "") + ">" + value + " step</option>";
-        })
-        .join("") +
-      "</select></div>" +
-      '<div class="alloc-timeline">' +
-      rows +
-      "</div>" +
-      '<p class="alloc-disclaimer">I livelli -5%, -10% ecc. sono soltanto una griglia di disciplina per visualizzare l’effetto sul P.M.; non sono previsioni di prezzo né ordini automatici.</p>'
-    );
+  function impactRows(snapshot) {
+    var planned = snapshot.rows.filter(function (row) { return row.allocation > 0.009; });
+    if (!planned.length) return '<div class="alloc-empty">Scegli uno scenario o inserisci un importo per vedere l’impatto stimato.</div>';
+    return planned.sort(function (a, b) { return b.allocation - a.allocation; }).map(function (row) {
+      var result = simulate(row, row.allocation), change = result ? result.changePct : 0;
+      return '<div class="alloc-impact-row"><span>' + escapeHtml(row.a.name) + '</span><strong>' + money(row.allocation, 2) + '</strong><span>Nuovo P.M. ' + (result ? money(result.pm, 3) : "—") + '</span><em class="' + (change < 0 ? "g" : change > 0 ? "y" : "mu") + '">' + (change < 0 ? "↓ " : change > 0 ? "↑ " : "→ ") + percent(Math.abs(change), 2) + '</em></div>';
+    }).join("");
   }
 
   function renderAllocationLab(portfolio) {
-    var el = document.getElementById("sec-allocation");
-    if (!el) return;
-    var snapshot = allocationBuildSnapshot(portfolio || P);
-    var state = snapshot.state;
-    var donut = allocationDonutStyle(snapshot);
-    var planTone = snapshot.remaining < -0.01 ? "risk" : snapshot.remaining < state.pool * 0.1 ? "warn" : "";
-    var plannedMix = ["crypto", "etf", "fondi"]
-      .filter(function (type) {
-        return donut.groups[type].value > 0;
-      })
-      .map(function (type) {
-        var group = donut.groups[type];
-        var pct = snapshot.postTotal > 0 ? (group.value / snapshot.postTotal) * 100 : 0;
-        return (
-          '<div class="alloc-legend-row"><span class="alloc-dot" style="background:' +
-          group.color +
-          '"></span><span>' +
-          group.label +
-          "</span><strong>" +
-          allocPlain(pct, 1) +
-          "%</strong></div>"
-        );
-      })
-      .join("");
-    el.innerHTML =
-      '<div class="alloc-wrap">' +
-      '<div class="alloc-hero">' +
-      '<section class="alloc-panel alloc-hero-main"><div class="alloc-eyebrow">Decision support · simulazione locale</div><h1 class="alloc-title">Allocazione</h1>' +
-      '<p class="alloc-copy">Il punto unico per confrontare priorità Globali, Crypto ed ETF e trasformare la liquidità in un piano leggibile. Considera prezzo attuale, distanza dal P.M., peso già in portafoglio e limite di concentrazione scelto da te.</p>' +
-      '<div class="alloc-note"><span>ⓘ</span><span>Gli score sono una regola trasparente di disciplina, non una raccomandazione finanziaria. Il risultato resta una simulazione da verificare con il tuo piano, rischio e orizzonte.</span></div></section>' +
-      '<section class="alloc-panel"><div class="alloc-eyebrow">Impostazioni del piano</div><div class="alloc-control-grid">' +
-      '<label class="alloc-field"><span class="alloc-label">Liquidità da simulare<small>Non aggiorna il Budget e resta indipendente dal What‑If principale.</small></span><input class="alloc-input" type="number" min="0" step="50" value="' +
-      state.pool.toFixed(2) +
-      '" onchange="allocationSetPool(this.value)"></label>' +
-      '<label class="alloc-field"><span class="alloc-label">Limite per singola posizione<small>Usato come semaforo e come tetto del piano simulato.</small></span><input class="alloc-input" type="number" min="3" max="60" step="1" value="' +
-      state.maxWeight.toFixed(0) +
-      '" onchange="allocationSetMaxWeight(this.value)"></label>' +
-      '</div><div class="alloc-actions"><button class="alloc-btn ' +
-      (state.scenario === "prudent" ? "active" : "") +
-      '" type="button" onclick="allocationApplyScenario(\'prudent\')">Prudente</button><button class="alloc-btn ' +
-      (state.scenario === "balanced" ? "active" : "") +
-      '" type="button" onclick="allocationApplyScenario(\'balanced\')">Bilanciato</button><button class="alloc-btn ' +
-      (state.scenario === "dynamic" ? "active" : "") +
-      '" type="button" onclick="allocationApplyScenario(\'dynamic\')">Dinamico</button><button class="alloc-btn secondary" type="button" onclick="allocationClearPlan()">Azzera piano</button></div>' +
-      '<div class="alloc-chips"><span class="alloc-chip">Scenario: ' +
-      allocationScenarioLabel(state.scenario) +
-      '</span><span class="alloc-chip">Dati dal portfolio attuale</span></div></section></div>' +
-      '<div class="alloc-kpis">' +
-      '<div class="alloc-kpi"><span class="alloc-label">Liquidità simulata</span><strong>' +
-      allocMoney(state.pool, 2) +
-      '</strong><small>Input modificabile</small></div>' +
-      '<div class="alloc-kpi"><span class="alloc-label">Piano distribuito</span><strong class="' +
-      (snapshot.planned > 0 ? "g" : "mu") +
-      '">' +
-      allocMoney(snapshot.planned, 2) +
-      '</strong><small>Su ' +
-      snapshot.rows.filter(function (row) { return row.allocation > 0; }).length +
-      " posizioni</small></div>" +
-      '<div class="alloc-kpi ' +
-      planTone +
-      '"><span class="alloc-label">Residuo non allocato</span><strong class="' +
-      (snapshot.remaining < 0 ? "r" : snapshot.remaining > 0 ? "y" : "g") +
-      '">' +
-      allocMoney(snapshot.remaining, 2) +
-      '</strong><small>' +
-      (snapshot.remaining < 0 ? "Piano oltre liquidità" : "Resta disponibile") +
-      "</small></div>" +
-      '<div class="alloc-kpi"><span class="alloc-label">Limite concentrazione</span><strong>' +
-      allocPercent(state.maxWeight, 0) +
-      '</strong><small>Sul valore post-piano</small></div></div>' +
-      allocationRankingHtml(snapshot) +
-      '<div class="alloc-grid"><section class="alloc-card"><h2>Mappa di distribuzione per categoria</h2><p class="alloc-card-sub">Le categorie sono espandibili: il riepilogo mostra strumenti, peso attuale → post-piano, scostamento e quota del piano. Score = sconto dal P.M. (max 38) + spazio sotto il limite (max 25) + ruolo nel mix (max 18) + intensità di rischio (max 12).</p><div class="alloc-map">' +
-      allocationMapRows(snapshot) +
-      "</div></section>" +
-      '<aside class="alloc-card"><h2>Mix dopo il piano</h2><p class="alloc-card-sub">La torta riflette solo gli importi simulati, non sposta davvero le posizioni.</p><div class="alloc-composition"><div class="alloc-donut" style="--alloc-donut:' +
-      donut.css +
-      '"></div><div class="alloc-legend">' +
-      plannedMix +
-      '</div></div><div style="height:18px"></div><h3>Semaforo di concentrazione</h3><p class="alloc-card-sub">Verde ≤ 75% del limite, giallo in avvicinamento, rosso oltre.</p><div class="alloc-concentration">' +
-      allocationConcentration(snapshot) +
-      "</div></aside></div>" +
-      '<div class="alloc-bottom-grid"><section class="alloc-card"><h2>Matrice opportunità × rischio</h2><p class="alloc-card-sub">Destra = maggiore distanza sotto il P.M.; alto = intensità di rischio più elevata. La dimensione della bolla segue il peso attuale. Seleziona una bolla per usarla sotto.</p><div class="alloc-matrix"><span class="alloc-matrix-y">Rischio indicativo ↑</span><span class="alloc-matrix-x">Sconto dal P.M. →</span>' +
-      allocationMatrixBubbles(snapshot) +
-      "</div></section>" +
-      '<section class="alloc-card"><h2>Obiettivo di posizione</h2><p class="alloc-card-sub">Quanto capitale storico vorresti simulare su una posizione, senza applicarlo.</p>' +
-      allocationGoalHtml(snapshot) +
-      '<div style="height:20px"></div><h2>Piano a tranche</h2><p class="alloc-card-sub">Confronta l’effetto di ingressi ripartiti sul P.M. con prezzi ipotetici in discesa.</p>' +
-      allocationTimelineHtml(snapshot) +
-      "</section></div>" +
-      '<p class="alloc-disclaimer">Allocazione usa esclusivamente i dati già presenti in WIPS. Non altera posizioni, prezzi, CSV, backup, Kraken, Budget o il What‑If globale. I valori evidenziati sono copiabili con un click, come nelle tabelle.</p>' +
-      "</div>";
+    var root = document.getElementById("sec-allocation");
+    if (!root || typeof calc !== "function" || typeof P === "undefined") return;
+    var snapshot = buildSnapshot(portfolio), state = snapshot.state, mix = donut(snapshot);
+    var budget = typeof window.bdgGetSnapshot === "function" ? window.bdgGetSnapshot() : null;
+    var budgetInvestible = Math.max(0, finite(budget && budget.investible, 0));
+    var plannedCount = snapshot.rows.filter(function (row) { return row.allocation > 0; }).length;
+    root.innerHTML = '<div class="alloc-wrap"><div class="alloc-hero"><section class="alloc-panel alloc-hero-main"><div class="alloc-eyebrow">Guida decisionale · simulazione locale</div><h1 class="alloc-title">Allocazione</h1><p class="alloc-copy">Leggi la distribuzione attuale, imposta i tuoi pesi di riferimento e prova una ripartizione della liquidità. Nessuna proposta modifica posizioni o prezzi reali.</p><div class="alloc-note"><span>ⓘ</span><span>I target sono un riferimento personale modificabile, non una raccomandazione. Gli importi restano una simulazione finché non decidi diversamente.</span></div></section><aside class="alloc-panel"><div class="alloc-control-grid"><label class="alloc-field"><span class="alloc-label">Liquidità da simulare<small>Puoi usare l’importo già calcolato nel Budget oppure inserirne uno diverso.</small></span><input class="alloc-input" type="number" min="0" step="50" value="' + state.pool.toFixed(2) + '" aria-label="Liquidità da simulare" onchange="allocationSetPool(this.value)"></label><label class="alloc-field"><span class="alloc-label">Limite per singola posizione<small>Protezione visiva contro una concentrazione eccessiva nel piano.</small></span><input class="alloc-input" type="number" min="3" max="60" step="1" value="' + state.maxWeight.toFixed(2) + '" aria-label="Limite per singola posizione" onchange="allocationSetMaxWeight(this.value)"></label><div class="alloc-actions"><button class="alloc-btn" type="button" onclick="allocationUseBudgetLiquidity()">Usa Budget: ' + money(budgetInvestible, 2) + '</button></div></div></aside></div><div class="alloc-kpis"><div class="alloc-kpi"><span class="alloc-label">Valore portfolio</span><strong>' + money(snapshot.totalValue, 2) + '</strong><small>Dati correnti</small></div><div class="alloc-kpi"><span class="alloc-label">Liquidità simulata</span><strong class="b">' + money(state.pool, 2) + '</strong><small>Non investita automaticamente</small></div><div class="alloc-kpi"><span class="alloc-label">Piano distribuito</span><strong class="' + (snapshot.planned > 0 ? "g" : "mu") + '">' + money(snapshot.planned, 2) + '</strong><small>Su ' + plannedCount + ' posizioni</small></div><div class="alloc-kpi ' + (snapshot.remaining < 0 ? "risk" : snapshot.remaining > 0 ? "warn" : "") + '"><span class="alloc-label">Da decidere</span><strong class="' + (snapshot.remaining > 0 ? "y" : "g") + '">' + money(snapshot.remaining, 2) + '</strong><small>' + (snapshot.remaining > 0 ? "Liquidità non ancora nel piano" : "Piano completo") + '</small></div></div><section class="alloc-card"><div class="alloc-card-head"><div><h2>1 · Distribuzione attuale e target</h2><p class="alloc-card-sub">Confronto diretto tra il peso effettivo, il riferimento che scegli e il risultato dopo il piano.</p></div></div><div class="alloc-targets">' + targetRows(snapshot) + '</div></section><section class="alloc-card alloc-scenario-card"><div><h2>2 · Prova una distribuzione</h2><p class="alloc-card-sub">Le proposte ripartiscono in modo uniforme dentro ogni categoria, rispettando i target e il limite per posizione. Ogni passaggio resta visibile e modificabile.</p></div><div class="alloc-actions" role="group" aria-label="Scenari di distribuzione"><button class="alloc-btn ' + (state.scenario === "target" ? "active" : "") + '" type="button" onclick="allocationApplyScenario(\'target\')">Verso i target</button><button class="alloc-btn ' + (state.scenario === "etf" ? "active" : "") + '" type="button" onclick="allocationApplyScenario(\'etf\')">Prevalenza ETF</button><button class="alloc-btn ' + (state.scenario === "crypto" ? "active" : "") + '" type="button" onclick="allocationApplyScenario(\'crypto\')">Prevalenza Crypto</button><button class="alloc-btn secondary" type="button" onclick="allocationClearPlan()">Azzera piano</button></div><div class="alloc-chips"><span class="alloc-chip">Scenario: ' + scenarioLabel(state.scenario) + '</span><span class="alloc-chip">Importi modificabili riga per riga</span></div></section><div class="alloc-grid"><section class="alloc-card"><h2>3 · Piano per asset</h2><p class="alloc-card-sub">Apri una categoria per modificare gli importi. Vedi insieme peso, distanza dal P.M. e nuovo P.M. stimato.</p><div class="alloc-map">' + mapRows(snapshot) + '</div></section><aside class="alloc-card"><h2>4 · Mix e concentrazione dopo il piano</h2><p class="alloc-card-sub">Il grafico rappresenta esclusivamente la simulazione in corso.</p><div class="alloc-composition"><div class="alloc-donut" style="--alloc-donut:' + mix.css + '"></div><div class="alloc-legend">' + TYPES.filter(function (type) { return mix.groups[type].value > 0; }).map(function (type) { var group = mix.groups[type]; var weight = snapshot.postTotal > 0 ? (group.value / snapshot.postTotal) * 100 : 0; return '<div class="alloc-legend-row"><i class="alloc-dot ' + type + '"></i><span>' + group.label + '</span><strong>' + percent(weight, 1) + '</strong></div>'; }).join("") + '</div></div><div class="alloc-separator"></div><h3>Concentrazione per posizione</h3><p class="alloc-card-sub">Il limite selezionato è ' + percent(state.maxWeight, 0) + ' del valore teorico dopo il piano.</p><div class="alloc-concentration">' + concentration(snapshot) + '</div></aside></div><section class="alloc-card"><h2>5 · Impatto stimato</h2><p class="alloc-card-sub">Riepilogo degli asset a cui hai assegnato liquidità: importo, nuovo prezzo medio e variazione rispetto al P.M. attuale.</p><div class="alloc-impact-list">' + impactRows(snapshot) + '</div></section><p class="alloc-disclaimer">Allocazione riusa esclusivamente dati e calcoli già presenti in WIPS. Non modifica portfolio, quotazioni, CSV, backup, Kraken, Budget o What‑If globale. I valori copiabili restano disponibili nelle tabelle.</p></div>';
   }
 
-  /* API globale minima: usata dai controlli HTML e tenuta separata dal core. */
   window.renderAllocationLab = renderAllocationLab;
-  window.allocationSetPool = allocationSetPool;
-  window.allocationSetMaxWeight = allocationSetMaxWeight;
-  window.allocationSetRankingScope = allocationSetRankingScope;
-  window.allocationSetAmount = allocationSetAmount;
-  window.allocationClearPlan = allocationClearPlan;
-  window.allocationApplyScenario = allocationApplyScenario;
-  window.allocationSetGoalAsset = allocationSetGoalAsset;
-  window.allocationSetGoalCapital = allocationSetGoalCapital;
-  window.allocationSetTimelineAsset = allocationSetTimelineAsset;
-  window.allocationSetTimelineAmount = allocationSetTimelineAmount;
-  window.allocationSetTranches = allocationSetTranches;
-  window.allocationSelectAsset = allocationSelectAsset;
+  window.allocationGetSnapshot = buildSnapshot;
+  window.allocationSetPool = setPool;
+  window.allocationUseBudgetLiquidity = useBudgetLiquidity;
+  window.allocationSetMaxWeight = setMaxWeight;
+  window.allocationSetCategoryTarget = setCategoryTarget;
+  window.allocationSetAmount = setAmount;
+  window.allocationClearPlan = clearPlan;
+  window.allocationApplyScenario = applyScenario;
 })();
