@@ -3000,7 +3000,7 @@
           )
           .join("");
         container.querySelectorAll("[data-staple]").forEach((button) =>
-          button.addEventListener("click", () => copyItem(button.dataset.staple, button)),
+          button.addEventListener("click", () => copyItem(formatIngredientCopyValue(button.dataset.staple), button)),
         );
       }
 
@@ -3817,14 +3817,14 @@
           group.className = "staples-group";
           const itemsHtml = items
             .map((item) => {
-              return `<div class="staple-item"><span class="staple-name">${escHtml(item)}</span><button class="staple-copy" title="Copia">📋</button></div>`;
+              return `<div class="staple-item"><span class="staple-name">${escHtml(item)}</span><button class="staple-copy" title="Copia nome e quantità">📋</button></div>`;
             })
             .join("");
           group.innerHTML = `<div class="staples-group-title">${escHtml(category)}</div><div class="staples-group-items">${itemsHtml}</div>`;
           group.querySelectorAll(".staple-copy").forEach((button, index) => {
             const value = items[index];
             button.addEventListener("click", function () {
-              copyItem(value, this);
+              copyItem(formatIngredientCopyValue(value), this);
             });
           });
           grid.appendChild(group);
@@ -3915,14 +3915,14 @@
       <div class="shop-items">${items
         .map((item) => {
           const sid = "si" + Math.random().toString(36).slice(2, 8);
-          const safeN = item.name.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+          const safeCopyValue = formatIngredientCopyValue(item.name, item.qty).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
           const checkKey = item.name.toLocaleLowerCase("it").trim();
           const isChecked = ST.shopChecks[checkKey] === true;
           return `<div class="shop-item${isChecked ? " done" : ""}" id="${sid}">
           <button type="button" class="schk${isChecked ? " on" : ""}" data-shop-key="${escHtml(checkKey)}" aria-label="Segna ${escHtml(item.name)} come acquistato" aria-pressed="${isChecked}"></button>
           <span class="si-name">${escHtml(item.name)}</span>
           ${item.qty > 1 ? `<span class="si-qty">×${item.qty}</span>` : ""}
-          <button class="si-copy" onclick="copyItem('${safeN}',this)">📋</button>
+          <button class="si-copy" title="Copia nome e quantità" aria-label="Copia ${escHtml(item.name)} con quantità ×${item.qty}" onclick="copyItem('${safeCopyValue}',this)">📋</button>
         </div>`;
         })
         .join("")}</div>
@@ -4038,6 +4038,10 @@
         ST.hidePurchased = !ST.hidePurchased;
         saveState();
         renderShop();
+      }
+      function formatIngredientCopyValue(name, qty = 1) {
+        const normalizedQty = Number.isFinite(Number(qty)) && Number(qty) > 0 ? Number(qty) : 1;
+        return `${name} ×${normalizedQty}`;
       }
       function copyItem(name, btn) {
         copyText(name)
