@@ -2804,7 +2804,7 @@
     </style>
     <link rel="stylesheet" href="WIPS-allocation-lab.css?v=2026-11-05-guided" />
     <link rel="stylesheet" href="WIPS-mobile.css?v=2026-11-05-guided" />
-    <link rel="stylesheet" href="WIPS-analytics-charts.css?v=2026-11-05-charts-2" />
+    <link rel="stylesheet" href="WIPS-analytics-charts.css?v=2026-11-11-copy" />
   </head>
   <body class="tab-crypto">
     <!--
@@ -3007,7 +3007,7 @@
     </footer>
 
     <script src="WIPS-data.js"></script>
-    <script src="WIPS-analytics-charts.js?v=2026-11-05-charts"></script>
+    <script src="WIPS-analytics-charts.js?v=2026-11-11-copy"></script>
     <script>
       /* ═══════════════════════════════════════════════════════════════════
         DATA & STORAGE
@@ -3131,7 +3131,7 @@
 
       /* Aggiorna soltanto i valori predefiniti salvati in precedenza: non
          sovrascrive mai una posizione o una quotazione modificata dall'utente. */
-        function migrateNovemberQuoteSnapshot() {
+      function migrateNovemberQuoteSnapshot() {
         var changed = false;
         var uranium = P.etf.find(function (asset) {
           return asset.id === "WNUC.L";
@@ -3146,16 +3146,28 @@
           changed = true;
         }
 
+        function migrateDefaultPosition(id, previous, next) {
+          var asset = P.etf.find(function (entry) { return entry.id === id; });
+          if (!asset || asset.cap !== previous.cap || asset.qty !== previous.qty || asset.pm0 !== previous.pm0) return;
+          asset.cap = next.cap;
+          asset.qty = next.qty;
+          asset.pm0 = next.pm0;
+          changed = true;
+        }
+        migrateDefaultPosition("CEA1.DE", { cap: 1113.76, qty: 5.176659, pm0: 215.15 }, { cap: 1614.76, qty: 7.293061, pm0: 221.41 });
+        migrateDefaultPosition("RBOT.L", { cap: 2541.53, qty: 205.127457, pm0: 12.39 }, { cap: 3043.81, qty: 234.319423, pm0: 12.99 });
+        migrateDefaultPosition("XAIX.DE", { cap: 3262.87, qty: 25.249173, pm0: 129.23 }, { cap: 3771.03, qty: 27.86335, pm0: 135.34 });
+
         var knownFallbackPrices = {
-          bitcoin: [67535.03], ethereum: [1992.19], solana: [79.61],
-          polkadot: [0.8232], ripple: [1.0862], avalanche: [7.39],
-          chainlink: [9.49], dogecoin: [0.064], cardano: [0.1627],
-          "XAIX.DE": [189.86, 189.48], "WNUC.L": [33.05],
-          "QNTM.L": [20.28, 20.26], "RBOT.L": [16.8, 16.72],
-          CIBR: [50.23, 50.63], "CEA1.DE": [225.65, 225.75],
-          COPX: [49.26, 49.12], "core-stoxx-europe-600": [320.3, 320.2],
-          "msci-japan": [98.28, 98.47],
-          "ftse-developed-asia-pacific": [44.37, 44.36],
+          bitcoin: [67535.03, 67885.93], ethereum: [1992.19, 1997.4], solana: [79.61, 80.51],
+          polkadot: [0.8232, 0.8209], ripple: [1.0862, 1.0507], avalanche: [7.39, 7.47],
+          chainlink: [9.49, 9.73], dogecoin: [0.064, 0.065], cardano: [0.1627, 0.1662],
+          "XAIX.DE": [189.86, 189.48, 193.26], "WNUC.L": [33.05, 34.76],
+          "QNTM.L": [20.28, 20.26, 21.47], "RBOT.L": [16.8, 16.72, 17.09],
+          CIBR: [50.23, 50.63, 50.88], "CEA1.DE": [225.65, 225.75, 234.5],
+          COPX: [49.26, 49.12, 49.84], "core-stoxx-europe-600": [320.3, 320.2, 318.8],
+          "msci-japan": [98.28, 98.47, 99.44],
+          "ftse-developed-asia-pacific": [44.37, 44.36, 45.17],
         };
         Object.keys(knownFallbackPrices).forEach(function (id) {
           if (knownFallbackPrices[id].indexOf(prices[id]) >= 0) {

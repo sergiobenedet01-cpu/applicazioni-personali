@@ -8,6 +8,12 @@ e `Rimosso`.
 
 ### Modificato
 
+- Aggiornati quantità, P.M., capitali e quotazioni fallback dai dati del
+  portafoglio dell'11 novembre 2026; le migrazioni aggiornano esclusivamente
+  i vecchi valori standard e non sostituiscono modifiche manuali.
+- Le righe dei grafici P&L e Nuovo P.M. What-If sono ora cliccabili e
+  copiabili anche da tastiera, con indicazione accessibile del valore copiato.
+
 - Allocazione ricostruita come guida con target per categoria, liquidità,
   scenari trasparenti, limite di concentrazione e impatto sul nuovo P.M.;
   rimossi ranking di convenienza, score, matrice e tranche.

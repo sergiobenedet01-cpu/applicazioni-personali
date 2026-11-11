@@ -49,16 +49,18 @@
     return description + " · i primi " + Math.min(3, rows.length) + " spiegano " + number((top / total) * 100, 1) + "% dell’impatto";
   }
 
-  function chartRow(row, value, metricHtml, aggregate, tone) {
+  function chartRow(row, value, metricHtml, aggregate, tone, copyValue, copyLabel) {
     var signClass = tone || (value >= 0 ? "positive" : "negative");
-    return '<div class="wips-analytic-chart-row" role="listitem" title="' + esc(row.a.name + ": " + metricHtml.replace(/<[^>]*>/g, "")) + '" aria-label="' + esc(row.a.name + ": " + metricHtml.replace(/<[^>]*>/g, "")) + '">' +
+    var details = row.a.name + ": " + metricHtml.replace(/<[^>]*>/g, "");
+    var copied = finite(copyValue) ? String(copyValue) : "";
+    return '<div class="wips-analytic-chart-row wips-copyable" role="button" tabindex="0" data-copy-value="' + esc(copied) + '" title="' + esc(details + " · Clicca per copiare " + copyLabel) + '" aria-label="' + esc(details + ". Clicca per copiare " + copyLabel) + '">' +
       '<div class="wips-analytic-chart-name">' + esc(row.a.name) + kind(row, aggregate) + '</div>' +
       '<div class="wips-analytic-chart-track" aria-hidden="true"><span class="wips-analytic-chart-bar ' + signClass + '" style="--bar-size:' + row._chartWidth + '"></span></div>' +
       '<div class="wips-analytic-chart-metric ' + signClass + '">' + metricHtml + '</div>' +
       '</div>';
   }
 
-  function chart(title, rows, value, metric, description, aggregate, tone, legend, splitByTone) {
+  function chart(title, rows, value, metric, description, aggregate, tone, legend, splitByTone, copyValue, copyLabel) {
     var sorted = rows.slice().sort(function (left, right) {
       if (splitByTone) {
         var tones = { positive: 0, warning: 1, neutral: 2 };
@@ -94,7 +96,8 @@
         html += '<div class="wips-analytic-chart-group ' + currentTone + '">' + groupLabel + '</div>';
         previousTone = currentTone;
       }
-      html += chartRow(row, value(row), metric(row), aggregate, currentTone);
+      var copied = typeof copyValue === "function" ? copyValue(row) : value(row);
+      html += chartRow(row, value(row), metric(row), aggregate, currentTone, copied, copyLabel || "valore");
     });
     return html + '</div></section>';
   }
@@ -109,6 +112,11 @@
       function (row) { return signed(row.c.re, " €", 2) + " · " + signed(row.c.rp, "%", 2); },
       "Pareto: valore assoluto del P&L in euro, decrescente",
       aggregate,
+      null,
+      null,
+      false,
+      null,
+      "P&L",
     );
     var mean = chart(
       "Nuovo P.M. con What‑If",
@@ -127,6 +135,8 @@
       },
       '<span><i class="positive"></i> P.M. ridotto</span><span><i class="warning"></i> P.M. aumentato</span>',
       true,
+      function (row) { return row.c.np; },
+      "nuovo P.M.",
     );
     return '<section class="wips-analytic-charts" aria-label="Grafici analitici ' + esc(scope === "all" ? "portafoglio globale" : scope) + '">' + pnl + mean + '</section>';
   }
