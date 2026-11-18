@@ -34,7 +34,7 @@
           "Frutta varia",
         ],
         Panificio: ["Pane per colazione", "Grissini"],
-        Freezer: [],
+        Freezer: ["Frutti di bosco congelati"],
         Carni: [],
         Altro: [
           "Barrette per merenda",
