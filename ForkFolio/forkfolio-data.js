@@ -238,6 +238,7 @@
             "Lattuga/misticanza",
             "Songino",
             "Mix verdure surgelate",
+            "Minestrone",
           ],
         },
         "🥄 Salse": {
@@ -1351,6 +1352,7 @@
           "Patate",
           "Patate dolci",
           "Porri",
+          "Minestrone",
         ],
         "🥄 Salse & Condimenti": [
           "Olio EVO",
