@@ -38,6 +38,7 @@
         Carni: [],
         Altro: [
           "Barrette per merenda",
+          "Crackers per merenda",
           "Dolcetti",
         ],
       };
