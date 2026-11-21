@@ -34,6 +34,7 @@
           "Frutta varia",
         ],
         Panificio: ["Pane per colazione", "Grissini"],
+        Aperitivo: ["Olive miste", "Chips di verdure", "Taralli", "Hummus", "Frutta secca salata"],
         Freezer: ["Frutti di bosco congelati"],
         Carni: [],
         Altro: [
