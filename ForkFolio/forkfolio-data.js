@@ -22,7 +22,7 @@
         Salse: ["Olio EVO (scorta)", "Burro di arachidi"],
         Spezie: ["Sale", "Pepe"],
         Carboidrati: ["Avena", "Gallette di mais"],
-        "Frigo e Latticini": ["Uova (scorta)", "Latte", "Yogurt bianco", "Yogurt da bere"],
+        "Frigo e Latticini": ["Uova (scorta)", "Latte", "Yogurt bianco", "Yogurt da bere", "Yogurt al caffè per colazione con Fra"],
         Colazione: [
           "Cacao",
           "Miele",
