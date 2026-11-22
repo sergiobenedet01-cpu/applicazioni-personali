@@ -31,6 +31,13 @@
         --r3: 6px;
         --t: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
       }
+      body[data-profile="francesca"] {
+        --bg:#120d19; --surface:#1b1322; --surface2:#23192d; --surface3:#30213d;
+        --border:rgba(229,196,255,.11); --border2:rgba(229,196,255,.22);
+        --accent:#c49aff; --accent2:#ff8fb8; --single:#b990ff; --double:#ff9dc5;
+      }
+      body[data-profile="sergio"] .ambient { background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(91,141,250,.09),transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(229,192,64,.07),transparent 60%); }
+      body[data-profile="francesca"] .ambient { background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(196,154,255,.13),transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(255,143,184,.10),transparent 60%); }
       *,
       *::before,
       *::after {
@@ -1319,6 +1326,11 @@
       .staple-copy:hover {
         color: var(--accent);
       }
+      .staple-include { border:1px solid var(--border2); background:transparent; color:var(--muted2); font:700 .56rem "JetBrains Mono",monospace; padding:.18rem .34rem; border-radius:999px; cursor:pointer; white-space:nowrap; }
+      .staple-include.active { color:#101014; background:var(--accent); border-color:var(--accent); }
+      .staple-add { display:grid; grid-template-columns:minmax(150px,.7fr) minmax(190px,1fr) auto; gap:.5rem; margin-top:.8rem; }
+      .staple-add select,.staple-add input { min-width:0; border:1px solid var(--border); border-radius:var(--r3); background:var(--surface2); color:var(--text); padding:.58rem .7rem; font:inherit; }
+      @media(max-width:680px){.staple-add{grid-template-columns:1fr}.staple-add .bb{min-height:44px}}
 
       @media (max-width: 980px) {
         .staples-grid {
@@ -2256,10 +2268,10 @@
               font-weight: 700;
               margin-right: 0.2rem;
             "
-            >Sergio Benedet</strong
+            id="profileName">Sergio Benedet</strong
           >
         </div>
-        <span class="claude-badge-sm">w/ Claude</span>
+        <button class="mode-switch" type="button" id="profileSwitch" onclick="toggleProfile()" title="Cambia profilo">👤 Sergio</button>
       </div>
     </header>
 
@@ -2441,10 +2453,21 @@
           </div>
         </section>
 
+        <!-- ══ CALENDARIO ═══════════════════════════════ -->
+        <section id="sCalendar" class="calendar-section" aria-label="Calendario pasti">
+          <div class="sec-hdr">
+            <div class="sec-num">// 02 · PIANO</div>
+            <div class="sec-title">Distribuisci i tuoi <span class="hl">pasti</span></div>
+            <div class="sec-sub">Ogni ricetta può essere assegnata solo per le porzioni che hai pianificato.</div>
+          </div>
+          <div class="calendar-cycle-note"><span>◷</span><span id="calendarRuleNote">Il ciclo di pianificazione inizia <strong>sabato a pranzo</strong>.</span></div>
+          <div class="calendar-grid" id="calendarGrid" aria-live="polite"></div>
+        </section>
+
         <!-- ══ 02 ISPIRAZIONE ═══════════════════════════ -->
         <section id="s02">
           <div class="sec-hdr">
-            <div class="sec-num">// 02</div>
+            <div class="sec-num">// 03</div>
             <div class="sec-title">
               Sezioni di <span class="hl">ispirazione</span>
             </div>
@@ -2551,7 +2574,7 @@
         <!-- ══ 03 TRACKER ════════════════════════════════ -->
         <section id="s03">
           <div class="sec-hdr">
-            <div class="sec-num">// 03</div>
+            <div class="sec-num">// 04</div>
             <div class="sec-title">
               Tracker <span class="hl">settimanale</span>
             </div>
@@ -2605,33 +2628,27 @@
           <!-- Staples -->
           <div id="staplesBlock" style="margin-top: 1.5rem">
             <div class="sec-hdr" style="margin-bottom: 0.85rem">
-              <div class="sec-num">// 03b</div>
+              <div class="sec-num">// 04b</div>
               <div class="sec-title" style="font-size: 1.1rem">
                 Ingredienti <span class="hl">ricorrenti</span>
               </div>
               <div class="sec-sub">
-                Quelli che compri sempre — clicca 📋 per copiare
+                Scegli cosa includere nella lista finale oppure aggiungi un tuo elemento.
               </div>
             </div>
             <div class="staples-grid" id="staplesGrid"></div>
+            <div class="staple-add" aria-label="Aggiungi ingrediente ricorrente">
+              <select id="stapleCategory" aria-label="Categoria ingrediente ricorrente"></select>
+              <input id="stapleName" type="text" maxlength="80" placeholder="Nuovo ingrediente ricorrente" />
+              <button class="bb bc" type="button" onclick="addCustomStaple()">＋ Aggiungi</button>
+            </div>
           </div>
-        </section>
-
-        <!-- ══ CALENDARIO ═══════════════════════════════ -->
-        <section id="sCalendar" class="calendar-section" aria-label="Calendario pasti">
-          <div class="sec-hdr">
-            <div class="sec-num">// CALENDARIO</div>
-            <div class="sec-title">Pasti dei prossimi <span class="hl">7 giorni</span></div>
-            <div class="sec-sub">Pranzo e cena, dal giorno corrente in avanti.</div>
-          </div>
-          <div class="calendar-cycle-note"><span>◷</span><span>Il ciclo di pianificazione inizia <strong>sabato a pranzo</strong>.</span></div>
-          <div class="calendar-grid" id="calendarGrid" aria-live="polite"></div>
         </section>
 
         <!-- ══ 04 SPESA ══════════════════════════════════ -->
         <section id="s04">
           <div class="sec-hdr">
-            <div class="sec-num">// 04</div>
+            <div class="sec-num">// 05</div>
             <div class="sec-title">
               Lista della <span class="hl">spesa</span>
             </div>
@@ -2661,6 +2678,7 @@
               >
                 ↺ Reset spunta
               </button>
+              <button class="bb bc" style="flex:none;width:auto;padding:.32rem .85rem;font-size:.68rem" type="button" onclick="downloadShoppingList()">⇩ Lista finale</button>
             </div>
           </div>
           <div class="shop-grid" id="shopGrid">
@@ -2777,10 +2795,13 @@
 
       const MODE_STORAGE_KEY = "forkfolio-ui-mode";
       const STATE_STORAGE_KEY = "forkfolio-state-v1";
+      const PROFILE_STORAGE_KEY = "forkfolio-active-profile";
       const BACKUP_SCHEMA = "forkfolio-backup";
       const BACKUP_VERSION = 1;
       let currentMode = null;
       let pendingBackup = null;
+      let activeProfile = "sergio";
+      const PROFILE_META = { sergio: { name: "Sergio", icon: "👤" }, francesca: { name: "Francesca", icon: "✦" } };
 
 
 
@@ -2804,6 +2825,8 @@
         shopChecks: {},
         hidePurchased: false,
         calendarAssignments: {},
+        customStaples: {},
+        includedStaples: {},
       };
 
       function clampStateNumber(value, min, max = 21) {
@@ -2845,6 +2868,14 @@
             }
           });
         }
+        const customStaples = {};
+        if (value.customStaples && typeof value.customStaples === "object" && !Array.isArray(value.customStaples)) {
+          Object.entries(value.customStaples).forEach(([category, items]) => {
+            if (Object.prototype.hasOwnProperty.call(STAPLES, category) && Array.isArray(items)) customStaples[category] = [...new Set(items.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim().slice(0, 80)))];
+          });
+        }
+        const includedStaples = {};
+        if (value.includedStaples && typeof value.includedStaples === "object" && !Array.isArray(value.includedStaples)) Object.entries(value.includedStaples).forEach(([name, included]) => { if (typeof name === "string" && included === true) includedStaples[name] = true; });
         const maxId = meals.reduce((max, meal) => Math.max(max, meal.id), 0);
         return {
           sM: clampStateNumber(value.sM, 0), sR: clampStateNumber(value.sR, 1),
@@ -2855,6 +2886,7 @@
           recipeSort: ["default", "alpha", "category", "favorites"].includes(value.recipeSort) ? value.recipeSort : "default",
           favoriteRecipeIds, shopChecks, hidePurchased: value.hidePurchased === true,
           calendarAssignments,
+          customStaples, includedStaples,
         };
       }
       function stateForStorage() {
@@ -2863,15 +2895,15 @@
           meals: ST.meals, nextId: ST.nextId, activeRCat: ST.activeRCat, recipeSearch: ST.recipeSearch,
           recipeFilter: ST.recipeFilter, recipeSort: ST.recipeSort,
           favoriteRecipeIds: ST.favoriteRecipeIds, shopChecks: ST.shopChecks,
-          hidePurchased: ST.hidePurchased, calendarAssignments: ST.calendarAssignments,
+          hidePurchased: ST.hidePurchased, calendarAssignments: ST.calendarAssignments, customStaples: ST.customStaples, includedStaples: ST.includedStaples,
         };
       }
       function saveState() {
-        try { localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(stateForStorage())); } catch {}
+        try { localStorage.setItem(`${STATE_STORAGE_KEY}-${activeProfile}`, JSON.stringify(stateForStorage())); } catch {}
       }
       function restoreState() {
         try {
-          const raw = localStorage.getItem(STATE_STORAGE_KEY);
+          const raw = localStorage.getItem(`${STATE_STORAGE_KEY}-${activeProfile}`) || (activeProfile === "sergio" ? localStorage.getItem(STATE_STORAGE_KEY) : null);
           if (!raw) return false;
           const restored = normalizeState(JSON.parse(raw));
           if (!restored) return false;
@@ -2884,6 +2916,7 @@
    INIT
 ═══════════════════════════════════════════════ */
       function init() {
+        try { activeProfile = localStorage.getItem(PROFILE_STORAGE_KEY) === "francesca" ? "francesca" : "sergio"; } catch {}
         restoreState();
         document.getElementById("sM").value = ST.sM;
         document.getElementById("sR").value = ST.sR;
@@ -2901,9 +2934,36 @@
         renderStaples();
         renderMobileStaples();
         renderAll();
+        renderProfileUI();
         hints();
         observeSections();
         prepareModePicker();
+      }
+
+      function freshProfileState() {
+        return { sM: 6, sR: 3, dM: 0, dR: 2, meals: [], nextId: 1, selIng: [], activeRCat: "all", recipeSearch: "", recipeFilter: "all", recipeSort: "default", favoriteRecipeIds: [], shopChecks: {}, hidePurchased: false, calendarAssignments: {}, customStaples: {}, includedStaples: {} };
+      }
+      function renderProfileUI() {
+        const meta = PROFILE_META[activeProfile];
+        document.body.dataset.profile = activeProfile;
+        const button = document.getElementById("profileSwitch");
+        if (button) button.textContent = `${meta.icon} ${meta.name} · passa a ${activeProfile === "sergio" ? "Francesca" : "Sergio"}`;
+        const profileName = document.getElementById("profileName");
+        if (profileName) profileName.textContent = activeProfile === "sergio" ? "Sergio Benedet" : "Francesca";
+      }
+      function toggleProfile() { switchProfile(activeProfile === "sergio" ? "francesca" : "sergio"); }
+      function switchProfile(profile) {
+        if (!PROFILE_META[profile] || profile === activeProfile) return;
+        saveState();
+        activeProfile = profile;
+        try { localStorage.setItem(PROFILE_STORAGE_KEY, profile); } catch {}
+        Object.assign(ST, freshProfileState());
+        restoreState();
+        ["sM", "sR", "dM", "dR"].forEach((id) => { document.getElementById(id).value = ST[id]; });
+        document.getElementById("recipeSearch").value = ST.recipeSearch;
+        document.getElementById("recipeSort").value = ST.recipeSort;
+        renderProfileUI(); renderRecCatTabs(); renderRecipes(); renderStaples(); renderMobileStaples(); renderAll(); hints();
+        toast(`✓ Profilo ${PROFILE_META[profile].name} attivo`);
       }
 
       /* ─── APP MODE ────────────────────────────────── */
@@ -2987,7 +3047,7 @@
       }
       function renderMobileStaples() {
         const container = document.getElementById("mobileStaples");
-        container.innerHTML = Object.entries(STAPLES)
+        container.innerHTML = Object.entries(getStaples())
           .filter(([, items]) => items.length)
           .map(
             ([category, items]) =>
@@ -3416,9 +3476,11 @@
 
         // Show/hide buttons based on setup limits
         document.getElementById("repsBtnS").style.display =
-          ST.sM > 0 ? "" : "none";
+          preferredType === "single" && ST.sM > 0 ? "" : "none";
         document.getElementById("repsBtnD").style.display =
-          ST.dM > 0 ? "" : "none";
+          preferredType === "double" && ST.dM > 0 ? "" : "none";
+        const selectedButton = preferredType === "single" ? document.getElementById("repsBtnS") : document.getElementById("repsBtnD");
+        selectedButton.textContent = "✓ Aggiungi";
 
         document.getElementById("repsModal").classList.add("open");
         document.body.style.overflow = "hidden";
@@ -3437,7 +3499,7 @@
         const cur = parseInt(el.textContent) || 1;
         el.textContent = Math.max(1, Math.min(7, cur + d));
       }
-      function confirmReps(type) {
+      function confirmReps(type = _repsType) {
         if (!_repsRec) return;
         const reps =
           parseInt(document.getElementById("repsVal").textContent) || 1;
@@ -3687,6 +3749,11 @@
       function calendarSlotKey(date, slot) { return `${calendarDateKey(date)}:${slot}`; }
       function fixedCalendarRule(date, slot) {
         const day = date.getDay();
+        if (activeProfile === "francesca") {
+          if (slot === "lunch" && day === 0) return { title: "Ristorante / fuori casa", meta: "Pasto condiviso · fuori lista spesa", kind: "fixed-away", badges: ["Fuori casa"] };
+          if (slot === "dinner" && (day === 6 || day === 0)) return { title: "Cena da Sergio", meta: "Pasto gestito dal profilo Sergio", kind: "fixed-away", badges: ["Da Sergio"] };
+          return null;
+        }
         if (slot === "lunch" && day >= 1 && day <= 5) return { title: "Mensa lavoro", meta: "Pasto fisso · fuori lista spesa", kind: "fixed-work", badges: ["Fuori casa"] };
         if (slot === "dinner" && day === 3) return { title: "Cena dalla mia ragazza", meta: "Pasto fisso · fuori lista spesa", kind: "fixed-away", badges: ["Fuori casa"] };
         if (slot === "lunch" && day === 0) return { title: "Ristorante / fuori casa", meta: "Pasto fisso · nessuna spesa automatica", kind: "fixed-away", badges: ["Fuori casa"] };
@@ -3694,6 +3761,7 @@
       }
       function calendarGuidance(date, slot) {
         const day = date.getDay();
+        if (activeProfile === "francesca" && day === 3 && slot === "dinner") return { title: "Cena di coppia con Sergio", meta: "Scegli una ricetta di coppia", kind: "special", badges: ["Coppia"], coupleOnly: true };
         if (day === 6 && slot === "lunch") return { title: "Pranzo da pianificare", meta: "Priorità: ricette veloci", kind: "special", badges: ["Veloce", "Inizio ciclo"] };
         if (day === 6 && slot === "dinner") return { title: "Cena speciale", meta: "Scegli liberamente una ricetta per l'occasione", kind: "special", badges: ["Cena speciale"] };
         if (day === 0 && slot === "dinner") return { title: "Cena leggera vegetariana", meta: "Priorità: ricette leggere e vegetariane", kind: "light", badges: ["Leggera", "Vegetariana"] };
@@ -3703,11 +3771,13 @@
         const assignment = ST.calendarAssignments[calendarSlotKey(date, slot)];
         return assignment ? ST.meals.find((meal) => meal.id === assignment.mealId) || null : null;
       }
+      function calendarAssignmentsForMeal(mealId) { return Object.values(ST.calendarAssignments).filter((assignment) => assignment.mealId === mealId).length; }
+      function calendarAvailability(meal) { return Math.max(0, (meal.reps || 1) - calendarAssignmentsForMeal(meal.id)); }
       function calendarSlotElement(date, slot) {
         const fixed = fixedCalendarRule(date, slot);
         const assigned = getCalendarAssignment(date, slot);
         const info = fixed || (assigned
-          ? { title: assigned.name, meta: `${assigned.type === "single" ? "👤 Singolo" : "👥 Coppia"} · già incluso nel piano e nella spesa`, kind: "planned", badges: [] }
+          ? { title: assigned.name, meta: `${assigned.type === "single" ? "👤 Singolo" : "👥 Coppia"} · ricetta assegnata`, kind: "planned", badges: [`${calendarAvailability(assigned)}/${assigned.reps || 1} porzioni libere`] }
           : calendarGuidance(date, slot));
         const el = document.createElement(fixed ? "div" : "button");
         if (!fixed) el.type = "button";
@@ -3725,6 +3795,8 @@
         const grid = document.getElementById("calendarGrid");
         if (!grid) return;
         const now = new Date();
+        const note = document.getElementById("calendarRuleNote");
+        if (note) note.innerHTML = activeProfile === "francesca" ? "Francesca pianifica tutti i pranzi; <strong>mercoledì cena di coppia</strong>." : "Il ciclo di pianificazione inizia <strong>sabato a pranzo</strong>.";
         const todayKey = calendarDateKey(now);
         grid.innerHTML = "";
         for (let offset = 0; offset < 7; offset++) {
@@ -3754,7 +3826,7 @@
         const title = `${slot === "lunch" ? "Pranzo" : "Cena"} · ${CALENDAR_DAY_NAMES[date.getDay()]} ${date.getDate()} ${CALENDAR_MONTH_NAMES[date.getMonth()]}`;
         const guidance = calendarGuidance(date, slot);
         document.getElementById("calendarPickerSlot").textContent = title;
-        document.getElementById("calendarPickerHint").textContent = `${guidance.meta}. Le ricette qui sotto sono già nel tracker: assegnarle al calendario non modifica né quantità né lista spesa.`;
+        document.getElementById("calendarPickerHint").textContent = `${guidance.meta}. Ogni assegnazione consuma una delle porzioni pianificate della ricetta.`;
         const list = document.getElementById("calendarPickerList");
         list.innerHTML = "";
         const assigned = getCalendarAssignment(date, slot);
@@ -3766,7 +3838,7 @@
           clear.addEventListener("click", clearCalendarAssignment);
           list.appendChild(clear);
         }
-        const meals = [...ST.meals].sort((a, b) => Number(calendarMealIsRecommended(b, date, slot)) - Number(calendarMealIsRecommended(a, date, slot)) || a.name.localeCompare(b.name, "it"));
+        const meals = [...ST.meals].filter((meal) => !guidance.coupleOnly || meal.type === "double").sort((a, b) => Number(calendarMealIsRecommended(b, date, slot)) - Number(calendarMealIsRecommended(a, date, slot)) || a.name.localeCompare(b.name, "it"));
         if (!meals.length) {
           list.innerHTML += '<div class="calendar-picker-empty">Aggiungi prima una ricetta al tracker: sarà poi disponibile qui senza creare una seconda lista della spesa.</div>';
         } else {
@@ -3774,7 +3846,9 @@
             const button = document.createElement("button");
             button.type = "button";
             button.className = "calendar-pick";
-            button.innerHTML = `${escHtml(meal.name)}<small>${meal.type === "single" ? "👤 Singolo" : "👥 Coppia"}${calendarMealIsRecommended(meal, date, slot) ? " · consigliata per questa fascia" : ""}</small>`;
+            const available = calendarAvailability(meal) + Number(assigned?.id === meal.id);
+            button.disabled = available < 1;
+            button.innerHTML = `${escHtml(meal.name)}<small>${meal.type === "single" ? "👤 Singolo" : "👥 Coppia"} · ${available}/${meal.reps || 1} porzioni disponibili${calendarMealIsRecommended(meal, date, slot) ? " · consigliata" : ""}</small>`;
             button.addEventListener("click", () => assignCalendarMeal(meal.id));
             list.appendChild(button);
           });
@@ -3785,7 +3859,10 @@
         document.body.style.overflow = "hidden";
       }
       function assignCalendarMeal(mealId) {
-        if (!calendarPickerTarget || !ST.meals.some((meal) => meal.id === mealId)) return;
+        const meal = ST.meals.find((item) => item.id === mealId);
+        if (!calendarPickerTarget || !meal) return;
+        const current = getCalendarAssignment(calendarPickerTarget.date, calendarPickerTarget.slot);
+        if (current?.id !== mealId && calendarAvailability(meal) < 1) return toast("⚠️ Hai già distribuito tutte le porzioni di questa ricetta");
         ST.calendarAssignments[calendarSlotKey(calendarPickerTarget.date, calendarPickerTarget.slot)] = { mealId };
         saveState();
         closeCalendarPicker();
@@ -3809,15 +3886,24 @@
       }
 
       /* ─── STAPLES ─────────────────────────────────── */
+      function getStaples() {
+        const merged = {};
+        Object.entries(STAPLES).forEach(([category, items]) => { merged[category] = [...items, ...(ST.customStaples[category] || [])]; });
+        return merged;
+      }
       function renderStaples() {
         const grid = document.getElementById("staplesGrid");
         grid.innerHTML = "";
-        Object.entries(STAPLES).filter(([, items]) => items.length).forEach(([category, items]) => {
+        const staples = getStaples();
+        const categorySelect = document.getElementById("stapleCategory");
+        categorySelect.innerHTML = Object.keys(staples).map((category) => `<option value="${escHtml(category)}">${escHtml(category)}</option>`).join("");
+        Object.entries(staples).filter(([, items]) => items.length).forEach(([category, items]) => {
           const group = document.createElement("div");
           group.className = "staples-group";
           const itemsHtml = items
             .map((item) => {
-              return `<div class="staple-item"><span class="staple-name">${escHtml(item)}</span><button class="staple-copy" title="Copia nome e quantità">📋</button></div>`;
+              const included = ST.includedStaples[item] === true;
+              return `<div class="staple-item"><span class="staple-name">${escHtml(item)}</span><button class="staple-include${included ? " active" : ""}" type="button" data-staple-include="${escHtml(item)}" aria-pressed="${included}">${included ? "Incluso" : "Includi"}</button><button class="staple-copy" title="Copia nome e quantità">📋</button></div>`;
             })
             .join("");
           group.innerHTML = `<div class="staples-group-title">${escHtml(category)}</div><div class="staples-group-items">${itemsHtml}</div>`;
@@ -3827,8 +3913,23 @@
               copyItem(formatIngredientCopyValue(value), this);
             });
           });
+          group.querySelectorAll("[data-staple-include]").forEach((button) => button.addEventListener("click", () => toggleStapleIncluded(button.dataset.stapleInclude)));
           grid.appendChild(group);
         });
+      }
+      function toggleStapleIncluded(name) {
+        if (ST.includedStaples[name]) delete ST.includedStaples[name]; else ST.includedStaples[name] = true;
+        saveState(); renderStaples(); renderMobileStaples(); renderShop();
+      }
+      function addCustomStaple() {
+        const category = document.getElementById("stapleCategory").value;
+        const input = document.getElementById("stapleName");
+        const name = input.value.trim().replace(/\s+/g, " ");
+        if (!category || !name) return toast("Inserisci prima un ingrediente e una categoria");
+        const all = getStaples()[category] || [];
+        if (all.some((item) => item.toLocaleLowerCase("it") === name.toLocaleLowerCase("it"))) return toast("Questo ingrediente è già presente");
+        (ST.customStaples[category] ||= []).push(name);
+        input.value = ""; saveState(); renderStaples(); renderMobileStaples(); toast("✓ Ingrediente ricorrente aggiunto");
       }
 
       /* ─── SHOPPING LIST ───────────────────────────── */
@@ -3893,6 +3994,8 @@
           const cat = findShopCategory(name);
           (catMap[cat] = catMap[cat] || []).push({ name, qty });
         });
+        const selectedStaples = Object.keys(ST.includedStaples).filter((name) => ST.includedStaples[name]);
+        if (selectedStaples.length) catMap["★ Ricorrenti"] = selectedStaples.map((name) => ({ name, qty: 1 }));
 
         // Sort items within each category alphabetically
         Object.values(catMap).forEach((arr) =>
@@ -3905,7 +4008,7 @@
         const toggle = document.getElementById("shopToggle");
         toggle.textContent = ST.hidePurchased ? "Mostra acquistati" : "Nascondi acquistati";
         toggle.setAttribute("aria-pressed", String(ST.hidePurchased));
-        const ordered = Object.keys(SHOP_CATS).filter((c) => catMap[c]);
+        const ordered = [...Object.keys(SHOP_CATS), "★ Ricorrenti"].filter((c) => catMap[c]);
         wrap.innerHTML = ordered
           .map((cat) => {
             const items = catMap[cat].filter((item) => !ST.hidePurchased || !ST.shopChecks[item.name.toLocaleLowerCase("it").trim()]);
@@ -4061,6 +4164,28 @@
         saveState();
         renderShop();
         toast("↺ Spunte azzerate");
+      }
+      function downloadShoppingList() {
+        const counts = {};
+        ST.meals.forEach((meal) => {
+          const mult = (meal.type === "double" ? 2 : 1) * (meal.reps || 1);
+          Object.values(meal.ing || {}).flat().forEach((name) => { const key = name.toLocaleLowerCase("it").trim(); if (!counts[key]) counts[key] = { name, qty: 0, category: findShopCategory(name) }; counts[key].qty += mult; });
+        });
+        const groups = {};
+        Object.values(counts).forEach((item) => (groups[item.category] ||= []).push(item));
+        const recurring = Object.keys(ST.includedStaples).filter((name) => ST.includedStaples[name]).map((name) => ({ name, qty: 1 }));
+        if (recurring.length) groups["★ Ricorrenti"] = recurring;
+        const lines = [`LISTA DELLA SPESA · ${PROFILE_META[activeProfile].name}`, ""];
+        [...Object.keys(SHOP_CATS), "★ Ricorrenti"].filter((cat) => groups[cat]).forEach((category) => {
+          lines.push(category);
+          groups[category].sort((a, b) => a.name.localeCompare(b.name, "it")).forEach((item) => lines.push(`□ ${item.name} ×${item.qty}`));
+          lines.push("");
+        });
+        if (lines.length <= 2) return toast("Aggiungi pasti o ricorrenti da includere prima di scaricare la lista");
+        const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob); const anchor = document.createElement("a");
+        anchor.href = url; anchor.download = `forkfolio-spesa-${activeProfile}.txt`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 0);
+        toast("⇩ Lista della spesa scaricata");
       }
       function goTo(id, btn) {
         document
