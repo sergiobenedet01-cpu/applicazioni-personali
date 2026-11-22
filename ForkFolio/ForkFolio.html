@@ -4178,7 +4178,10 @@
         const lines = [`LISTA DELLA SPESA · ${PROFILE_META[activeProfile].name}`, ""];
         [...Object.keys(SHOP_CATS), "★ Ricorrenti"].filter((cat) => groups[cat]).forEach((category) => {
           lines.push(category);
-          groups[category].sort((a, b) => a.name.localeCompare(b.name, "it")).forEach((item) => lines.push(`□ ${item.name} ×${item.qty}`));
+          groups[category].sort((a, b) => a.name.localeCompare(b.name, "it")).forEach((item) => {
+            const purchased = ST.shopChecks[item.name.toLocaleLowerCase("it").trim()] === true;
+            lines.push(`${purchased ? "✓" : "□"} ${item.name} ×${item.qty}${purchased ? " — già acquistato" : ""}`);
+          });
           lines.push("");
         });
         if (lines.length <= 2) return toast("Aggiungi pasti o ricorrenti da includere prima di scaricare la lista");
