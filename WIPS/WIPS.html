@@ -1881,7 +1881,31 @@
         line-height: 1.4;
       }
       .bdg-summary-panel {
-        border-color: rgba(249, 115, 22, 0.22);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      .bdg-summary-panel .bdg-summary-grid { margin-bottom: 12px; }
+      .bdg-window-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin: 12px 0;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .bdg-window-meta > div { min-width: 0; }
+      .bdg-window-meta strong { display: block; margin-top: 4px; color: var(--t2); font-family: var(--MO); font-size: 0.76rem; font-weight: 600; }
+      .bdg-decision-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 2px;
+      }
+      .bdg-decision-status .bdg-progress { flex: 1; min-width: 0; }
+      @media (max-width: 660px) {
+        .bdg-window-meta { grid-template-columns: 1fr; }
+        .bdg-decision-status { align-items: flex-start; flex-direction: column; }
+        .bdg-decision-status .bdg-progress { width: 100%; }
       }
       .bdg-cycle-meta {
         margin: 8px 0 14px;
@@ -2073,6 +2097,19 @@
         font-size: 0.68rem;
         line-height: 1.5;
       }
+      .bdg-calendar-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        margin: -4px 0 14px;
+        color: var(--t3);
+        font-family: var(--MO);
+        font-size: 0.66rem;
+      }
+      .bdg-calendar-legend span { display: inline-flex; align-items: center; gap: 6px; }
+      .bdg-calendar-legend i { width: 8px; height: 8px; border-radius: 50%; background: rgba(129, 140, 248, 0.8); }
+      .bdg-calendar-legend i.expense { background: #f97316; }
+      .bdg-calendar-legend i.payday { background: var(--go); }
       .calendar-header {
         font-family: var(--SA);
         font-size: 0.95rem;
@@ -2805,6 +2842,7 @@
     <link rel="stylesheet" href="WIPS-allocation-lab.css?v=2026-11-05-guided" />
     <link rel="stylesheet" href="WIPS-mobile.css?v=2026-11-05-guided" />
     <link rel="stylesheet" href="WIPS-analytics-charts.css?v=2026-11-11-copy" />
+    <link rel="stylesheet" href="WIPS-dashboard.css?v=2026-11-26" />
   </head>
   <body class="tab-crypto">
     <!--
@@ -2854,6 +2892,7 @@
         </button>
       </div>
       <div class="hnav">
+        <button class="np nav-dashboard" id="nb-dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
         <button class="np on" id="nb-crypto" onclick="switchTab('crypto')">
           🪙 Crypto
         </button>
@@ -2997,6 +3036,7 @@
     <div id="sec-crypto" class="sec on"></div>
     <div id="sec-etf" class="sec"></div>
     <div id="sec-all" class="sec"></div>
+    <div id="sec-dashboard" class="sec"></div>
     <div id="sec-edit" class="sec"></div>
     <div id="sec-budget" class="sec"></div>
     <div id="sec-allocation" class="sec"></div>
@@ -3008,6 +3048,7 @@
 
     <script src="WIPS-data.js"></script>
     <script src="WIPS-analytics-charts.js?v=2026-11-11-copy"></script>
+    <script src="WIPS-dashboard.js?v=2026-11-26"></script>
     <script>
       /* ═══════════════════════════════════════════════════════════════════
         DATA & STORAGE
@@ -3042,6 +3083,7 @@
       var STORAGE_KEY = "spm9";
 
       var TAB_IDS = [
+        "dashboard",
         "crypto",
         "etf",
         "all",
@@ -3155,20 +3197,29 @@
           changed = true;
         }
         migrateDefaultPosition("CEA1.DE", { cap: 1113.76, qty: 5.176659, pm0: 215.15 }, { cap: 1614.76, qty: 7.293061, pm0: 221.41 });
+        migrateDefaultPosition("CEA1.DE", { cap: 1614.76, qty: 7.293061, pm0: 221.41 }, { cap: 1664.78, qty: 7.503365, pm0: 221.87 });
         migrateDefaultPosition("RBOT.L", { cap: 2541.53, qty: 205.127457, pm0: 12.39 }, { cap: 3043.81, qty: 234.319423, pm0: 12.99 });
+        migrateDefaultPosition("RBOT.L", { cap: 3043.81, qty: 234.319423, pm0: 12.99 }, { cap: 3543.95, qty: 263.294851, pm0: 13.46 });
+        migrateDefaultPosition("RBOT.L", { cap: 3543.95, qty: 263.294851, pm0: 13.46 }, { cap: 3794.85, qty: 278.011121, pm0: 13.65 });
         migrateDefaultPosition("XAIX.DE", { cap: 3262.87, qty: 25.249173, pm0: 129.23 }, { cap: 3771.03, qty: 27.86335, pm0: 135.34 });
+        migrateDefaultPosition("XAIX.DE", { cap: 3771.03, qty: 27.86335, pm0: 135.34 }, { cap: 4278.99, qty: 30.459792, pm0: 140.48 });
+        migrateDefaultPosition("XAIX.DE", { cap: 4278.99, qty: 30.459792, pm0: 140.48 }, { cap: 4285.45, qty: 30.492744, pm0: 140.54 });
+        migrateDefaultPosition("COPX", { cap: 2014.41, qty: 36.374283, pm0: 55.38 }, { cap: 2515.56, qty: 47.187431, pm0: 53.31 });
+        migrateDefaultPosition("COPX", { cap: 2515.56, qty: 47.187431, pm0: 53.31 }, { cap: 2766.44, qty: 52.925982, pm0: 52.27 });
 
         var knownFallbackPrices = {
-          bitcoin: [67535.03, 67885.93], ethereum: [1992.19, 1997.4], solana: [79.61, 80.51],
-          polkadot: [0.8232, 0.8209], ripple: [1.0862, 1.0507], avalanche: [7.39, 7.47],
-          chainlink: [9.49, 9.73], dogecoin: [0.064, 0.065], cardano: [0.1627, 0.1662],
-          "XAIX.DE": [189.86, 189.48, 193.26], "WNUC.L": [33.05, 34.76],
-          "QNTM.L": [20.28, 20.26, 21.47], "RBOT.L": [16.8, 16.72, 17.09],
-          CIBR: [50.23, 50.63, 50.88], "CEA1.DE": [225.65, 225.75, 234.5],
-          COPX: [49.26, 49.12, 49.84], "core-stoxx-europe-600": [320.3, 320.2, 318.8],
-          "msci-japan": [98.28, 98.47, 99.44],
-          "ftse-developed-asia-pacific": [44.37, 44.36, 45.17],
+          bitcoin: [67535.03, 67885.93, 65694.1, 55749.372363787494], ethereum: [1992.19, 1997.4, 1833.37, 1563.8082440892354], solana: [79.61, 80.51, 73.57, 65.44408154233446],
+          polkadot: [0.8232, 0.8209, 0.7383, 0.6112555050523802], ripple: [1.0862, 1.0507, 0.9399, 0.853516036223174], avalanche: [7.39, 7.47, 7.53, 6.094744847901362],
+          chainlink: [9.49, 9.73, 9.13, 8.066363137170379], dogecoin: [0.064, 0.065, 0.0602, 0.050441201425419996], cardano: [0.1627, 0.1662, 0.155, 0.13283677445184966],
+          "XAIX.DE": [189.86, 189.48, 193.26, 200.3, 194.65989787454885, 185.23993860496486], "WNUC.L": [33.05, 34.76, 36.18, 30.14495847318293],
+          "QNTM.L": [20.28, 20.26, 21.47, 22.45, 19.33199738569753], "RBOT.L": [16.8, 16.72, 17.09, 17.96, 17.205995418421608, 15.961990840451339],
+          CIBR: [50.23, 50.63, 50.88, 53.28, 53.06004343499918], "CEA1.DE": [225.65, 225.75, 234.5, 245.75, 221.70053036204425],
+          COPX: [49.26, 49.12, 49.84, 50.87, 45.770027192198704, 41.18003372550627], "core-stoxx-europe-600": [320.3, 320.2, 318.8, 326.85, 310.0473318453088],
+          "msci-japan": [98.28, 98.47, 99.44, 103.15, 96.9474635665519],
+          "ftse-developed-asia-pacific": [44.37, 44.36, 45.17, 46.69, 42.68414391016534],
         };
+        var snapshotNovember24 = { bitcoin: 55370.656392341436, ethereum: 1555.8219755331497, solana: 65.71301145576972, polkadot: 0.6258394288284742, ripple: 0.8676087405414065, avalanche: 6.1732508292912325, chainlink: 8.317030995616312, dogecoin: 0.05156541659596131, cardano: 0.1360217497457244, "XAIX.DE": 193.73986152246582, "WNUC.L": 31.230028484639146, "QNTM.L": 20.130022033142513, "RBOT.L": 16.93401896416121, CIBR: 54.510033250127606, "CEA1.DE": 235.3504061177885, COPX: 43.05002321486839, "core-stoxx-europe-600": 315.904449826661, "msci-japan": 101.46157652746032, "ftse-developed-asia-pacific": 44.61440557568528 };
+        Object.keys(snapshotNovember24).forEach(function (id) { knownFallbackPrices[id].push(snapshotNovember24[id]); });
         Object.keys(knownFallbackPrices).forEach(function (id) {
           if (knownFallbackPrices[id].indexOf(prices[id]) >= 0) {
             prices[id] = DEFAULT_PRICES[id];
@@ -3343,6 +3394,7 @@
         });
         if (t === "edit") renderEditor();
         if (t === "budget") renderBudget();
+        if (t === "dashboard" && typeof renderPortfolioDashboard === "function") renderPortfolioDashboard();
         if (t === "allocation" && typeof renderAllocationLab === "function")
           renderAllocationLab();
         if (
@@ -4502,6 +4554,7 @@
         renderTables(add, portfolio);
         if (portfolio.fondi.length) renderFondi(add, portfolio);
         renderAllSection(add, portfolio);
+        if (g("sec-dashboard") && g("sec-dashboard").classList.contains("on") && typeof renderPortfolioDashboard === "function") renderPortfolioDashboard(portfolio);
         if (
           g("sec-allocation") &&
           g("sec-allocation").classList.contains("on") &&
@@ -5122,9 +5175,16 @@
           },
           {
             name: "ChatGPT",
-            amount: 8,
+            amount: 23,
             day: 26,
             category: "Produttivita",
+            group: "ricorrenti",
+          },
+          {
+            name: "Surfshark VPN",
+            amount: 2.92,
+            day: 14,
+            category: "Servizi",
             group: "ricorrenti",
           },
         ];
@@ -5397,6 +5457,17 @@
           return dates;
         }
 
+        function saturdayDates(count, window) {
+          var n = Math.max(0, Math.floor(count || 0));
+          var saturdays = getWeekdayDates(window.start, window.end, 6);
+          if (!saturdays.length) return spreadDates(n, window);
+          var dates = [];
+          for (var i = 0; i < n; i++) {
+            dates.push(saturdays[Math.min(i, saturdays.length - 1)]);
+          }
+          return dates;
+        }
+
         function monthlyItems(window) {
           var items = [];
           var seen = {};
@@ -5539,7 +5610,7 @@
                 "Supermercato",
                 state.bSp,
                 state.nSet,
-                spreadDates(state.nSet, win),
+                saturdayDates(state.nSet, win),
                 "supermercato",
                 "Spesa",
               ),
@@ -5549,7 +5620,7 @@
                 "Pieno carburante",
                 state.cPieno,
                 state.nPieni,
-                spreadDates(state.nPieni, win),
+                saturdayDates(state.nPieni, win),
                 "carburante",
                 "Auto",
               ),
@@ -5670,34 +5741,6 @@
         window.bdgGetSnapshot = function () {
           return calculate();
         };
-
-        function excludedHtml(items) {
-          if (!items.length) {
-            return '<div class="bdg-empty-state">Nessuna ricorrenza immediata dopo lo stipendio.</div>';
-          }
-          return items
-            .map(function (item) {
-              return (
-                '<div class="bdg-line-item paid">' +
-                '<div class="bdg-line-item-left">' +
-                '<span class="bdg-line-name">' +
-                escapeHtml(item.name) +
-                "</span>" +
-                '<span class="bdg-line-meta">Esclusa perche cade il ' +
-                item.dateLabel +
-                ", dopo lo stipendio</span>" +
-                "</div>" +
-                '<div class="bdg-line-item-right">' +
-                '<span class="bdg-line-amount">' +
-                formatCurrency(item.amount) +
-                "</span>" +
-                '<span class="bdg-line-badge paid">Fuori periodo</span>' +
-                "</div>" +
-                "</div>"
-              );
-            })
-            .join("");
-        }
 
         function calendarHtml(r) {
           var expenseDays = r.calendarItems.reduce(function (map, item) {
@@ -5878,9 +5921,6 @@
 
           var calendarRoot = g("bdg-calendar");
           if (calendarRoot) calendarRoot.innerHTML = calendarHtml(r);
-          var excludedRoot = g("bdg-excluded");
-          if (excludedRoot) excludedRoot.innerHTML = excludedHtml(r.excluded);
-
           setText("bdg-amt-aff", formatCurrency(r.breakdown.affitto));
           setText("bdg-amt-boll", formatCurrency(r.breakdown.bollette));
           setText("bdg-amt-dom", formatCurrency(r.breakdown.domeniche));
@@ -5891,37 +5931,6 @@
           setText("bdg-amt-safe", formatCurrency(r.safety));
           setText("bdg-tot", formatCurrency(r.reservedTotal));
 
-          setText("bdg-f-liq", formatCurrency(r.liq));
-          setText("bdg-f-exp", "- " + formatCurrency(r.expenseTotal));
-          setText("bdg-f-safe", "- " + formatCurrency(r.safety));
-          var inv = g("bdg-f-inv");
-          if (inv) {
-            inv.textContent = formatCurrency(r.investible);
-            inv.className =
-              "bdg-frow-val " + (r.investible >= 0 ? "pos" : "neg");
-          }
-
-          var rv = g("bdg-res-val");
-          if (rv) {
-            rv.textContent = formatCurrency(r.investible);
-            rv.className =
-              "bdg-res-val " +
-              (r.investible > 0 ? "pos" : r.investible < 0 ? "neg" : "zero");
-          }
-          setText(
-            "bdg-res-msg",
-            r.investible >= 0
-              ? "Dopo spese e margine resta investibile il " +
-                  Math.round(r.pct) +
-                  "% della liquidita"
-              : "Deficit previsto di " + formatCurrency(Math.abs(r.investible)),
-          );
-          var bar = g("bdg-bar-fill");
-          if (bar) {
-            bar.style.width = r.barPct + "%";
-            bar.className =
-              "bdg-bar-fill " + (r.investible < 0 ? "neg" : "pos");
-          }
           var status = g("bdg-next-charge");
           if (status) status.className = "bdg-status-pill " + r.statusType;
           var card = g("bdg-kpi-investible-card");
@@ -6037,22 +6046,17 @@
             '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Margine sicurezza</div><div class="bdg-kpi-value" id="bdg-kpi-safe">—</div></div>',
             '    <div class="bdg-kpi-card primary" id="bdg-kpi-investible-card"><div class="bdg-kpi-label">Investibile oggi</div><div class="bdg-kpi-value" id="bdg-kpi-investible">—</div></div>',
             "  </div>",
-            '  <div class="bdg-formula-note">Regola applicata: data attuale <= data spesa < prossimo stipendio. Tutto cio che cade dal giorno dello stipendio in poi viene escluso dal calcolo attuale.</div>',
+            '  <div class="bdg-decision-status"><span class="bdg-status-pill safe" id="bdg-next-charge">—</span><div class="bdg-progress"><div class="bdg-progress-head"><span>Ciclo stipendio completato</span><strong id="bdg-progress-value">—</strong></div><div class="bdg-progress-track"><div class="bdg-progress-fill pos" id="bdg-progress-fill" style="width:0%"></div></div></div></div>',
+            '  <div class="bdg-formula-note">Liquidità − spese previste − margine di sicurezza. Le voci dal giorno dello stipendio in poi restano nel ciclo successivo.</div>',
             "</div>",
-            '<div class="bdg-card bdg-card-hl bdg-summary-panel">',
+            '<div class="bdg-card bdg-summary-panel">',
             '  <div class="bdg-sect">📊 Sintesi finestra</div>',
             '  <div class="bdg-summary-grid">',
             '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Spese prima dello stipendio</div><div class="bdg-kpi-value" id="bdg-recurring-total">—</div></div>',
             '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Margine protetto</div><div class="bdg-kpi-value" id="bdg-paid-total">—</div></div>',
             '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Totale riservato</div><div class="bdg-kpi-value" id="bdg-future-total">—</div></div>',
-            '    <div class="bdg-kpi-card"><div class="bdg-kpi-label">Prossima uscita</div><div class="bdg-kpi-value" id="bdg-next-expense">—</div></div>',
             "  </div>",
-            '  <div class="bdg-cycle-meta">',
-            '    <span class="bdg-cycle-label">Ciclo stipendio</span> <strong id="bdg-cycle-range">—</strong><br>',
-            '    <span class="bdg-cycle-label">Finestra decisionale</span> <strong id="bdg-decision-range">—</strong>',
-            "  </div>",
-            '  <div class="bdg-status-row"><span class="bdg-status-pill safe" id="bdg-next-charge">—</span><span class="bdg-status-text" id="bdg-forecast-msg">—</span></div>',
-            '  <div class="bdg-progress"><div class="bdg-progress-head"><span>Ciclo stipendio completato</span><strong id="bdg-progress-value">—</strong></div><div class="bdg-progress-track"><div class="bdg-progress-fill pos" id="bdg-progress-fill" style="width:0%"></div></div></div>',
+            '  <div class="bdg-window-meta"><div><span class="bdg-cycle-label">Da oggi</span><strong id="bdg-oggi">—</strong></div><div><span class="bdg-cycle-label">Ciclo stipendio</span><strong id="bdg-cycle-range">—</strong></div><div><span class="bdg-cycle-label">Finestra decisionale</span><strong id="bdg-decision-range">—</strong></div></div>',
             "</div>",
             '<div class="bdg-card bdg-input-card">',
             '  <div class="bdg-sect">📥 Dati di input</div>',
@@ -6080,13 +6084,6 @@
             '  <button class="bdg-mode-btn" onclick="bdgResetAuto()">Ripristina conteggi automatici</button>',
             "</div>",
             '<div class="bdg-card">',
-            '  <div class="bdg-sect">📅 Periodo calcolato</div>',
-            '  <div class="bdg-prow"><span class="bdg-plbl">Da oggi</span><span class="bdg-pval" id="bdg-oggi">—</span></div>',
-            '  <div class="bdg-prow"><span class="bdg-plbl">Al prossimo stipendio</span><span class="bdg-pval" id="bdg-payday">—</span></div>',
-            '  <div class="bdg-prow"><span class="bdg-plbl">Giorni rimanenti</span><span class="bdg-pval accent" id="bdg-giorni">—</span></div>',
-            '  <div class="bdg-chips"><div class="bdg-chip">Dom: <b id="bdg-chip-dom">—</b></div><div class="bdg-chip">Spese: <b id="bdg-chip-set">—</b></div><div class="bdg-chip" id="bdg-chip-rule">—</div></div>',
-            "</div>",
-            '<div class="bdg-card">',
             '  <div class="bdg-sect">📤 Breakdown riservato</div>',
             '  <div class="bdg-brow off"><span class="bdg-bname">🏠 Affitto</span><span class="bdg-bamt" id="bdg-amt-aff">—</span></div>',
             '  <div class="bdg-brow off"><span class="bdg-bname">⚡ Bollette</span><span class="bdg-bamt" id="bdg-amt-boll">—</span></div>',
@@ -6098,22 +6095,13 @@
             '  <div class="bdg-brow on"><span class="bdg-bname">🛡️ Margine sicurezza</span><span class="bdg-bamt var" id="bdg-amt-safe">—</span></div>',
             '  <div class="bdg-btot"><span class="bdg-btot-lbl">Totale riservato</span><span class="bdg-btot-val" id="bdg-tot">—</span></div>',
             "</div>",
+            '<div class="bdg-card bdg-full bdg-card-calendar bdg-card-hl"><div class="bdg-sect">🗓️ Calendario decisionale · mese corrente e successivo</div><p class="bdg-calendar-note">Visualizza ricorrenze, spese datate e stipendio. Il calcolo investibile considera soltanto le uscite prima dello stipendio.</p><div class="bdg-calendar-legend"><span><i></i>Finestra attiva</span><span><i class="expense"></i>Uscita</span><span><i class="payday"></i>Stipendio</span></div><div class="bdg-calendar" id="bdg-calendar"></div></div>',
             '<div class="bdg-card bdg-full">',
             '  <div class="bdg-sect">➕ Spese straordinarie e personalizzate</div>',
-            '  <div class="bdg-custom-list" id="bdg-custom-list">' +
-              customEditorHtml() +
-              "</div>",
+            '  <div class="bdg-custom-list" id="bdg-custom-list">' + customEditorHtml() + "</div>",
             '  <button class="earb" style="margin-top:12px;" onclick="bdgAddCustom()">+ Aggiungi spesa datata</button>',
             "</div>",
-            '<div class="bdg-card bdg-full bdg-card-calendar bdg-card-hl"><div class="bdg-sect">🗓️ Calendario decisionale · mese corrente e successivo</div><p class="bdg-calendar-note">Mostra ricorrenze, spese datate e la data del prossimo stipendio già presenti nel Budget. Il calcolo investibile continua a considerare solo la finestra prima dello stipendio.</p><div class="bdg-calendar" id="bdg-calendar"></div></div>',
-            '<div class="bdg-card bdg-full"><div class="bdg-sect">🚫 Voci fuori dalla finestra Budget</div><div class="bdg-event-list" id="bdg-excluded"></div></div>',
-            '<div class="bdg-card bdg-card-hl">',
-            '  <div class="bdg-sect">🎯 Formula finale</div>',
-            '  <div class="bdg-res-center"><div class="bdg-res-lbl">Capitale investibile oggi</div><div class="bdg-res-val zero" id="bdg-res-val">0,00 €</div><div class="bdg-res-msg" id="bdg-res-msg">Inserisci la tua liquidità</div><div class="bdg-bar"><div class="bdg-bar-fill pos" id="bdg-bar-fill" style="width:0%"></div></div></div>',
-            '  <div class="bdg-formula"><div class="bdg-frow"><span class="bdg-frow-lbl">Liquidità</span><span class="bdg-frow-val liq" id="bdg-f-liq">—</span></div><div class="bdg-frow"><span class="bdg-frow-lbl">– Spese future prima dello stipendio</span><span class="bdg-frow-val neg" id="bdg-f-exp">—</span></div><div class="bdg-frow"><span class="bdg-frow-lbl">– Margine sicurezza</span><span class="bdg-frow-val neg" id="bdg-f-safe">—</span></div><div class="bdg-frow total"><span class="bdg-frow-lbl">= Investibile</span><span class="bdg-frow-val pos" id="bdg-f-inv">—</span></div></div>',
-            '  <div class="bdg-formula-note">Le spese con data uguale o successiva al prossimo stipendio appartengono al periodo successivo.</div>',
-            "</div>",
-            '<div class="bdg-footer">Motore v3: ogni voce viene trasformata in evento datato e filtrata con la regola oggi <= spesa < prossimo stipendio.</div>',
+            '<div class="bdg-footer">Ogni voce viene trasformata in un evento datato e conteggiata solo se cade prima del prossimo stipendio.</div>',
             "</div>",
             "</div>",
           ].join("");
@@ -6142,6 +6130,6 @@
       /* ═════════════════════════════════════════════════════════════════════ */
     </script>
     <script src="WIPS-allocation-lab.js?v=2026-11-05-guided"></script>
-    <script src="WIPS-mobile.js?v=2026-11-05-guided"></script>
+    <script src="WIPS-mobile.js?v=2026-11-26-dashboard"></script>
   </body>
 </html>
