@@ -114,5 +114,15 @@ body.mode-mobile .dash-wrap { padding:0; }
 .dash-axis { margin:14px 62px 8px 0; }
 .dash-axis span { font-size:.62rem; }
 .dash-bars { margin-right:62px; }
+.dash-axis { position:relative; height:28px; }
+.dash-axis button { position:absolute; top:0; transform:translateX(-50%); font:inherit; font-size:.62rem; color:#aebbd5; background:transparent; border:0; padding:6px 2px; cursor:pointer; }
+.dash-axis button.major { color:#e0e8fa; font-weight:700; }
+.dash-axis button[aria-pressed=true] { color:#ffe36e; font-weight:700; }
+.dash-axis button:focus-visible { outline:2px solid #ffe36e; border-radius:4px; }
+.dash-guide-controls { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; color:var(--t2); font-size:.75rem; margin:12px 0; }
+.dash-guide-controls button { background:rgba(255,216,75,.13); color:#ffe36e; border:1px solid rgba(255,216,75,.4); border-radius:8px; padding:8px 12px; cursor:pointer; }
+.dash-compare-wrap { position:relative; }
+.dash-guide-layer { position:absolute; z-index:2; top:0; bottom:0; left:164px; right:256px; pointer-events:none; }
+.dash-guide { position:absolute; top:0; bottom:0; width:2px; background:#ffe05b; box-shadow:0 0 7px rgba(255,224,91,.55); }
 .dash-map-item:hover rect { filter:brightness(1.15); }
 @media (prefers-reduced-motion:reduce) { .dash-map-item rect { transition:none; } }
