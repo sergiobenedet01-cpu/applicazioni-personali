@@ -3432,6 +3432,7 @@
           card.innerHTML = `
       <div class="rc-name">${escHtml(r.name)}</div>
       <div class="rc-tags">${tags.map((t) => `<span class="rc-tag">${escHtml(t)}</span>`).join("")}</div>
+      ${Array.isArray(r.steps) && r.steps.length ? `<details style="margin:.55rem 0;color:var(--muted2);font-size:.76rem"><summary style="cursor:pointer;color:var(--accent)">Ingredienti e preparazione</summary><div style="margin-top:.45rem"><strong>Ingredienti:</strong> ${Object.values(r.ing || {}).flat().map(escHtml).join(", ")}<ol style="padding-left:1.2rem;margin-top:.4rem">${r.steps.map((step) => `<li>${escHtml(step)}</li>`).join("")}</ol></div></details>` : ""}
       <div class="rc-actions">
         <button class="rcb2 rcs" onclick="addRec(${r.id},'single')">👤 Singolo</button>
         <button class="rcb2 rcd" onclick="addRec(${r.id},'double')">👥 Coppia</button>
@@ -3542,7 +3543,7 @@
           return;
         }
         const allIng = Object.values(rec.ing || {}).flat();
-        const text = `📖 ${rec.name}\n\nIngredienti:\n${allIng.map((i) => `• ${i}`).join("\n")}`;
+        const text = `📖 ${rec.name}\n\nIngredienti:\n${allIng.map((i) => `• ${i}`).join("\n")}${Array.isArray(rec.steps) && rec.steps.length ? `\n\nPreparazione:\n${rec.steps.map((step, index) => `${index + 1}. ${step}`).join("\n")}` : ""}`;
         copyText(text).then(() => {
           const orig = btn.textContent;
           btn.textContent = "✓";
